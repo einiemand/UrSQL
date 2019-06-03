@@ -19,7 +19,12 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Errors.hpp" />
+    <ClInclude Include="src\Error.hpp" />
+    <ClInclude Include="src\Keyword.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Error.cpp" />
+    <ClCompile Include="src\Keyword.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

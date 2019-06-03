@@ -1,6 +1,6 @@
 #ifndef ERROR_HPP
 #define ERROR_HPP
-
+#include <iostream>
 #include <xutility>
 
 namespace UrSQL {
@@ -59,6 +59,12 @@ struct StatusResult {
 	}
 };
 
+inline void show_message(const char* const what, std::ostream& output = std::cout) {
+	output << what << '\n';
 }
 
-#endif /* errors */
+void show_error(Error err, const char* const what = nullptr, std::ostream& output = std::cout);
+
+}
+
+#endif /* Error.hpp */
