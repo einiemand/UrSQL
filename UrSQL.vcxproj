@@ -19,9 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\main.cpp" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="src\Errors.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
