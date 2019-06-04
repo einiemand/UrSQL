@@ -49,21 +49,32 @@ enum class Error {
 	no_error = 5000
 };
 
+extern std::ostream& defaultOutput;
 
-struct StatusResult {
-	Error m_code;
+class StatusResult {
+public:
 
-	StatusResult(Error code) : m_code(code) {}
+	StatusResult(Error code, std::string msg = "");
+	~StatusResult() = default;
+
+	StatusResult(const StatusResult&) = delete;
+	StatusResult& operator=(StatusResult&& rhs) noexcept;
+
 	inline operator bool() noexcept {
 		return m_code == Error::no_error;
 	}
+
+	void show_error(std::ostream& output = defaultOutput) const;
+
+private:
+	Error m_code;
+	std::string m_msg;
 };
 
-inline void show_message(const char* const what, std::ostream& output = std::cout) {
+inline void show_message(const char* what, std::ostream& output = defaultOutput) {
 	output << what << '\n';
 }
 
-void show_error(Error err, const char* const what = nullptr, std::ostream& output = std::cout);
 
 }
 

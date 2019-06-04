@@ -31,11 +31,11 @@ enum class Keyword {
 
 bool is_keyword(const char* aWord);
 
+Keyword to_keyword(const char* aWord);
+
 inline bool is_keyword(const std::string& aWord) {
 	return is_keyword(aWord.c_str());
 }
-
-Keyword to_keyword(const char* aWord);
 
 inline Keyword to_keyword(const std::string& aWord) {
 	return to_keyword(aWord.c_str());
