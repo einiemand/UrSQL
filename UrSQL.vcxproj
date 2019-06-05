@@ -21,11 +21,15 @@
   <ItemGroup>
     <ClInclude Include="src\Error.hpp" />
     <ClInclude Include="src\Keyword.hpp" />
+    <ClInclude Include="src\Token.hpp" />
+    <ClInclude Include="src\Tokenizer.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Error.cpp" />
     <ClCompile Include="src\Keyword.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Token.cpp" />
+    <ClCompile Include="src\Tokenizer.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

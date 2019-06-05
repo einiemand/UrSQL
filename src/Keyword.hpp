@@ -5,18 +5,6 @@
 
 namespace UrSQL {
 
-constexpr char left_paren = '(';
-constexpr char right_paren = ')';
-constexpr char left_bracket = '[';
-constexpr char right_bracket = ']';
-constexpr char left_brace = '{';
-constexpr char right_brace = '}';
-constexpr char colon = ':';
-constexpr char comma = ',';
-constexpr char semicolon = ';';
-constexpr char apostrophe = '\'';
-constexpr char quote = '"';
-
 enum class Keyword {
 	add_kw, and_kw, auto_increment_kw, boolean_kw,
 	by_kw, char_kw, create_kw, database_kw, databases_kw,
