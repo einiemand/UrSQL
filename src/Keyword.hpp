@@ -17,17 +17,9 @@ enum class Keyword {
 	where_kw
 };
 
-bool is_keyword(const char* aWord);
+bool is_keyword(const std::string& aWord);
 
-Keyword to_keyword(const char* aWord);
-
-inline bool is_keyword(const std::string& aWord) {
-	return is_keyword(aWord.c_str());
-}
-
-inline Keyword to_keyword(const std::string& aWord) {
-	return to_keyword(aWord.c_str());
-}
+Keyword to_keyword(const std::string& aWord);
 
 }
 #endif /* Keyword.hpp */
