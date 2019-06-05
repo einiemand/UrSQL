@@ -1,6 +1,7 @@
 #pragma once
 #ifndef TOKENIZER_HPP
 #define TOKENIZER_HPP
+#include "Token.hpp"
 #include <istream>
 #include <vector>
 #include <functional>
@@ -8,8 +9,6 @@
 namespace UrSQL {
 
 using size_type = std::size_t;
-
-class Token;
 
 class Tokenizer {
 public:

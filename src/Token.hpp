@@ -7,7 +7,7 @@
 namespace UrSQL {
 
 enum class TokenType {
-	comma, colon, number, operators,
+	comma, colon, number, comparator,
 	lparen, rparen, lbracket, rbracket, lbrace, rbrace,
 	slash, star, equal, plus, minus, keyword,
 	identifier, string, unknown
