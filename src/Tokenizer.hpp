@@ -8,8 +8,6 @@
 
 namespace UrSQL {
 
-using size_type = std::size_t;
-
 class Tokenizer {
 public:
 	using tokenize_condition = std::function<bool(char)>;
