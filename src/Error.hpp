@@ -5,6 +5,8 @@
 
 namespace UrSQL {
 
+using size_type = std::size_t;
+
 enum class Error {
 	//parse related...
 	keyword_expected = 100,
@@ -54,25 +56,27 @@ extern std::ostream& defaultOutput;
 class StatusResult {
 public:
 
-	StatusResult(Error code, std::string msg = "");
+	StatusResult(Error aCode, std::string aMsg = "");
 	~StatusResult() = default;
 
-	StatusResult(const StatusResult&) = delete;
+	StatusResult(StatusResult&& rhs) noexcept;
 	StatusResult& operator=(StatusResult&& rhs) noexcept;
 
 	inline operator bool() noexcept {
 		return m_code == Error::no_error;
 	}
 
-	void show_error(std::ostream& output = defaultOutput) const;
+	void set_error(Error aCode, std::string aMsg) noexcept;
+
+	void show_error() const;
 
 private:
 	Error m_code;
 	std::string m_msg;
 };
 
-inline void show_message(const char* what, std::ostream& output = defaultOutput) {
-	output << what << '\n';
+inline void show_message(const char* what) {
+	defaultOutput << what << '\n';
 }
 
 

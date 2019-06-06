@@ -11,23 +11,32 @@ StatusResult::StatusResult(Error code, std::string msg) :
 {
 }
 
+StatusResult::StatusResult(StatusResult&& rhs) noexcept :
+	m_code(rhs.m_code),
+	m_msg(std::move(rhs.m_msg))
+{
+}
+
 StatusResult& StatusResult::operator=(StatusResult&& rhs) noexcept {
-	if (!rhs) {
-		m_msg = std::move(rhs.m_msg);
-	}
 	m_code = rhs.m_code;
+	m_msg = std::move(rhs.m_msg);
 	return *this;
 }
 
-void StatusResult::show_error(std::ostream& output) const {
+void StatusResult::set_error(Error aCode, std::string aMsg) noexcept {
+	m_code = aCode;
+	m_msg = std::move(aMsg);
+}
+
+void StatusResult::show_error() const {
 	static std::unordered_map<Error, const char*> err2msg{
 
 	};
-	output << err2msg.at(m_code);
+	defaultOutput << err2msg.at(m_code);
 	if (!m_msg.empty()) {
-		output << ": " << m_msg;
+		defaultOutput << ": " << m_msg;
 	}
-	output << '\n';
+	defaultOutput << '\n';
 }
 
 }
