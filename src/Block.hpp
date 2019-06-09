@@ -1,21 +1,10 @@
 #pragma once
 #ifndef BLOCK_HPP
 #define BLOCK_HPP
-#include "Error.hpp"
+#include "Storable.hpp"
 #include <unordered_map>
 
 namespace UrSQL {
-
-class Block;
-
-class Storable {
-public:
-	Storable(const Storable&) = delete;
-	Storable& operator=(const Storable&) = delete;
-
-	virtual void encode(Block& aBlock) const = 0;
-	virtual ~Storable() = 0 {}
-};
 
 enum class BlockType : char {
 	TOC_type = 'C',
@@ -28,28 +17,27 @@ enum class BlockType : char {
 constexpr size_type defaultBlockSize = 1024;
 constexpr size_type defaultPayloadSize = defaultBlockSize - sizeof(BlockType);
 
-using TableNumMap = std::unordered_map<std::string, int32_t>;
+using blocknum_t = int32_t;
 
 class TOC : public Storable {
 public:
+	using TableNumMap = std::unordered_map<std::string, blocknum_t>;
+
 	TOC() = default;
 	~TOC() = default;
 
-	TOC(const TOC&) = delete;
-	TOC& operator=(const TOC&) = delete;
-
-	void encode(Block& aBlock) const override;
-	StatusResult decode(const Block& aBlock);
+	StatusResult encode(Block& aBlock) const override;
+	StatusResult decode(const Block& aBlock) override;
 
 	inline bool table_exists(const std::string& aTableName) const {
 		return m_map.count(aTableName) == 1;
 	}
 
-	int32_t get_blocknum_by_name(const std::string& aTableName) const;
+	blocknum_t get_blocknum_by_name(const std::string& aTableName) const;
 
-	StatusResult add(const std::string& aTableName, int32_t aBlockNum);
+	void add(const std::string& aTableName, blocknum_t aBlockNum);
 
-	StatusResult drop(const std::string& aTableName);
+	void drop(const std::string& aTableName);
 
 private:
 	TableNumMap m_map;
@@ -59,7 +47,7 @@ class Block {
 public:
 	Block();
 	Block(BlockType aType);
-	Block(Storable& aStorable);
+	Block(const Storable& aStorable);
 	~Block() = default;
 
 	Block(const Block& rhs);
@@ -67,6 +55,10 @@ public:
 
 	inline BlockType get_type() const {
 		return m_type;
+	}
+
+	inline void set_type(BlockType aType) {
+		m_type = aType;
 	}
 
 	inline const char* get_data() const {
