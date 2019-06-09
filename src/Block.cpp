@@ -18,10 +18,7 @@ Block::Block(const Storable& aStorable) :
 	m_type(BlockType::free_type),
 	m_data("")
 {
-	StatusResult theResult = aStorable.encode(*this);
-	if (!theResult) {
-		theResult.show_error();
-	}
+	aStorable.encode(*this);
 }
 
 Block::Block(const Block& rhs) :
@@ -36,51 +33,36 @@ Block& Block::operator=(const Block& rhs) noexcept {
 	return *this;
 }
 
-StatusResult TOC::encode(Block& aBlock) const {
+void TOC::encode(Block& aBlock) const {
 	aBlock.set_type(BlockType::TOC_type);
-	StatusResult theResult(Error::no_error);
-	try {
-		BufferWriter theWriter(aBlock.get_data(), defaultPayloadSize);
+	BufferWriter theWriter(aBlock.get_data(), defaultPayloadSize);
 
-		size_type theMapSize = m_map.size();
-		theWriter << theMapSize;
+	size_type theMapSize = m_map.size();
+	theWriter << theMapSize;
 
-		for (const auto& thePair : m_map) {
-			const std::string& theTableName = thePair.first;
-			blocknum_t theBlockNum = thePair.second;
-			theWriter << theTableName << theBlockNum;
-		}
+	for (const auto& thePair : m_map) {
+		const std::string& theTableName = thePair.first;
+		blocknum_t theBlockNum = thePair.second;
+		theWriter << theTableName << theBlockNum;
 	}
-	catch (std::out_of_range&) {
-		theResult.set_error(Error::block_fullData, "Block is full, cannot hold more data from TOC");
-	}
-	return theResult;
+	//theResult.set_error(Error::block_fullData, "Block is full, cannot hold more data from TOC");
 }
 
-StatusResult TOC::decode(const Block& aBlock) {
-	StatusResult theResult(Error::no_error);
-	if (aBlock.get_type() == BlockType::TOC_type) {
-		try {
-			BufferReader theReader(aBlock.get_data(), defaultPayloadSize);
-			size_type theMapSize;
-			theReader >> theMapSize;
-
-			for (; theMapSize > 0; --theMapSize) {
-				std::string theTableName;
-				blocknum_t theBlockNum;
-				theReader >> theTableName >> theBlockNum;
-
-				m_map.insert({ theTableName,theBlockNum });
-			}
-		}
-		catch (std::out_of_range&) {
-			theResult.set_error(Error::block_notEnoughData, "Reached the end of Block data before fully decoding into TOC");
-		}
+void TOC::decode(const Block& aBlock) {
+	if (aBlock.get_type() != BlockType::TOC_type) {
+		throw std::runtime_error("Block type is not TOC!");
 	}
-	else {
-		theResult.set_error(Error::block_invalidType, "Block type is not TOC");
+	BufferReader theReader(aBlock.get_data(), defaultPayloadSize);
+	size_type theMapSize;
+	theReader >> theMapSize;
+
+	for (; theMapSize > 0; --theMapSize) {
+		std::string theTableName;
+		blocknum_t theBlockNum;
+		theReader >> theTableName >> theBlockNum;
+
+		m_map.insert({ theTableName,theBlockNum });
 	}
-	return theResult;
 }
 
 blocknum_t TOC::get_blocknum_by_name(const std::string& aTableName) const {

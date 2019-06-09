@@ -17,37 +17,11 @@ enum class BlockType : char {
 constexpr size_type defaultBlockSize = 1024;
 constexpr size_type defaultPayloadSize = defaultBlockSize - sizeof(BlockType);
 
-using blocknum_t = int32_t;
-
-class TOC : public Storable {
-public:
-	using TableNumMap = std::unordered_map<std::string, blocknum_t>;
-
-	TOC() = default;
-	~TOC() = default;
-
-	StatusResult encode(Block& aBlock) const override;
-	StatusResult decode(const Block& aBlock) override;
-
-	inline bool table_exists(const std::string& aTableName) const {
-		return m_map.count(aTableName) == 1;
-	}
-
-	blocknum_t get_blocknum_by_name(const std::string& aTableName) const;
-
-	void add(const std::string& aTableName, blocknum_t aBlockNum);
-
-	void drop(const std::string& aTableName);
-
-private:
-	TableNumMap m_map;
-};
-
 class Block {
 public:
 	Block();
-	Block(BlockType aType);
-	Block(const Storable& aStorable);
+	explicit Block(BlockType aType);
+	explicit Block(const Storable& aStorable);
 	~Block() = default;
 
 	Block(const Block& rhs);
@@ -71,6 +45,30 @@ public:
 private:
 	BlockType m_type;
 	char m_data[defaultPayloadSize];
+};
+
+class TOC : public Storable {
+public:
+	using TableNumMap = std::unordered_map<std::string, blocknum_t>;
+
+	TOC() = default;
+	~TOC() = default;
+
+	void encode(Block& aBlock) const override;
+	void decode(const Block& aBlock) override;
+
+	inline bool table_exists(const std::string& aTableName) const {
+		return m_map.count(aTableName) == 1;
+	}
+
+	blocknum_t get_blocknum_by_name(const std::string& aTableName) const;
+
+	void add(const std::string& aTableName, blocknum_t aBlockNum);
+
+	void drop(const std::string& aTableName);
+
+private:
+	TableNumMap m_map;
 };
 
 }

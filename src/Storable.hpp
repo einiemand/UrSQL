@@ -6,6 +6,7 @@
 namespace UrSQL {
 
 class Block;
+using blocknum_t = int32_t;
 
 class Storable {
 public:
@@ -14,9 +15,16 @@ public:
 	Storable(const Storable&) = delete;
 	Storable& operator=(const Storable&) = delete;
 
-	virtual StatusResult encode(Block& aBlock) const = 0;
-	virtual StatusResult decode(const Block& aBlock) = 0;
+	virtual void encode(Block& aBlock) const = 0;
+	virtual void decode(const Block& aBlock) = 0;
 	virtual ~Storable() = 0 {}
+
+	inline blocknum_t get_blocknum() const {
+		return m_blocknum;
+	}
+
+protected:
+	blocknum_t m_blocknum;
 };
 
 }
