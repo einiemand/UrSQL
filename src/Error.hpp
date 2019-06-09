@@ -45,6 +45,8 @@ enum class Error {
 	block_invalidType = 600,
 	block_fullData = 610,
 	block_notEnoughData = 620,
+	block_found = 630,
+	block_notFound = 640,
 
 	//command related...
 	unknown_command = 3000,
@@ -69,6 +71,10 @@ public:
 
 	inline operator bool() noexcept {
 		return m_code == Error::no_error;
+	}
+
+	inline Error get_code() const {
+		return m_code;
 	}
 
 	void set_error(Error aCode, std::string aMsg) noexcept;
