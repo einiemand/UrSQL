@@ -29,14 +29,29 @@ size_type Storage::get_block_count() {
 	return total / defaultBlockSize;
 }
 
-blocknum_t Storage::get_free_block_number() {
-	return m_set.empty() ? get_block_count() : *m_set.cbegin();
+StatusResult Storage::get_free_block_number(blocknum_t& aFreeBlockNum) {
+	StatusResult theResult = each_block(
+		[&aFreeBlockNum](Block& aBlock, blocknum_t aBlockNum)->StatusResult {
+			if (aBlock.get_type() == BlockType::free_type) {
+				aFreeBlockNum = aBlockNum;
+				return StatusResult(Error::block_found);
+			}
+			return StatusResult(Error::no_error);
+		}
+	);
+	if (theResult.get_code() == Error::block_found) {
+		return StatusResult(Error::no_error);
+	}
+	if (theResult) {
+		aFreeBlockNum = get_block_count();
+	}
+	return theResult;
 }
 
 StatusResult Storage::setup_toc(const TOC& aTOC) {
 	std::string theFilePath = get_file_path();
 
-	m_file.open(theFilePath, std::fstream::out | std::fstream::trunc | std::fstream::binary);
+	m_file.open(theFilePath, std::fstream::trunc);
 	m_file.close();
 
 	m_file.open(theFilePath, std::fstream::in | std::fstream::out | std::fstream::binary);
@@ -58,7 +73,7 @@ StatusResult Storage::load_toc(TOC& aTOC) {
 
 		StatusResult theResult = read_block(theBlock, 0);
 		if (theResult) {
-			theResult = aTOC.decode(theBlock);
+			aTOC.decode(theBlock);
 		}
 		return theResult;
 	}
@@ -74,7 +89,7 @@ StatusResult Storage::read_block(Block& aBlock, blocknum_t aBlockNum) {
 		}
 	}
 	else {
-		theResult.set_error(Error::read_error, "fstream offset error: " + std::to_string(aBlockNum));
+		theResult.set_error(Error::seek_error, "fstream offset error: " + std::to_string(aBlockNum));
 	}
 	return theResult;
 }
@@ -83,11 +98,26 @@ StatusResult Storage::write_block(const Block& aBlock, blocknum_t aBlockNum) {
 	StatusResult theResult(Error::no_error);
 	if (m_file.seekp(static_cast<int64_t>(aBlockNum) * defaultBlockSize)) {
 		if (!m_file.write(reinterpret_cast<const char*>(&aBlock), defaultBlockSize)) {
-			theResult.set_error(Error::read_error, "unable to write blocks to " + get_file_path());
+			theResult.set_error(Error::write_error, "unable to write blocks to " + get_file_path());
 		}
 	}
 	else {
-		theResult.set_error(Error::read_error, "fstream offset error: " + std::to_string(aBlockNum));
+		theResult.set_error(Error::seek_error, "fstream offset error: " + std::to_string(aBlockNum));
+	}
+	return theResult;
+}
+
+StatusResult Storage::each_block(BlockVisitor aVisitor) {
+	size_type theBlockCnt = get_block_count();
+
+	StatusResult theResult(Error::no_error);
+
+	Block theBlock;
+	for (size_type theBlockNum = 0; theResult && theBlockNum < theBlockCnt; ++theBlockNum) {
+		theResult = read_block(theBlock, theBlockNum);
+		if (theResult) {
+			theResult = aVisitor(theBlock, theBlockNum);
+		}
 	}
 	return theResult;
 }
