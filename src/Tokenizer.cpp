@@ -59,8 +59,9 @@ inline bool is_separator(char aChar) {
 	return is_whitespace(aChar) || is_comparator(aChar) || is_quote(aChar) || is_punctuation(aChar);
 }
 
-void Tokenizer::tokenize() {
-	for (char peek = m_input.peek(); !m_input.eof() && peek != -1; peek = m_input.peek()) {
+StatusResult Tokenizer::tokenize() {
+	StatusResult theResult(Error::no_error);
+	for (char peek = m_input.peek(); theResult && peek != -1; peek = m_input.peek()) {
 		if (is_whitespace(peek)) {
 			m_input.get();
 		}
@@ -92,14 +93,22 @@ void Tokenizer::tokenize() {
 			m_tokens.emplace_back(TokenType::comparator, std::move(theData));
 		}
 		else if (is_quote(peek)) {
-			std::string theData = read_until(is_quote);
-			m_tokens.emplace_back(TokenType::identifier, std::move(theData));
+			m_input.get();
+			std::string theData = read_until(peek);
+			if (m_input.peek() == peek) {
+				m_input.get();
+				m_tokens.emplace_back(TokenType::identifier, std::move(theData));
+			}
+			else {
+				theResult.set_error(Error::syntax_error, "A terminating quote is expected");
+			}
 		}
 		else {
-			std::string theData = read_until(is_separator);
-			m_tokens.emplace_back(TokenType::unknown, std::move(theData));
+			std::string theData = read_until(-1);
+			theResult.set_error(Error::syntax_error, "Unknown command - " + theData);
 		}
 	}
+	return theResult;
 }
 
 std::string Tokenizer::read_while(tokenize_condition aCondition) {

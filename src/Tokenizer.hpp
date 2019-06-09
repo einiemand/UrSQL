@@ -2,6 +2,7 @@
 #ifndef TOKENIZER_HPP
 #define TOKENIZER_HPP
 #include "Token.hpp"
+#include "Error.hpp"
 #include <istream>
 #include <vector>
 #include <functional>
@@ -12,7 +13,7 @@ class Tokenizer {
 public:
 	using tokenize_condition = std::function<bool(char)>;
 
-	Tokenizer(std::istream& anInput);
+	explicit Tokenizer(std::istream& anInput);
 	~Tokenizer() = default;
 
 	Tokenizer(const Tokenizer&) = delete;
@@ -30,10 +31,13 @@ public:
 		return m_tokens[m_index];
 	}
 
-	void tokenize();
+	StatusResult tokenize();
 
 	std::string read_while(tokenize_condition aCondition);
 	std::string read_until(tokenize_condition aCondition);
+	inline std::string read_until(char aChar) {
+		return read_until([aChar](char ch)->bool { return ch == aChar; });
+	}
 
 private:
 	std::istream& m_input;
