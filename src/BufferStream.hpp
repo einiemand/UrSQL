@@ -34,7 +34,7 @@ private:
 
 class BufferReader {
 public:
-	BufferReader(char* aBuf, size_type aSize);
+	BufferReader(const char* aBuf, size_type aSize);
 	~BufferReader() = default;
 
 	BufferReader(const BufferReader&) = delete;
@@ -54,7 +54,7 @@ public:
 	BufferReader& operator>>(std::string& aString);
 
 private:
-	char* m_buf;
+	const char* m_buf;
 	size_type m_pos;
 	size_type m_size;
 };

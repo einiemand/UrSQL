@@ -20,7 +20,7 @@ BufferWriter& BufferWriter::operator<<(const std::string& aString) {
 	throw std::out_of_range("BufferWriter out of range");
 }
 
-BufferReader::BufferReader(char* aBuf, size_type aSize) :
+BufferReader::BufferReader(const char* aBuf, size_type aSize) :
 	m_buf(aBuf),
 	m_pos(0),
 	m_size(aSize)
