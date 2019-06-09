@@ -4,6 +4,7 @@
 #include <fstream>
 #include "Error.hpp"
 #include "Block.hpp"
+#include <set>
 
 namespace UrSQL {
 
@@ -12,8 +13,10 @@ struct CreateNewFile {};
 
 class Storage {
 public:
-	Storage(std::string aFileName, OpenExistingFile);
+	using FreeBlockNumSet = std::set<blocknum_t>;
+
 	Storage(std::string aFileName, CreateNewFile);
+	Storage(std::string aFileName, OpenExistingFile);
 	~Storage() = default;
 
 	Storage(const Storage&) = delete;
@@ -24,16 +27,21 @@ public:
 	}
 
 	std::string get_file_path() const;
-	size_type get_block_count() const;
+	size_type get_block_count();
+	blocknum_t get_free_block_number();
 
-	StatusResult read_block(Block& aBlock, int32_t aBlockNum);
-	StatusResult write_block(const Block& aBlock, int32_t aBlockNum);
+	StatusResult setup_toc(const TOC& aTOC);
+	StatusResult load_toc(TOC& aTOC);
+
+	StatusResult read_block(Block& aBlock, blocknum_t aBlockNum);
+	StatusResult write_block(const Block& aBlock, blocknum_t aBlockNum);
 
 	static const char* default_storage_path;
 	static const char* default_file_extension;
 private:
 	std::string m_name;
 	std::fstream m_file;
+	FreeBlockNumSet m_set;
 };
 
 }

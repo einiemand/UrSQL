@@ -72,7 +72,7 @@ void Tokenizer::tokenize() {
 				m_tokens.emplace_back(TokenType::keyword, theLowerCaseData, to_keyword(theLowerCaseData));
 			}
 			else {
-				m_tokens.emplace_back(TokenType::identifier, theData);
+				m_tokens.emplace_back(TokenType::identifier, std::move(theData));
 			}
 		}
 		else if (is_punctuation(peek)) {
@@ -92,7 +92,7 @@ void Tokenizer::tokenize() {
 			m_tokens.emplace_back(TokenType::comparator, std::move(theData));
 		}
 		else if (is_quote(peek)) {
-			std::string theData = read_while(is_quote);
+			std::string theData = read_until(is_quote);
 			m_tokens.emplace_back(TokenType::identifier, std::move(theData));
 		}
 		else {
