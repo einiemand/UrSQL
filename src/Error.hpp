@@ -41,6 +41,11 @@ enum class Error {
 	seek_error = 520,
 	storage_full = 530,
 
+	//block related...
+	block_invalidType = 600,
+	block_fullData = 610,
+	block_notEnoughData = 620,
+
 	//command related...
 	unknown_command = 3000,
 	invalid_command = 3010,
