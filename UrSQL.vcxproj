@@ -19,15 +19,26 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Block.hpp" />
+    <ClInclude Include="src\BufferStream.hpp" />
+    <ClInclude Include="src\Database.hpp" />
     <ClInclude Include="src\Error.hpp" />
     <ClInclude Include="src\Keyword.hpp" />
+    <ClInclude Include="src\Storable.hpp" />
+    <ClInclude Include="src\Storage.hpp" />
+    <ClInclude Include="src\Table.hpp" />
     <ClInclude Include="src\Token.hpp" />
     <ClInclude Include="src\Tokenizer.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Block.cpp" />
+    <ClCompile Include="src\BufferStream.cpp" />
+    <ClCompile Include="src\Database.cpp" />
     <ClCompile Include="src\Error.cpp" />
     <ClCompile Include="src\Keyword.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Storage.cpp" />
+    <ClCompile Include="src\Table.cpp" />
     <ClCompile Include="src\Token.cpp" />
     <ClCompile Include="src\Tokenizer.cpp" />
   </ItemGroup>
