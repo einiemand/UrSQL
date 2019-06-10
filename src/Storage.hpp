@@ -23,7 +23,7 @@ public:
 	Storage(const Storage&) = delete;
 	Storage& operator=(const Storage&) = delete;
 
-	inline bool ready() const {
+	inline bool storage_ready() const {
 		return m_file.is_open();
 	}
 
