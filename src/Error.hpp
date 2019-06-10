@@ -48,6 +48,9 @@ enum class Error {
 	block_found = 630,
 	block_notFound = 640,
 
+	//foler related...
+	folder_notExist = 700,
+
 	//command related...
 	unknown_command = 3000,
 	invalid_command = 3010,
