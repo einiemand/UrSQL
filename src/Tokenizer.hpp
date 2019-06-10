@@ -11,7 +11,7 @@ namespace UrSQL {
 
 class Tokenizer {
 public:
-	using tokenize_condition = std::function<bool(char)>;
+	using TokenizeCondition = std::function<bool(char)>;
 
 	explicit Tokenizer(std::istream& anInput);
 	~Tokenizer() = default;
@@ -23,18 +23,17 @@ public:
 		return m_index < m_tokens.size();
 	}
 
-	inline void next(size_type anOffset = 1) {
-		m_index += anOffset;
+	inline size_type size() const {
+		return m_tokens.size();
 	}
 
-	inline Token& current() {
-		return m_tokens[m_index];
-	}
+	Token& peek();
+	Token& get();
 
 	StatusResult tokenize();
 
-	std::string read_while(tokenize_condition aCondition);
-	std::string read_until(tokenize_condition aCondition);
+	std::string read_while(TokenizeCondition aCondition);
+	std::string read_until(TokenizeCondition aCondition);
 	inline std::string read_until(char aChar) {
 		return read_until([aChar](char ch)->bool { return ch == aChar; });
 	}
