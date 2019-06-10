@@ -30,7 +30,16 @@ void StatusResult::set_error(Error aCode, std::string aMsg) noexcept {
 
 void StatusResult::show_error() const {
 	static std::unordered_map<Error, const char*> err2msg{
-
+		{ Error::read_error,"Read error" },
+		{ Error::write_error,"Write error" },
+		{ Error::seek_error,"File seek error" },
+		{ Error::block_invalidType,"Block type is invalid" },
+		{ Error::block_fullData,"Block is full" },
+		{ Error::block_notEnoughData,"Block didn't hold enough data to be parsed" },
+		{ Error::folder_notExist,"Folder doesn't exist" },
+		{ Error::unknown_command,"Unknown command" },
+		{ Error::invalid_command,"Invalid command" },
+		{ Error::not_implemented,"Functionality not implemented yet" }
 	};
 	defaultOutput << err2msg.at(m_code);
 	if (!m_msg.empty()) {
