@@ -19,7 +19,7 @@ Tokenizer::Tokenizer(std::istream& anInput) :
 }
 
 inline bool is_whitespace(char aChar) {
-	return strchr(" \t\r\n\b", aChar) != nullptr;
+	return std::isspace(aChar);
 }
 
 inline bool is_alpha(char aChar) {
@@ -57,6 +57,19 @@ TokenType get_punctuation_type(char aChar) {
 
 inline bool is_separator(char aChar) {
 	return is_whitespace(aChar) || is_comparator(aChar) || is_quote(aChar) || is_punctuation(aChar);
+}
+
+Token& Tokenizer::peek() {
+	if (more()) {
+		return m_tokens.front();
+	}
+	throw std::out_of_range("Check if there are more tokens before peeking!");
+}
+
+Token& Tokenizer::get() {
+	Token& theToken = peek();
+	++m_index;
+	return theToken;
 }
 
 StatusResult Tokenizer::tokenize() {
@@ -111,7 +124,7 @@ StatusResult Tokenizer::tokenize() {
 	return theResult;
 }
 
-std::string Tokenizer::read_while(tokenize_condition aCondition) {
+std::string Tokenizer::read_while(TokenizeCondition aCondition) {
 	std::string theData;
 	for (char theChar = m_input.peek(); theChar != -1 && aCondition(theChar); theChar = m_input.peek()) {
 		theData += m_input.get();
@@ -119,7 +132,7 @@ std::string Tokenizer::read_while(tokenize_condition aCondition) {
 	return theData;
 }
 
-std::string Tokenizer::read_until(tokenize_condition aCondition) {
+std::string Tokenizer::read_until(TokenizeCondition aCondition) {
 	std::string theData;
 	for (char theChar = m_input.peek(); theChar != -1 && !aCondition(theChar); theChar = m_input.peek()) {
 		theData += m_input.get();
