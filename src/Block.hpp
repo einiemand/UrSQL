@@ -19,12 +19,11 @@ constexpr size_type defaultPayloadSize = defaultBlockSize - sizeof(BlockType);
 
 class Block {
 public:
-	Block();
-	explicit Block(BlockType aType);
+	explicit Block(BlockType aType = BlockType::free_type);
 	explicit Block(const Storable& aStorable);
 	~Block() = default;
 
-	Block(const Block& rhs);
+	Block(const Block& rhs) noexcept;
 	Block& operator=(const Block& rhs) noexcept;
 
 	inline BlockType get_type() const {
@@ -47,15 +46,17 @@ private:
 	char m_data[defaultPayloadSize];
 };
 
+static_assert(sizeof(Block) == defaultBlockSize);
+
 class TOC : public Storable {
 public:
 	using TableNumMap = std::unordered_map<std::string, blocknum_t>;
 
-	TOC() = default;
+	TOC();
 	~TOC() = default;
 
 	void encode(Block& aBlock) const override;
-	void decode(const Block& aBlock) override;
+	void decode(const Block& aBlock, blocknum_t aBlockNum) override;
 
 	inline bool table_exists(const std::string& aTableName) const {
 		return m_map.count(aTableName) == 1;

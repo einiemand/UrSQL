@@ -3,11 +3,6 @@
 
 namespace UrSQL {
 
-Block::Block() :
-	Block(BlockType::free_type)
-{
-}
-
 Block::Block(BlockType aType) :
 	m_type(aType),
 	m_data("")
@@ -21,7 +16,7 @@ Block::Block(const Storable& aStorable) :
 	aStorable.encode(*this);
 }
 
-Block::Block(const Block& rhs) :
+Block::Block(const Block& rhs) noexcept :
 	m_type(rhs.m_type)
 {
 	memcpy(m_data, rhs.m_data, defaultPayloadSize);
@@ -31,6 +26,11 @@ Block& Block::operator=(const Block& rhs) noexcept {
 	m_type = rhs.m_type;
 	memcpy(m_data, rhs.m_data, defaultPayloadSize);
 	return *this;
+}
+
+TOC::TOC() :
+	Storable(0)
+{
 }
 
 void TOC::encode(Block& aBlock) const {
@@ -48,10 +48,12 @@ void TOC::encode(Block& aBlock) const {
 	//theResult.set_error(Error::block_fullData, "Block is full, cannot hold more data from TOC");
 }
 
-void TOC::decode(const Block& aBlock) {
+void TOC::decode(const Block& aBlock, blocknum_t aBlockNum) {
 	if (aBlock.get_type() != BlockType::TOC_type) {
 		throw std::runtime_error("Block type is not TOC!");
 	}
+	set_blocknum(aBlockNum);
+
 	BufferReader theReader(aBlock.get_data(), defaultPayloadSize);
 	size_type theMapSize;
 	theReader >> theMapSize;
