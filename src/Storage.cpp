@@ -56,9 +56,9 @@ StatusResult Storage::setup_toc(const TOC& aTOC) {
 
 	m_file.open(theFilePath, std::fstream::in | std::fstream::out | std::fstream::binary);
 
-	if (ready()) {
+	if (storage_ready()) {
 		Block theBlock(aTOC);
-		return write_block(theBlock, 0);
+		return write_block(theBlock, aTOC.get_blocknum());
 	}
 
 	return StatusResult(Error::write_error, "file " + m_name + " cannot be opened");
@@ -68,12 +68,12 @@ StatusResult Storage::load_toc(TOC& aTOC) {
 	std::string theFilePath = get_file_path();
 	m_file.open(theFilePath, std::fstream::in | std::fstream::out | std::fstream::binary);
 
-	if (ready()) {
+	if (storage_ready()) {
 		Block theBlock;
 
 		StatusResult theResult = read_block(theBlock, 0);
 		if (theResult) {
-			aTOC.decode(theBlock);
+			aTOC.decode(theBlock, 0);
 		}
 		return theResult;
 	}
