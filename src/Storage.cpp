@@ -61,7 +61,7 @@ StatusResult Storage::setup_toc(const TOC& aTOC) {
 		return write_block(theBlock, aTOC.get_blocknum());
 	}
 
-	return StatusResult(Error::write_error, "file " + m_name + " cannot be opened");
+	return StatusResult(Error::write_error, "file '" + m_name + "' cannot be opened");
 }
 
 StatusResult Storage::load_toc(TOC& aTOC) {
@@ -78,14 +78,14 @@ StatusResult Storage::load_toc(TOC& aTOC) {
 		return theResult;
 	}
 
-	return StatusResult(Error::read_error, "file " + m_name + " cannot be opened");
+	return StatusResult(Error::read_error, "file '" + m_name + "' cannot be opened");
 }
 
 StatusResult Storage::read_block(Block& aBlock, blocknum_t aBlockNum) {
 	StatusResult theResult(Error::no_error);
 	if (m_file.seekg(static_cast<int64_t>(aBlockNum) * defaultBlockSize)) {
 		if (!m_file.read(reinterpret_cast<char*>(&aBlock), defaultBlockSize)) {
-			theResult.set_error(Error::read_error, "unable to read blocks from " + get_file_path());
+			theResult.set_error(Error::read_error, "unable to read blocks from '" + get_file_path() + '\'');
 		}
 	}
 	else {
@@ -98,7 +98,7 @@ StatusResult Storage::write_block(const Block& aBlock, blocknum_t aBlockNum) {
 	StatusResult theResult(Error::no_error);
 	if (m_file.seekp(static_cast<int64_t>(aBlockNum) * defaultBlockSize)) {
 		if (!m_file.write(reinterpret_cast<const char*>(&aBlock), defaultBlockSize)) {
-			theResult.set_error(Error::write_error, "unable to write blocks to " + get_file_path());
+			theResult.set_error(Error::write_error, "unable to write blocks to '" + get_file_path() + '\'');
 		}
 	}
 	else {

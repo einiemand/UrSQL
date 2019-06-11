@@ -118,7 +118,7 @@ StatusResult Tokenizer::tokenize() {
 		}
 		else {
 			std::string theData = read_until(-1);
-			theResult.set_error(Error::syntax_error, "Unknown command - " + theData);
+			theResult.set_error(Error::syntax_error, "Unknown command - '" + theData + '\'');
 		}
 	}
 	return theResult;

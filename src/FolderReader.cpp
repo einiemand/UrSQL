@@ -18,7 +18,7 @@ StatusResult FolderReader::each_file(FileVisitor aVisitor) const {
 		}
 		return StatusResult(Error::no_error);
 	}
-	return StatusResult(Error::folder_notExist, "Folder " + m_path + " doesn't exist");
+	return StatusResult(Error::folder_notExist, "Folder '" + m_path + "' doesn't exist");
 }
 
 
