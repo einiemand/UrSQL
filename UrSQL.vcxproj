@@ -23,6 +23,7 @@
     <ClInclude Include="src\Block.hpp" />
     <ClInclude Include="src\BufferStream.hpp" />
     <ClInclude Include="src\Database.hpp" />
+    <ClInclude Include="src\DBManager.hpp" />
     <ClInclude Include="src\Error.hpp" />
     <ClInclude Include="src\FolderReader.hpp" />
     <ClInclude Include="src\Interpreter.hpp" />
@@ -31,21 +32,26 @@
     <ClInclude Include="src\Storable.hpp" />
     <ClInclude Include="src\Storage.hpp" />
     <ClInclude Include="src\Table.hpp" />
+    <ClInclude Include="src\TOC.hpp" />
     <ClInclude Include="src\Token.hpp" />
     <ClInclude Include="src\Tokenizer.hpp" />
+    <ClInclude Include="src\Util.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\BasicProcessor.cpp" />
     <ClCompile Include="src\Block.cpp" />
     <ClCompile Include="src\BufferStream.cpp" />
     <ClCompile Include="src\Database.cpp" />
+    <ClCompile Include="src\DBManager.cpp" />
     <ClCompile Include="src\Error.cpp" />
     <ClCompile Include="src\FolderReader.cpp" />
     <ClCompile Include="src\Keyword.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Statement.cpp" />
+    <ClCompile Include="src\Storable.cpp" />
     <ClCompile Include="src\Storage.cpp" />
     <ClCompile Include="src\Table.cpp" />
+    <ClCompile Include="src\TOC.cpp" />
     <ClCompile Include="src\Token.cpp" />
     <ClCompile Include="src\Tokenizer.cpp" />
   </ItemGroup>
