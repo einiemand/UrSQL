@@ -1,4 +1,5 @@
 #include "Storage.hpp"
+#include "TOC.hpp"
 #include <string>
 #include <sstream>
 
