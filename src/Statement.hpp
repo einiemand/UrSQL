@@ -10,9 +10,7 @@ class Tokenizer;
 
 class Statement {
 public:
-	Statement(Tokenizer& aTokenizer) : m_tokenizer(aTokenizer)
-	{
-	}
+	Statement(Tokenizer& aTokenizer);
 
 	Statement(const Statement&) = delete;
 	Statement& operator=(const Statement&) = delete;

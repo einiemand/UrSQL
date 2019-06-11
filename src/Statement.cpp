@@ -3,6 +3,11 @@
 
 namespace UrSQL {
 
+Statement::Statement(Tokenizer& aTokenizer) :
+	m_tokenizer(aTokenizer)
+{
+}
+
 BasicStatement::BasicStatement(Tokenizer& aTokenizer, Keyword aKeyword) :
 	Statement(aTokenizer),
 	m_keyword(aKeyword)
@@ -14,7 +19,7 @@ StatusResult BasicStatement::parse() {
 }
 
 StatusResult BasicStatement::validate() const {
-	return m_tokenizer.size() <= 1 ? StatusResult(Error::no_error) :
+	return m_tokenizer.remaining() == 1 ? StatusResult(Error::no_error) :
 		StatusResult(Error::invalid_command, "Redundant input after '" + m_tokenizer.peek().get_data() + '\'');
 }
 
