@@ -30,6 +30,7 @@ void StatusResult::set_error(Error aCode, std::string aMsg) noexcept {
 
 void StatusResult::show_error() const {
 	static std::unordered_map<Error, const char*> err2msg{
+		{ Error::syntax_error,"Syntax error" },
 		{ Error::read_error,"Read error" },
 		{ Error::write_error,"Write error" },
 		{ Error::seek_error,"File seek error" },
