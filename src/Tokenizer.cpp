@@ -59,9 +59,10 @@ inline bool is_separator(char aChar) {
 	return is_whitespace(aChar) || is_comparator(aChar) || is_quote(aChar) || is_punctuation(aChar);
 }
 
-Token& Tokenizer::peek() {
-	if (more()) {
-		return m_tokens.front();
+Token& Tokenizer::peek(size_type anOffset) {
+	size_type thePos = m_index + anOffset;
+	if (remaining() > thePos) {
+		return m_tokens[thePos];
 	}
 	throw std::out_of_range("Check if there are more tokens before peeking!");
 }

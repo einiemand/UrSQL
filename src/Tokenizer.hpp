@@ -23,11 +23,11 @@ public:
 		return m_index < m_tokens.size();
 	}
 
-	inline size_type size() const {
-		return m_tokens.size();
+	inline size_type remaining() const {
+		return m_tokens.size() - m_index;
 	}
 
-	Token& peek();
+	Token& peek(size_type anOffset = 0);
 	Token& get();
 
 	StatusResult tokenize();
