@@ -3,8 +3,6 @@
 
 namespace UrSQL {
 
-
-
 FolderReader::FolderReader(std::string aPath) :
 	m_path(std::move(aPath))
 {
