@@ -1,11 +1,9 @@
 #ifndef ERROR_HPP
 #define ERROR_HPP
+#include "Util.hpp"
 #include <iostream>
-#include <xutility>
 
 namespace UrSQL {
-
-using size_type = std::size_t;
 
 enum class Error {
 	//parse related...

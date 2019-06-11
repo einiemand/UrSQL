@@ -5,8 +5,6 @@
 
 namespace UrSQL {
 
-using size_type = std::size_t;
-
 enum class Keyword {
 	add_kw, and_kw, auto_increment_kw, boolean_kw,
 	by_kw, char_kw, create_kw, database_kw, databases_kw,
