@@ -1,9 +1,8 @@
 #pragma once
 #ifndef STORAGE_HPP
 #define STORAGE_HPP
-#include <fstream>
 #include "Error.hpp"
-#include "Block.hpp"
+#include <fstream>
 #include <set>
 #include <functional>
 
@@ -11,6 +10,9 @@ namespace UrSQL {
 
 struct OpenExistingFile {};
 struct CreateNewFile {};
+
+class Block;
+class TOC;
 
 class Storage {
 public:
