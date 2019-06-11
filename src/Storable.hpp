@@ -2,24 +2,35 @@
 #ifndef STORABLE_HPP
 #define STORABLE_HPP
 #include "Error.hpp"
+#include "Block.hpp"
 
 namespace UrSQL {
 
-class Block;
-using blocknum_t = int32_t;
+class BufferWriter;
+class BufferReader;
 
 class Storable {
 public:
-	Storable(blocknum_t aBlockNum = -1) : m_blocknum(aBlockNum)
-	{
-	}
+	Storable() = default;
 
 	Storable(const Storable&) = delete;
 	Storable& operator=(const Storable&) = delete;
 
-	virtual void encode(Block& aBlock) const = 0;
-	virtual void decode(const Block& aBlock, blocknum_t aBlockNum) = 0;
-	virtual ~Storable() = 0 {}
+	virtual void serialize(BufferWriter& aWriter) const = 0;
+	virtual void deserialize(BufferReader& aReader) = 0;
+	virtual ~Storable() = default;
+};
+
+
+class MonoStorable : public Storable {
+public:
+	MonoStorable(blocknum_t aBlockNum = -1);
+	~MonoStorable() override = default;
+
+	virtual BlockType expected_block_type() const = 0;
+
+	void encode(Block& aBlock) const;
+	void decode(const Block& aBlock, blocknum_t aBlockNum);
 
 	inline blocknum_t get_blocknum() const {
 		return m_blocknum;
