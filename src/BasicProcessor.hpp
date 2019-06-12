@@ -10,7 +10,7 @@ public:
 	BasicProcessor(Interpreter* anInterpreter = nullptr);
 	~BasicProcessor() = default;
 
-	std::unique_ptr<Statement> get_statement(Tokenizer& aTokenizer) const override;
+	std::unique_ptr<Statement> get_statement(Tokenizer& aTokenizer) override;
 
 };
 
