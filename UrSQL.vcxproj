@@ -24,6 +24,7 @@
     <ClInclude Include="src\BufferStream.hpp" />
     <ClInclude Include="src\Database.hpp" />
     <ClInclude Include="src\DBManager.hpp" />
+    <ClInclude Include="src\DBStatement.hpp" />
     <ClInclude Include="src\Error.hpp" />
     <ClInclude Include="src\FolderReader.hpp" />
     <ClInclude Include="src\Interpreter.hpp" />
@@ -43,6 +44,7 @@
     <ClCompile Include="src\BufferStream.cpp" />
     <ClCompile Include="src\Database.cpp" />
     <ClCompile Include="src\DBManager.cpp" />
+    <ClCompile Include="src\DBStatement.cpp" />
     <ClCompile Include="src\Error.cpp" />
     <ClCompile Include="src\FolderReader.cpp" />
     <ClCompile Include="src\Keyword.cpp" />
