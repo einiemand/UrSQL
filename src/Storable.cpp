@@ -16,12 +16,12 @@ void MonoStorable::encode(Block& aBlock) const {
 }
 
 void MonoStorable::decode(const Block& aBlock, blocknum_t aBlockNum) {
-	if (expected_block_type() == aBlock.get_type()) {
-		set_blocknum(aBlockNum);
-		BufferReader theReader(aBlock.get_data(), defaultBlockSize);
-		deserialize(theReader);
+	if (expected_block_type() != aBlock.get_type()) {
+		throw std::runtime_error("Block type is NOT correct!");
 	}
-	throw std::runtime_error("Block type is NOT correct!");
+	set_blocknum(aBlockNum);
+	BufferReader theReader(aBlock.get_data(), defaultBlockSize);
+	deserialize(theReader);
 }
 
 }
