@@ -59,18 +59,38 @@ inline bool is_separator(char aChar) {
 	return is_whitespace(aChar) || is_comparator(aChar) || is_quote(aChar) || is_punctuation(aChar);
 }
 
-Token& Tokenizer::peek(size_type anOffset) {
-	size_type thePos = m_index + anOffset;
-	if (remaining() > thePos) {
-		return m_tokens[thePos];
+const Token& Tokenizer::peek(size_type anOffset) {
+	if (remaining() > anOffset) {
+		return m_tokens[m_index + anOffset];
 	}
 	throw std::out_of_range("Check if there are more tokens before peeking!");
 }
 
-Token& Tokenizer::get() {
-	Token& theToken = peek();
+const Token& Tokenizer::get() {
+	const Token& theToken = peek();
 	++m_index;
 	return theToken;
+}
+
+bool Tokenizer::next(size_type anOffset) {
+	m_index += anOffset;
+	return more();
+}
+
+bool Tokenizer::skip_if(TokenType aType) {
+	if (more() && peek().get_type() == aType) {
+		next();
+		return true;
+	}
+	return false;
+}
+
+bool Tokenizer::skip_if(Keyword aKeyword) {
+	if (more() && peek().get_keyword() == aKeyword) {
+		next();
+		return true;
+	}
+	return false;
 }
 
 StatusResult Tokenizer::tokenize() {
@@ -80,7 +100,7 @@ StatusResult Tokenizer::tokenize() {
 			m_input.get();
 		}
 		else if (is_alpha(peek)) {
-			std::string theData = read_until(is_separator);
+			std::string theData = _read_until(is_separator);
 			std::string theLowerCaseData(theData);
 			std::transform(theLowerCaseData.begin(), theLowerCaseData.end(), theLowerCaseData.begin(), ::tolower);
 			if (is_keyword(theLowerCaseData)) {
@@ -95,7 +115,7 @@ StatusResult Tokenizer::tokenize() {
 			m_tokens.emplace_back(theType, std::string(1, m_input.get()));
 		}
 		else if (is_number(peek)) {
-			std::string theData = read_until(is_separator);
+			std::string theData = _read_until(is_separator);
 			TokenType theType = TokenType::number;
 			if (!std::all_of(theData.cbegin(), theData.cend(), is_number)) {
 				theType = TokenType::identifier;
@@ -103,12 +123,12 @@ StatusResult Tokenizer::tokenize() {
 			m_tokens.emplace_back(theType, std::move(theData));
 		}
 		else if (is_comparator(peek)) {
-			std::string theData = read_while(is_comparator);
+			std::string theData = _read_while(is_comparator);
 			m_tokens.emplace_back(TokenType::comparator, std::move(theData));
 		}
 		else if (is_quote(peek)) {
 			m_input.get();
-			std::string theData = read_until(peek);
+			std::string theData = _read_until(peek);
 			if (m_input.peek() == peek) {
 				m_input.get();
 				m_tokens.emplace_back(TokenType::identifier, std::move(theData));
@@ -118,14 +138,14 @@ StatusResult Tokenizer::tokenize() {
 			}
 		}
 		else {
-			std::string theData = read_until(-1);
+			std::string theData = _read_until(-1);
 			theResult.set_error(Error::syntax_error, "Unknown command - '" + theData + '\'');
 		}
 	}
 	return theResult;
 }
 
-std::string Tokenizer::read_while(TokenizeCondition aCondition) {
+std::string Tokenizer::_read_while(TokenizeCondition aCondition) {
 	std::string theData;
 	for (char theChar = m_input.peek(); theChar != -1 && aCondition(theChar); theChar = m_input.peek()) {
 		theData += m_input.get();
@@ -133,7 +153,7 @@ std::string Tokenizer::read_while(TokenizeCondition aCondition) {
 	return theData;
 }
 
-std::string Tokenizer::read_until(TokenizeCondition aCondition) {
+std::string Tokenizer::_read_until(TokenizeCondition aCondition) {
 	std::string theData;
 	for (char theChar = m_input.peek(); theChar != -1 && !aCondition(theChar); theChar = m_input.peek()) {
 		theData += m_input.get();

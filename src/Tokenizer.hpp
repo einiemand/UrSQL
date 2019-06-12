@@ -27,21 +27,25 @@ public:
 		return m_tokens.size() - m_index;
 	}
 
-	Token& peek(size_type anOffset = 0);
-	Token& get();
+	const Token& peek(size_type anOffset = 0);
+	const Token& get();
+	bool next(size_type anOffset = 1);
+
+	bool skip_if(TokenType aType);
+	bool skip_if(Keyword aKeyword);
 
 	StatusResult tokenize();
-
-	std::string read_while(TokenizeCondition aCondition);
-	std::string read_until(TokenizeCondition aCondition);
-	inline std::string read_until(char aChar) {
-		return read_until([aChar](char ch)->bool { return ch == aChar; });
-	}
 
 private:
 	std::istream& m_input;
 	std::vector<Token> m_tokens;
 	size_type m_index;
+
+	std::string _read_while(TokenizeCondition aCondition);
+	std::string _read_until(TokenizeCondition aCondition);
+	inline std::string _read_until(char aChar) {
+		return _read_until([aChar](char ch)->bool { return ch == aChar; });
+	}
 };
 
 } /* UrSQL */
