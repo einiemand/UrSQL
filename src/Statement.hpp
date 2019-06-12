@@ -18,7 +18,7 @@ public:
 	virtual StatusResult parse() = 0;
 	virtual StatusResult validate() const = 0;
 	virtual StatusResult run() const = 0;
-	virtual ~Statement() = 0 {}
+	virtual ~Statement() = default;
 protected:
 	Tokenizer& m_tokenizer;
 };
