@@ -1,6 +1,8 @@
 #include "Error.hpp"
 #include "Tokenizer.hpp"
 #include "BasicProcessor.hpp"
+#include "DBManager.hpp"
+#include "Database.hpp"
 #include <sstream>
 #include <algorithm>
 
@@ -13,7 +15,8 @@ int main(int argc, char* argv[])
 {
 	using namespace UrSQL;
 	static const char* const thePrevMark = "\n> ";
-	BasicProcessor theBasicProcessor;
+	DBManager theDBManager;
+	BasicProcessor theBasicProcessor(&theDBManager);
 
 	StatusResult theResult(Error::no_error);
 	while (theResult.get_code() != Error::user_terminated) {
@@ -28,7 +31,7 @@ int main(int argc, char* argv[])
 				if (theResult) {
 					theResult = theBasicProcessor.process_input(theTokenizer);
 				}
-				if (!theResult && theResult.get_code() != Error::user_terminated) {
+				if (theResult.get_code() != Error::user_terminated) {
 					theResult.show_error();
 				}
 			}
