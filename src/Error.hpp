@@ -38,6 +38,7 @@ enum class Error {
 	write_error = 510,
 	seek_error = 520,
 	storage_full = 530,
+	delete_error = 540,
 
 	//block related...
 	block_invalidType = 600,
@@ -80,6 +81,10 @@ public:
 
 	void set_error(Error aCode, std::string aMsg) noexcept;
 
+	inline void set_message(std::string aMsg) noexcept {
+		set_error(get_code(), std::move(aMsg));
+	}
+
 	void show_error() const;
 
 private:
@@ -87,9 +92,7 @@ private:
 	std::string m_msg;
 };
 
-inline void show_message(const char* what) {
-	defaultOutput << what << '\n';
-}
+void show_message(const char* what);
 
 
 }
