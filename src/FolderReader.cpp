@@ -11,12 +11,18 @@ FolderReader::FolderReader(std::string aPath) :
 StatusResult FolderReader::each_file(FileVisitor aVisitor) const {
 	if (std::filesystem::exists(m_path)) {
 		for (const auto& theEntry : std::filesystem::directory_iterator(m_path)) {
-			std::string theFilePath = theEntry.path().generic_string();
-			aVisitor(theFilePath);
+			std::string theFileName = theEntry.path().generic_string();
+			size_type thePos = theFileName.rfind('/');
+			if (std::string::npos != thePos) {
+				theFileName.erase(0, thePos + 1);
+			}
+			if (!aVisitor(theFileName)) {
+				break;
+			}
 		}
 		return StatusResult(Error::no_error);
 	}
-	return StatusResult(Error::folder_notExist, "Folder '" + m_path + "' doesn't exist");
+	return StatusResult(Error::folder_notExist, '\'' + m_path + '\'');
 }
 
 

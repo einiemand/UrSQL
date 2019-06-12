@@ -9,7 +9,7 @@ namespace UrSQL {
 
 class FolderReader {
 public:
-	using FileVisitor = std::function<void(const std::string&)>;
+	using FileVisitor = std::function<bool(const std::string&)>;
 
 	FolderReader(std::string aPath);
 	~FolderReader() = default;
