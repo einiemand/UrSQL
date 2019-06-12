@@ -20,8 +20,8 @@ public:
 	Interpreter(const Interpreter&) = delete;
 	Interpreter& operator=(const Interpreter&) = delete;
 
-	virtual std::unique_ptr<Statement> get_statement(Tokenizer& aTokenizer) const = 0;
-	virtual ~Interpreter() = 0 {}
+	virtual std::unique_ptr<Statement> get_statement(Tokenizer& aTokenizer) = 0;
+	virtual ~Interpreter() = default;
 
 	StatusResult process_input(Tokenizer& aTokenizer) {
 		if (auto theStatement = get_statement(aTokenizer)) {
@@ -36,7 +36,7 @@ public:
 		}
 
 		return m_next ? m_next->process_input(aTokenizer) :
-			StatusResult(Error::unknown_command, "A valid command should start with a keyword");
+			StatusResult(Error::unknown_command, "Enter 'help' to get familiar with this clumsy DB engine.");
 	}
 
 	virtual Database* get_active_database() const {
