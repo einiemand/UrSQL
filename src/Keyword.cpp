@@ -13,6 +13,7 @@ const std::unordered_map<std::string, Keyword> str2keyword{
 	{ "database",  Keyword::database_kw },
 	{ "databases", Keyword::databases_kw },
 	{ "delete",    Keyword::delete_kw },
+	{ "desc",      Keyword::describe_kw },
 	{ "describe",  Keyword::describe_kw },
 	{ "double",    Keyword::double_kw },
 	{ "drop",      Keyword::drop_kw },
