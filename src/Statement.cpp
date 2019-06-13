@@ -28,9 +28,9 @@ StatusResult BasicStatement::run() const {
 	switch (m_keyword) {
 	case Keyword::help_kw: {
 		static const std::string theHelpMsg = 
-			"help    - show guide on how to use UrSQL.\n"
-			"version - show UrSQL version.\n"
-			"quit    - quit UrSQL.";
+			"help    - show guide on how to use UrSQL\n"
+			"version - show UrSQL version\n"
+			"quit    - quit UrSQL";
 		theResult.set_message(theHelpMsg);
 		break;
 	}
@@ -40,7 +40,7 @@ StatusResult BasicStatement::run() const {
 		break;
 	}
 	case Keyword::quit_kw: {
-		theResult.set_error(Error::user_terminated, "Bye.");
+		theResult.set_error(Error::user_terminated, "Bye");
 		break;
 	}
 	default:
