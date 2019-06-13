@@ -130,4 +130,22 @@ StatusResult UseDBStatement::run() const {
 	return m_manager.use_database(m_dbname);
 }
 
+/* -------------------------------ShowDBStatement------------------------------- */
+ShowDBStatement::ShowDBStatement(Tokenizer& aTokenizer, DBManager& aDBManager) :
+	DBStatement(aTokenizer, aDBManager)
+{
+}
+
+StatusResult ShowDBStatement::parse() {
+	return StatusResult(Error::no_error);
+}
+
+StatusResult ShowDBStatement::validate() const {
+	return StatusResult(Error::no_error);
+}
+
+StatusResult ShowDBStatement::run() const {
+	return StatusResult(Error::no_error);
+}
+
 }

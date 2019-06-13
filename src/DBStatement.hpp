@@ -20,6 +20,7 @@ protected:
 	DBManager& m_manager;
 };
 
+/* -------------------------------CreateDBStatement------------------------------- */
 class CreateDBStatement : public DBStatement {
 public:
 	CreateDBStatement(Tokenizer& aTokenizer, DBManager& aDBManager);
@@ -32,6 +33,7 @@ private:
 	std::string m_dbname;
 };
 
+/* -------------------------------DropDBStatement------------------------------- */
 class DropDBStatement : public DBStatement {
 public:
 	DropDBStatement(Tokenizer& aTokenizer, DBManager& aDBManager);
@@ -44,6 +46,7 @@ private:
 	std::string m_dbname;
 };
 
+/* -------------------------------UseDBStatement------------------------------- */
 class UseDBStatement : public DBStatement {
 public:
 	UseDBStatement(Tokenizer& aTokenizer, DBManager& aDBManager);
@@ -59,7 +62,11 @@ private:
 class ShowDBStatement : public DBStatement {
 public:
 	ShowDBStatement(Tokenizer& aTokenizer, DBManager& aDBManager);
+	~ShowDBStatement() override = default;
 
+	StatusResult parse() override;
+	StatusResult validate() const override;
+	StatusResult run() const override;
 };
 
 }

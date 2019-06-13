@@ -47,7 +47,7 @@ StatusResult DBManager::create_database(const std::string& aName) {
 	auto theNewDB = std::make_unique<Database>(aName, CreateNewFile{}, theResult);
 	if (theResult) {
 		_reset_active_db(std::move(theNewDB));
-		theResult.set_message("Database '" + aName + "' created.");
+		theResult.set_message("Query OK, database '" + aName + "' created");
 	}
 	return theResult;
 }
@@ -58,22 +58,21 @@ StatusResult DBManager::drop_database(const std::string& aName) {
 	}
 	StatusResult theResult = DBManager::_delete_dbfile(aName);
 	if (theResult) {
-		theResult.set_message("Database '" + aName + "' dropped.");
+		theResult.set_message("Query OK, database '" + aName + "' dropped");
 	}
 	return theResult;
 }
 
 StatusResult DBManager::use_database(const std::string& aName) {
 	StatusResult theResult(Error::no_error);
-	if (m_activeDB && m_activeDB->get_name() == aName) {
-		theResult.set_message("Already using database '" + aName + "'.");
-	}
-	else {
+	if (!m_activeDB || m_activeDB->get_name() != aName) {
 		auto theNewDB = std::make_unique<Database>(aName, OpenExistingFile{}, theResult);
 		if (theResult) {
 			_reset_active_db(std::move(theNewDB));
-			theResult.set_message("Switch to database '" + aName + "'.");
 		}
+	}
+	if (theResult) {
+		theResult.set_message("Database changed");
 	}
 	return theResult;
 }
