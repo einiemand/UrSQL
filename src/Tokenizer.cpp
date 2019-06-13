@@ -131,7 +131,7 @@ StatusResult Tokenizer::tokenize() {
 			std::string theData = _read_until(peek);
 			if (m_input.peek() == peek) {
 				m_input.get();
-				m_tokens.emplace_back(TokenType::identifier, std::move(theData));
+				m_tokens.emplace_back(TokenType::string, std::move(theData));
 			}
 			else {
 				theResult.set_error(Error::syntax_error, "A terminating quote is expected");
