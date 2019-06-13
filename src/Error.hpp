@@ -94,7 +94,6 @@ private:
 
 void show_message(const char* what);
 
-
 }
 
 #endif /* Error.hpp */

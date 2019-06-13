@@ -5,16 +5,42 @@
 #include "Database.hpp"
 #include <sstream>
 #include <algorithm>
+#include <chrono>
+#include <iomanip>
 
-void trim(std::string& aString) {
+namespace UrSQL {
+class TimeCounter {
+public:
+	using Clock = std::chrono::steady_clock;
+
+	TimeCounter() : m_start(Clock::now()) {}
+	~TimeCounter() { _show_time_elapsed(); }
+
+	TimeCounter(const TimeCounter&) = delete;
+	TimeCounter& operator=(const TimeCounter&) = delete;
+private:
+	std::chrono::time_point<Clock> m_start;
+
+	void _show_time_elapsed() {
+		auto theEndTime = Clock::now();
+		auto theElapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(theEndTime - m_start);
+
+		defaultOutput << " (" << std::setprecision(2) << std::fixed <<
+			static_cast<float>(theElapsedTime.count()) / 1000 << " sec)\n";
+	}
+};
+
+void trim_input(std::string& aString) {
 	aString.erase(aString.begin(), std::find_if_not(aString.begin(), aString.end(), std::isspace));
 	aString.erase(aString.length() - (std::find_if_not(aString.rbegin(), aString.rend(), std::isspace) - aString.rbegin()));
+}
+
 }
 
 int main(int argc, char* argv[])
 {
 	using namespace UrSQL;
-	static const char* const thePrevMark = "\n> ";
+	static const char* const thePrevMark = "\nursql> ";
 	DBManager theDBManager;
 	BasicProcessor theBasicProcessor(&theDBManager);
 
@@ -23,7 +49,8 @@ int main(int argc, char* argv[])
 		defaultOutput << thePrevMark;
 		std::string theUserInput;
 		if (std::getline(std::cin, theUserInput, ';')) {
-			trim(theUserInput);
+			TimeCounter theCounter;
+			trim_input(theUserInput);
 			if (!theUserInput.empty()) {
 				std::istringstream theInputStream(theUserInput);
 				Tokenizer theTokenizer(theInputStream);
@@ -31,11 +58,10 @@ int main(int argc, char* argv[])
 				if (theResult) {
 					theResult = theBasicProcessor.process_input(theTokenizer);
 				}
-				if (theResult.get_code() != Error::user_terminated) {
-					theResult.show_error();
-				}
+				theResult.show_error();
 			}
 		}
+
 	}
 	/*char theChar;
 

@@ -4,7 +4,6 @@
 namespace UrSQL {
 
 std::ostream& defaultOutput = std::cout;
-const char* const defaultPreSpace = "  ";
 
 StatusResult::StatusResult(Error code, std::string msg) :
 	m_code(code),
@@ -46,15 +45,14 @@ void StatusResult::show_error() const {
 		{ Error::invalid_command,"Invalid command" },
 		{ Error::not_implemented,"Functionality not implemented yet" }
 	};
-	defaultOutput << defaultPreSpace;
-	if (m_code != Error::no_error) {
+	if (m_code != Error::no_error && m_code != Error::user_terminated) {
 		defaultOutput << err2msg.at(m_code) << ": ";
 	}
-	defaultOutput << m_msg << '\n';
+	defaultOutput << m_msg;
 }
 
 void show_message(const char* what) {
-	defaultOutput << defaultPreSpace << what << '\n';
+	defaultOutput << what << '\n';
 }
 
 }
