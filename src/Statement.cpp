@@ -24,27 +24,29 @@ StatusResult BasicStatement::validate() const {
 }
 
 StatusResult BasicStatement::run() const {
+	StatusResult theResult(Error::no_error);
 	switch (m_keyword) {
 	case Keyword::help_kw: {
-		static const char* theHelpMsg = 
+		static const std::string theHelpMsg = 
 			"help    - show guide on how to use UrSQL.\n"
 			"version - show UrSQL version.\n"
 			"quit    - quit UrSQL.";
-		show_message(theHelpMsg);
+		theResult.set_message(theHelpMsg);
 		break;
 	}
-	case Keyword::version_kw:
-		show_message("UrSQL 1.0");
+	case Keyword::version_kw: {
+		static const std::string theVersionMsg = "UrSQL 1.0";
+		theResult.set_message(theVersionMsg);
 		break;
-	case Keyword::quit_kw:
-		show_message("Bye.");
-		return StatusResult(Error::user_terminated);
-	case Keyword::unknown_kw:
+	}
+	case Keyword::quit_kw: {
+		theResult.set_error(Error::user_terminated, "Bye.");
 		break;
+	}
 	default:
 		throw std::runtime_error("Impossible: A BasicStatement shouldn't have been run");
 	}
-	return StatusResult(Error::no_error);
+	return theResult;
 }
 
 }
