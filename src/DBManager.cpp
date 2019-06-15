@@ -17,15 +17,13 @@ std::unique_ptr<Statement> DBManager::get_statement(Tokenizer& aTokenizer) {
 	Keyword theKeyword = aTokenizer.peek().get_keyword();
 
 	switch (theKeyword) {
-	case Keyword::create_kw: {
+	case Keyword::create_kw:
+	case Keyword::drop_kw:
+	case Keyword::describe_kw: {
 		if (aTokenizer.remaining() > 1 && aTokenizer.peek(1).get_keyword() == Keyword::database_kw) {
 			return DBStatement::factory(theKeyword, aTokenizer, *this);
 		}
-	}
-	case Keyword::drop_kw: {
-		if (aTokenizer.remaining() > 1 && aTokenizer.peek(1).get_keyword() == Keyword::database_kw) {
-			return DBStatement::factory(theKeyword, aTokenizer, *this);
-		}
+		break;
 	}
 	case Keyword::use_kw:
 		return DBStatement::factory(theKeyword, aTokenizer, *this);
@@ -33,15 +31,10 @@ std::unique_ptr<Statement> DBManager::get_statement(Tokenizer& aTokenizer) {
 		if (aTokenizer.remaining() > 1 && aTokenizer.peek(1).get_keyword() == Keyword::databases_kw) {
 			return DBStatement::factory(theKeyword, aTokenizer, *this);
 		}
+		break;
 	}
-	case Keyword::describe_kw: {
-		if (aTokenizer.remaining() > 1 && aTokenizer.peek(1).get_keyword() == Keyword::database_kw) {
-			return DBStatement::factory(theKeyword, aTokenizer, *this);
-		}
 	}
-	default:
-		return nullptr;
-	}
+	return nullptr;
 }
 
 StatusResult DBManager::create_database(const std::string& aName) {
@@ -106,8 +99,17 @@ StatusResult DBManager::describe_database(const std::string& aName) {
 		theDB = theDBHolder.get();
 	}
 	if (theResult) {
-		DescDBView(theDB->get_storage()).show();
-		theResult.set_message("Describing database '" + aName + '\'');
+		std::vector<BlockType> theBlockTypes;
+		theResult = (theDB->get_storage()).each_block(
+			[&theBlockTypes](Block& aBlock, blocknum_t)->StatusResult {
+				theBlockTypes.push_back(aBlock.get_type());
+				return StatusResult(Error::no_error);
+			}
+		);
+		if (theResult) {
+			DescDBView(theBlockTypes).show();
+			theResult.set_message("Describing database '" + aName + '\'');
+		}
 	}
 	return theResult;
 }
