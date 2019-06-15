@@ -1,12 +1,12 @@
 #include "Storage.hpp"
 #include "TOC.hpp"
-#include <string>
 #include <sstream>
 
 namespace UrSQL {
 
 const char* Storage::default_storage_path = "./tmp";
 const char* Storage::default_file_extension = ".db";
+const size_type Storage::extension_length = strlen(Storage::default_file_extension);
 
 Storage::Storage(std::string aFileName, CreateNewFile, const TOC& aTOC, StatusResult& aResult) :
 	m_name(std::move(aFileName))
@@ -24,6 +24,10 @@ std::string Storage::get_dbfile_path(const std::string& aDBName) {
 	std::ostringstream thePath;
 	thePath << default_storage_path << '/' << aDBName << default_file_extension;
 	return thePath.str();
+}
+
+bool Storage::has_default_extension(const std::string& aFileName) {
+	return aFileName.substr(aFileName.length() - Storage::extension_length) == Storage::default_file_extension;
 }
 
 size_type Storage::_get_block_count() {

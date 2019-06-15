@@ -40,8 +40,10 @@ public:
 
 	static const char* default_storage_path;
 	static const char* default_file_extension;
+	static const size_type extension_length;
 
 	static std::string get_dbfile_path(const std::string& aDBName);
+	static bool has_default_extension(const std::string& aFileName);
 private:
 	std::string m_name;
 	std::fstream m_file;
