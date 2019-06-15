@@ -8,7 +8,7 @@ namespace UrSQL {
 
 enum class BlockType : char {
 	TOC_type = 'C',
-	table_type = 'T',
+	entity_type = 'E',
 	index_type = 'I',
 	row_type = 'R',
 	free_type = 'F'
