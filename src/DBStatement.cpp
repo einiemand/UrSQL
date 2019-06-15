@@ -4,158 +4,265 @@
 
 namespace UrSQL {
 
-/* -------------------------------CreateDBStatement------------------------------- */
-CreateDBStatement::CreateDBStatement(Tokenizer& aTokenizer, DBManager& aDBManager) :
-	DBStatement(aTokenizer, aDBManager)
-{
-}
 
-StatusResult CreateDBStatement::parse() {
-	StatusResult theResult(Error::no_error);
-	if (m_tokenizer.next(2)) {
-		const Token& theToken = m_tokenizer.get();
-		if (theToken.get_type() == TokenType::identifier) {
-			m_dbname = theToken.get_data();
-		}
-		else if (theToken.get_type() == TokenType::string) {
-			theResult.set_error(Error::syntax_error, "Don't surround identifiers with quotes");
+/* -------------------------------CreateDBStatement------------------------------- */
+class CreateDBStatement : public DBStatement {
+public:
+	CreateDBStatement(Tokenizer& aTokenizer, DBManager& aDBManager) :
+		DBStatement(aTokenizer, aDBManager)
+	{
+	}
+
+	~CreateDBStatement() override = default;
+
+	StatusResult parse() override {
+		StatusResult theResult(Error::no_error);
+		if (m_tokenizer.next(2)) {
+			const Token& theToken = m_tokenizer.get();
+			switch (theToken.get_type()) {
+			case TokenType::identifier:
+				m_dbname = theToken.get_data();
+				break;
+			case TokenType::string:
+				theResult.set_error(Error::syntax_error, "Don't surround identifiers with quotes");
+				break;
+			default:
+				theResult.set_error(Error::unexpected_identifier, "Illegal database name '" + theToken.get_data() + '\'');
+			}
 		}
 		else {
-			theResult.set_error(Error::unexpected_identifier, "Illegal database name '" + theToken.get_data() + '\'');
+			theResult.set_error(Error::identifier_expected, "Database name expected");
 		}
+		return theResult;
 	}
-	else {
-		theResult.set_error(Error::identifier_expected, "Database name expected");
-	}
-	return theResult;
-}
 
-StatusResult CreateDBStatement::validate() const {
-	StatusResult theResult(Error::no_error);
-	if (!m_tokenizer.more()) {
-		bool exists = false;
-		theResult = DBManager::database_exists(exists, m_dbname);
-		if (theResult && exists) {
-			theResult.set_error(Error::database_exists, '\'' + m_dbname + '\'');
+	StatusResult validate() const override {
+		StatusResult theResult(Error::no_error);
+		if (!m_tokenizer.more()) {
+			bool exists = false;
+			theResult = DBManager::database_exists(exists, m_dbname);
+			if (theResult && exists) {
+				theResult.set_error(Error::database_exists, '\'' + m_dbname + '\'');
+			}
 		}
+		else {
+			theResult.set_error(Error::invalid_command, "Redundant input after '" + m_dbname + '\'');
+		}
+		return theResult;
 	}
-	else {
-		theResult.set_error(Error::invalid_command, "Redundant input after '" + m_dbname + '\'');
-	}
-	return theResult;
-}
 
-StatusResult CreateDBStatement::run() const {
-	return m_manager.create_database(m_dbname);
-}
+	StatusResult execute() const override {
+		return m_manager.create_database(m_dbname);
+	}
+private:
+	std::string m_dbname;
+};
+
 
 /* -------------------------------DropDBStatement------------------------------- */
-DropDBStatement::DropDBStatement(Tokenizer& aTokenizer, DBManager& aDBManager) :
-	DBStatement(aTokenizer, aDBManager)
-{
-}
+class DropDBStatement : public DBStatement {
+public:
+	DropDBStatement(Tokenizer& aTokenizer, DBManager& aDBManager) :
+		DBStatement(aTokenizer, aDBManager)
+	{
+	}
 
-StatusResult DropDBStatement::parse() {
-	StatusResult theResult(Error::no_error);
-	if (m_tokenizer.next(2)) {
-		const Token& theToken = m_tokenizer.get();
-		if (theToken.get_type() == TokenType::identifier) {
-			m_dbname = theToken.get_data();
-		}
-		else if (theToken.get_type() == TokenType::string) {
-			theResult.set_error(Error::syntax_error, "Don't surround identifiers with quotes");
+	~DropDBStatement() override = default;
+
+	StatusResult parse() override {
+		StatusResult theResult(Error::no_error);
+		if (m_tokenizer.next(2)) {
+			const Token& theToken = m_tokenizer.get();
+			switch (theToken.get_type()) {
+			case TokenType::identifier:
+				m_dbname = theToken.get_data();
+				break;
+			case TokenType::string:
+				theResult.set_error(Error::syntax_error, "Don't surround identifiers with quotes");
+				break;
+			default:
+				theResult.set_error(Error::unexpected_identifier, "Illegal database name '" + theToken.get_data() + '\'');
+			}
 		}
 		else {
-			theResult.set_error(Error::unexpected_identifier, "Illegal database name '" + theToken.get_data() + '\'');
+			theResult.set_error(Error::identifier_expected, "Database name expected");
 		}
+		return theResult;
 	}
-	else {
-		theResult.set_error(Error::identifier_expected, "Database name expected");
-	}
-	return theResult;
-}
 
-StatusResult DropDBStatement::validate() const {
-	StatusResult theResult(Error::no_error);
-	if (!m_tokenizer.more()) {
-		bool exists = false;
-		theResult = DBManager::database_exists(exists, m_dbname);
-		if (theResult && !exists) {
-			theResult.set_error(Error::unknown_database, '\'' + m_dbname + '\'');
+	StatusResult validate() const override {
+		StatusResult theResult(Error::no_error);
+		if (!m_tokenizer.more()) {
+			bool exists = false;
+			theResult = DBManager::database_exists(exists, m_dbname);
+			if (theResult && !exists) {
+				theResult.set_error(Error::unknown_database, '\'' + m_dbname + '\'');
+			}
 		}
+		else {
+			theResult.set_error(Error::invalid_command, "Redundant input after '" + m_dbname + '\'');
+		}
+		return theResult;
 	}
-	else {
-		theResult.set_error(Error::invalid_command, "Redundant input after '" + m_dbname + '\'');
-	}
-	return theResult;
-}
 
-StatusResult DropDBStatement::run() const {
-	return m_manager.drop_database(m_dbname);
-}
+	StatusResult execute() const override {
+		return m_manager.drop_database(m_dbname);
+	}
+private:
+	std::string m_dbname;
+};
+
 
 /* -------------------------------UseDBStatement------------------------------- */
-UseDBStatement::UseDBStatement(Tokenizer& aTokenizer, DBManager& aDBManager) :
-	DBStatement(aTokenizer, aDBManager)
-{
-}
+class UseDBStatement : public DBStatement {
+public:
+	UseDBStatement(Tokenizer& aTokenizer, DBManager& aDBManager) :
+		DBStatement(aTokenizer, aDBManager)
+	{
+	}
 
-StatusResult UseDBStatement::parse() {
-	StatusResult theResult(Error::no_error);
-	if (m_tokenizer.next()) {
-		const Token& theToken = m_tokenizer.peek();
-		if (theToken.get_type() == TokenType::identifier) {
-			m_dbname = theToken.get_data();
-		}
-		else if (theToken.get_type() == TokenType::string) {
-			theResult.set_error(Error::syntax_error, "Don't surround identifiers with quotes");
+	~UseDBStatement() override = default;
+
+	StatusResult parse() override {
+		StatusResult theResult(Error::no_error);
+		if (m_tokenizer.next()) {
+			const Token& theToken = m_tokenizer.get();
+			switch (theToken.get_type()) {
+			case TokenType::identifier:
+				m_dbname = theToken.get_data();
+				break;
+			case TokenType::string:
+				theResult.set_error(Error::syntax_error, "Don't surround identifiers with quotes");
+				break;
+			default:
+				theResult.set_error(Error::unexpected_identifier, "Illegal database name '" + theToken.get_data() + '\'');
+			}
 		}
 		else {
-			theResult.set_error(Error::unexpected_identifier, "Illegal database name '" + theToken.get_data() + '\'');
+			theResult.set_error(Error::identifier_expected, "Database name expected");
 		}
+		return theResult;
 	}
-	else {
-		theResult.set_error(Error::identifier_expected, "Database name expected");
-	}
-	return theResult;
-}
 
-StatusResult UseDBStatement::validate() const {
-	StatusResult theResult(Error::no_error);
-	if (!m_tokenizer.more()) {
-		bool exists = false;
-		theResult = DBManager::database_exists(exists, m_dbname);
-		if (theResult && !exists) {
-			theResult.set_error(Error::unknown_database, '\'' + m_dbname + '\'');
+	StatusResult validate() const override {
+		StatusResult theResult(Error::no_error);
+		if (!m_tokenizer.more()) {
+			bool exists = false;
+			theResult = DBManager::database_exists(exists, m_dbname);
+			if (theResult && !exists) {
+				theResult.set_error(Error::unknown_database, '\'' + m_dbname + '\'');
+			}
 		}
+		else {
+			theResult.set_error(Error::invalid_command, "Redundant input after '" + m_dbname + '\'');
+		}
+		return theResult;
 	}
-	else {
-		theResult.set_error(Error::invalid_command, "Redundant input after '" + m_dbname + '\'');
-	}
-	return theResult;
-}
 
-StatusResult UseDBStatement::run() const {
-	return m_manager.use_database(m_dbname);
-}
+	StatusResult execute() const override {
+		return m_manager.use_database(m_dbname);
+	}
+private:
+	std::string m_dbname;
+};
+
 
 /* -------------------------------ShowDBStatement------------------------------- */
-ShowDBStatement::ShowDBStatement(Tokenizer& aTokenizer, DBManager& aDBManager) :
-	DBStatement(aTokenizer, aDBManager)
-{
-}
+class ShowDBStatement : public DBStatement {
+public:
+	ShowDBStatement(Tokenizer& aTokenizer, DBManager& aDBManager) :
+		DBStatement(aTokenizer, aDBManager)
+	{
+	}
 
-StatusResult ShowDBStatement::parse() {
-	StatusResult theResult(Error::no_error);
-	return StatusResult(Error::no_error);
-}
+	~ShowDBStatement() override = default;
 
-StatusResult ShowDBStatement::validate() const {
-	return StatusResult(Error::no_error);
-}
+	StatusResult parse() override {
+		m_tokenizer.next(2);
+		return StatusResult(Error::no_error);
+	}
 
-StatusResult ShowDBStatement::run() const {
-	return StatusResult(Error::no_error);
+	StatusResult validate() const override {
+		return !m_tokenizer.more() ? StatusResult(Error::no_error) :
+			StatusResult(Error::invalid_command, "Redundant input after 'databases'");
+	}
+
+	StatusResult execute() const override {
+		return m_manager.show_databases();
+	}
+};
+
+
+/* -------------------------------DescDBStatement------------------------------- */
+class DescDBStatement : public DBStatement {
+public:
+	DescDBStatement(Tokenizer& aTokenizer, DBManager& aDBManager) :
+		DBStatement(aTokenizer, aDBManager)
+	{
+	}
+
+	~DescDBStatement() override = default;
+
+	StatusResult parse() override {
+		StatusResult theResult(Error::no_error);
+		if (m_tokenizer.next(2)) {
+			const Token& theToken = m_tokenizer.get();
+			switch (theToken.get_type()) {
+			case TokenType::identifier:
+				m_dbname = theToken.get_data();
+				break;
+			case TokenType::string:
+				theResult.set_error(Error::syntax_error, "Don't surround identifiers with quotes");
+				break;
+			default:
+				theResult.set_error(Error::unexpected_identifier, "Illegal database name '" + theToken.get_data() + '\'');
+			}
+		}
+		else {
+			theResult.set_error(Error::identifier_expected, "Database name expected");
+		}
+		return theResult;
+	}
+
+	StatusResult validate() const override {
+		StatusResult theResult(Error::no_error);
+		if (!m_tokenizer.more()) {
+			bool exists = false;
+			theResult = DBManager::database_exists(exists, m_dbname);
+			if (theResult && !exists) {
+				theResult.set_error(Error::unknown_database, '\'' + m_dbname + '\'');
+			}
+		}
+		else {
+			theResult.set_error(Error::invalid_command, "Redundant input after '" + m_dbname + '\'');
+		}
+		return theResult;
+	}
+
+	StatusResult execute() const override {
+		return m_manager.describe_database(m_dbname);
+	}
+private:
+	std::string m_dbname;
+};
+
+
+/* -------------------------------Static DBStatement Methods------------------------------- */
+std::unique_ptr<DBStatement> DBStatement::factory(Keyword aStmtType, Tokenizer& aTokenizer, DBManager& aDBManager) {
+	switch (aStmtType) {
+	case Keyword::create_kw:
+		return std::make_unique<CreateDBStatement>(aTokenizer, aDBManager);
+	case Keyword::drop_kw:
+		return std::make_unique<DropDBStatement>(aTokenizer, aDBManager);
+	case Keyword::use_kw:
+		return std::make_unique<UseDBStatement>(aTokenizer, aDBManager);
+	case Keyword::show_kw:
+		return std::make_unique<ShowDBStatement>(aTokenizer, aDBManager);
+	case Keyword::describe_kw:
+		return std::make_unique<DescDBStatement>(aTokenizer, aDBManager);
+	default:
+		return nullptr;
+	}
 }
 
 }
