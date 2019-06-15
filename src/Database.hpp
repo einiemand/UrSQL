@@ -3,8 +3,7 @@
 #define DATABASE_HPP
 #include "Storage.hpp"
 #include "TOC.hpp"
-#include "Table.hpp"
-#include <string>
+#include "Entity.hpp"
 #include <memory>
 #include <fstream>
 #include <unordered_map>
@@ -13,7 +12,7 @@ namespace UrSQL {
 
 class Database {
 public:
-	using TableCache = std::unordered_map< std::string, std::unique_ptr<Table> >;
+	using EntityCache = std::unordered_map< std::string, std::unique_ptr<Entity> >;
 
 	Database(const std::string& aFileName, CreateNewFile, StatusResult& aResult);
 	Database(const std::string& aFileName, OpenExistingFile, StatusResult& aResult);
@@ -25,10 +24,14 @@ public:
 	inline const std::string& get_name() const {
 		return m_storage.get_name();
 	}
+
+	inline Storage& get_storage() {
+		return m_storage;
+	}
 private:
 	TOC m_toc;
 	Storage m_storage;
-	TableCache m_tables;
+	EntityCache m_entities;
 };
 
 }
