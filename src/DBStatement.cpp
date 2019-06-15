@@ -4,6 +4,12 @@
 
 namespace UrSQL {
 
+DBStatement::DBStatement(Tokenizer& aTokenizer, DBManager& aDBManager) :
+	Statement(aTokenizer),
+	m_manager(aDBManager)
+{
+}
+
 
 /* -------------------------------CreateDBStatement------------------------------- */
 class CreateDBStatement : public DBStatement {

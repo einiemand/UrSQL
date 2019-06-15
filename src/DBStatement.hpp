@@ -9,12 +9,7 @@ class DBManager;
 
 class DBStatement : public Statement {
 public:
-	DBStatement(Tokenizer& aTokenizer, DBManager& aDBManager) :
-		Statement(aTokenizer),
-		m_manager(aDBManager)
-	{
-	}
-
+	DBStatement(Tokenizer& aTokenizer, DBManager& aDBManager);
 	~DBStatement() override = default;
 
 	static std::unique_ptr<DBStatement> factory(Keyword aStmtType, Tokenizer& aTokenizer, DBManager& aDBManager);
