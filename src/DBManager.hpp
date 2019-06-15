@@ -32,6 +32,7 @@ private:
 	void _release_active_db();
 
 	static StatusResult _delete_dbfile(const std::string& aName);
+	static StatusResult _collect_dbnames(StringList& aDBNames);
 };
 
 }
