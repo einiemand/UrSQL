@@ -25,18 +25,11 @@ public:
 
 	StatusResult process_input(Tokenizer& aTokenizer) {
 		if (auto theStatement = get_statement(aTokenizer)) {
-			StatusResult theResult = theStatement->parse();
-			if (theResult) {
-				theResult = theStatement->validate();
-				if (theResult) {
-					theResult = theStatement->run();
-				}
-			}
-			return theResult;
+			return theStatement->run();
 		}
 
 		return m_next ? m_next->process_input(aTokenizer) :
-			StatusResult(Error::unknown_command, "Enter 'help' to get familiar with this clumsy DB engine.");
+			StatusResult(Error::unknown_command, "Enter 'help' to get familiar with this clumsy DB engine");
 	}
 
 	virtual Database* get_active_database() const {
