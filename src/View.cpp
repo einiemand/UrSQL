@@ -1,5 +1,4 @@
 #include "View.hpp"
-#include "Storage.hpp"
 #include "FolderReader.hpp"
 #include "Block.hpp"
 #include <algorithm>
@@ -57,8 +56,8 @@ void View::print_line(const StringList& aStrings, const std::vector<size_type>& 
 	defaultOutput << '\n';
 }
 
-DescDBView::DescDBView(Storage& aStorage) :
-	m_storage(aStorage)
+DescDBView::DescDBView(const std::vector<BlockType>& theTypes) :
+	m_types(theTypes)
 {
 }
 
@@ -67,20 +66,12 @@ void DescDBView::show() const {
 	static const size_type theFirstWidth = theFirstHeader.length() + 2;
 	static constexpr size_type theSecondWidth = 6 + 2;
 
-	std::vector<BlockType> theBlockTypes;
-	m_storage.each_block(
-		[&theBlockTypes](Block& aBlock, blocknum_t)->StatusResult {
-			theBlockTypes.push_back(aBlock.get_type());
-			return StatusResult(Error::no_error);
-		}
-	);
-
 	View::print_horizontal_line({ theFirstWidth,theSecondWidth });
 	View::print_line({ theFirstHeader,theSecondHeader }, { theFirstWidth,theSecondWidth });
 	View::print_horizontal_line({ theFirstWidth,theSecondWidth });
 
-	for (size_type i = 0; i < theBlockTypes.size(); ++i) {
-		BlockType theType = theBlockTypes[i];
+	for (size_type i = 0; i < m_types.size(); ++i) {
+		BlockType theType = m_types[i];
 		std::string theTypeString;
 		switch (theType) {
 		case BlockType::TOC_type:

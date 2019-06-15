@@ -2,7 +2,6 @@
 #ifndef VIEW_HPP
 #define VIEW_HPP
 #include "Error.hpp"
-#include <memory>
 
 namespace UrSQL {
 
@@ -40,16 +39,16 @@ private:
 };
 
 /* -------------------------------DescDBView------------------------------- */
-class Storage;
+enum class BlockType : char;
 
 class DescDBView : public View {
 public:
-	DescDBView(Storage& aStorage);
+	DescDBView(const std::vector<BlockType>& theTypes);
 	~DescDBView() override = default;
 
 	void show() const override;
 private:
-	Storage& m_storage;
+	const std::vector<BlockType>& m_types;
 };
 
 }
