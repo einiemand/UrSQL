@@ -30,6 +30,7 @@ void StatusResult::set_error(Error aCode, std::string aMsg) noexcept {
 
 void StatusResult::show_error() const {
 	static std::unordered_map<Error, const char*> err2msg{
+		{ Error::unexpected_identifier,"Unexpected identifier" },
 		{ Error::syntax_error,"Syntax error" },
 		{ Error::database_exists,"Database alreay exists" },
 		{ Error::unknown_database,"Unknown database" },

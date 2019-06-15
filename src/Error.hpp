@@ -20,10 +20,10 @@ enum class Error {
 	statement_expected = 200,
 	noDatabase_specified = 210,
 
-	//table/DB related...
-	table_exists = 300,
+	//entity/DB related...
+	entity_exists = 300,
 	database_exists,
-	unknown_table = 310,
+	unknown_entity = 310,
 	unknown_database = 320,
 
 	//type related...
