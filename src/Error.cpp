@@ -47,7 +47,7 @@ void StatusResult::show_error() const {
 		{ Error::not_implemented,"Functionality not implemented yet" }
 	};
 	if (m_code != Error::no_error && m_code != Error::user_terminated) {
-		defaultOutput << err2msg.at(m_code) << ": ";
+		defaultOutput << (err2msg.count(m_code) ? err2msg.at(m_code) : "Unsupported error type") << ": ";
 	}
 	defaultOutput << m_msg;
 }
