@@ -5,6 +5,8 @@
 
 namespace UrSQL {
 
+class Storable;
+
 class BufferWriter {
 public:
 	BufferWriter(char* aBuf, size_type aSize);
@@ -25,6 +27,7 @@ public:
 	}
 
 	BufferWriter& operator<<(const std::string& aString);
+	BufferWriter& operator<<(const Storable& aStorable);
 
 private:
 	char* m_buf;
@@ -52,6 +55,7 @@ public:
 	}
 
 	BufferReader& operator>>(std::string& aString);
+	BufferReader& operator>>(Storable& aStorable);
 
 private:
 	const char* m_buf;

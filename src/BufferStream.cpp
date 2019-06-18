@@ -1,4 +1,5 @@
 #include "BufferStream.hpp"
+#include "Storable.hpp"
 
 namespace UrSQL {
 
@@ -20,6 +21,11 @@ BufferWriter& BufferWriter::operator<<(const std::string& aString) {
 	throw std::out_of_range("BufferWriter out of range");
 }
 
+BufferWriter& BufferWriter::operator<<(const Storable& aStorable) {
+	aStorable.serialize(*this);
+	return *this;
+}
+
 BufferReader::BufferReader(const char* aBuf, size_type aSize) :
 	m_buf(aBuf),
 	m_pos(0),
@@ -36,6 +42,11 @@ BufferReader& BufferReader::operator>>(std::string& aString) {
 		return *this;
 	}
 	throw std::out_of_range("BufferReader out of range");
+}
+
+BufferReader& BufferReader::operator>>(Storable& aStorable) {
+	aStorable.deserialize(*this);
+	return *this;
 }
 
 } /* UrSQL */
