@@ -28,24 +28,24 @@ public:
 	Block(const Block& rhs) noexcept;
 	Block& operator=(const Block& rhs) noexcept;
 
-	inline BlockType get_type() const {
+	inline BlockType getType() const {
 		return m_type;
 	}
 
-	inline void set_type(BlockType aType) {
+	inline void setType(BlockType aType) {
 		m_type = aType;
 	}
 
-	inline const char* get_data() const {
-		return m_data;
+	inline const char* getData() const {
+		return m_Data;
 	}
 
-	inline char* get_data() {
-		return m_data;
+	inline char* getData() {
+		return m_Data;
 	}
 private:
 	BlockType m_type;
-	char m_data[defaultPayloadSize];
+	char m_Data[defaultPayloadSize];
 };
 
 static_assert(sizeof(Block) == defaultBlockSize, "Block size is not equal to defaultBlockSize. Fix it!");

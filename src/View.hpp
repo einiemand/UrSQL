@@ -5,10 +5,6 @@
 
 namespace UrSQL {
 
-enum class ViewType {
-	show_databases
-};
-
 class View {
 public:
 	View() = default;
@@ -20,11 +16,11 @@ public:
 	virtual void show() const = 0;
 protected:
 	static constexpr char vertex = '+';
-	static constexpr char vertical_edge = '|';
-	static constexpr char horizontal_edge = '-';
+	static constexpr char verticalEdge = '|';
+	static constexpr char horizontalEdge = '-';
 
-	static void print_horizontal_line(const std::vector<size_type>& aWidths);
-	static void print_line(const StringList& aFieldNames, const std::vector<size_type>& aWidths);
+	static void printHorizontalLine(const std::vector<size_type>& aWidths);
+	static void printLine(const StringList& aFieldNames, const std::vector<size_type>& aWidths);
 };
 
 /* -------------------------------ShowDBView------------------------------- */
@@ -35,7 +31,7 @@ public:
 
 	void show() const override;
 private:
-	const StringList& m_dbnames;
+	const StringList& m_dbNames;
 };
 
 /* -------------------------------DescDBView------------------------------- */

@@ -47,12 +47,12 @@ const std::unordered_map<std::string, Keyword> str2keyword{
 	{ "where",     Keyword::where_kw }
 };
 
-bool is_keyword(const std::string& aWord) {
+bool isKeyword(const std::string& aWord) {
 	return str2keyword.count(aWord) == 1;
 }
 
-Keyword to_keyword(const std::string& aWord) {
-	return is_keyword(aWord) ? str2keyword.at(aWord) : Keyword::unknown_kw;
+Keyword toKeyword(const std::string& aWord) {
+	return isKeyword(aWord) ? str2keyword.at(aWord) : Keyword::unknown_kw;
 }
 
 }

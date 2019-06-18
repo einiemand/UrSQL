@@ -21,11 +21,11 @@ public:
 	Database(const Database&) = delete;
 	Database& operator=(const Database&) = delete;
 
-	inline const std::string& get_name() const {
-		return m_storage.get_name();
+	inline const std::string& getName() const {
+		return m_storage.getName();
 	}
 
-	inline Storage& get_storage() {
+	inline Storage& getStorage() {
 		return m_storage;
 	}
 private:

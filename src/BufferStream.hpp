@@ -13,11 +13,11 @@ public:
 	BufferWriter(const BufferWriter&) = delete;
 	BufferWriter& operator=(const BufferWriter&) = delete;
 
-	template<typename T, typename = std::enable_if_t< std::is_integral_v<T> || std::is_floating_point_v<T>, void> >
+	template<typename T, typename = std::enable_if_t< std::is_arithmetic_v<T> >>
 	BufferWriter& operator<<(const T aNum) {
 		static constexpr size_type theTypeSize = sizeof(T);
 		if (m_pos + theTypeSize < m_size) {
-			memcpy(m_buf + m_pos, &aNum, theTypeSize);
+			memcpy(m_Buf + m_pos, &aNum, theTypeSize);
 			m_pos += theTypeSize;
 			return *this;
 		}
@@ -27,7 +27,7 @@ public:
 	BufferWriter& operator<<(const std::string& aString);
 
 private:
-	char* m_buf;
+	char* m_Buf;
 	size_type m_pos;
 	size_type m_size;
 };
@@ -40,11 +40,11 @@ public:
 	BufferReader(const BufferReader&) = delete;
 	BufferReader& operator=(const BufferReader&) = delete;
 
-	template<typename T, typename = std::enable_if_t< std::is_integral_v<T> || std::is_floating_point_v<T>, void> >
+	template<typename T, typename = std::enable_if_t< std::is_arithmetic_v<T> >>
 	BufferReader& operator>>(T& aNum) {
 		static constexpr size_type theTypeSize = sizeof(T);
 		if (m_pos + theTypeSize < m_size) {
-			memcpy(&aNum, m_buf + m_pos, theTypeSize);
+			memcpy(&aNum, m_Buf + m_pos, theTypeSize);
 			m_pos += theTypeSize;
 			return *this;
 		}
@@ -54,7 +54,7 @@ public:
 	BufferReader& operator>>(std::string& aString);
 
 private:
-	const char* m_buf;
+	const char* m_Buf;
 	size_type m_pos;
 	size_type m_size;
 };

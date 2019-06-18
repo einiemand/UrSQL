@@ -25,34 +25,34 @@ public:
 	Storage(const Storage&) = delete;
 	Storage& operator=(const Storage&) = delete;
 
-	inline bool storage_ready() const {
+	inline bool storageReady() const {
 		return m_file.is_open();
 	}
 
-	inline const std::string& get_name() const {
+	inline const std::string& getName() const {
 		return m_name;
 	}
 
-	StatusResult read_block(Block& aBlock, blocknum_t aBlockNum);
-	StatusResult write_block(const Block& aBlock, blocknum_t aBlockNum);
+	StatusResult readBlock(Block& aBlock, blocknum_t aBlocknum);
+	StatusResult writeBlock(const Block& aBlock, blocknum_t aBlocknum);
 
-	StatusResult each_block(BlockVisitor aVisitor);
+	StatusResult eachBlock(BlockVisitor aVisitor);
 
-	static const char* default_storage_path;
-	static const char* default_file_extension;
-	static const size_type extension_length;
+	static const char* defaultStoragePath;
+	static const char* defaultFileExtension;
+	static const size_type extensionLength;
 
-	static std::string get_dbfile_path(const std::string& aDBName);
-	static bool has_default_extension(const std::string& aFileName);
+	static std::string getDBFilePath(const std::string& aDBName);
+	static bool hasDefaultExtension(const std::string& aFileName);
 private:
 	std::string m_name;
 	std::fstream m_file;
 
-	size_type _get_block_count();
-	StatusResult _get_free_block_number(blocknum_t& aFreeBlockNum);
+	size_type _getBlockCount();
+	StatusResult _getFreeBlocknumber(blocknum_t& aFreeBlocknum);
 
-	StatusResult _setup_toc(const TOC& aTOC);
-	StatusResult _load_toc(TOC& aTOC);
+	StatusResult _setupTOC(const TOC& aTOC);
+	StatusResult _loadTOC(TOC& aTOC);
 };
 
 }

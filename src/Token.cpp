@@ -9,7 +9,7 @@ Token::Token() :
 
 Token::Token(TokenType type, std::string data, Keyword keyword) :
 	m_type(type),
-	m_data(std::move(data)),
+	m_Data(std::move(data)),
 	m_keyword(keyword)
 {
 }

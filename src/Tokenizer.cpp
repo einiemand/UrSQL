@@ -5,11 +5,11 @@
 
 namespace UrSQL {
 
-constexpr char left_paren = '(';
-constexpr char right_paren = ')';
+constexpr char leftParen = '(';
+constexpr char rightParen = ')';
 constexpr char comma = ',';
-constexpr char double_quote = '"';
-constexpr char single_quote = '\'';
+constexpr char doubleQuote = '"';
+constexpr char singleQuote = '\'';
 
 Tokenizer::Tokenizer(std::istream& anInput) :
 	m_input(anInput),
@@ -18,45 +18,45 @@ Tokenizer::Tokenizer(std::istream& anInput) :
 {
 }
 
-inline bool is_whitespace(char aChar) {
+inline bool isWhiteSpace(char aChar) {
 	return std::isspace(aChar);
 }
 
-inline bool is_alpha(char aChar) {
+inline bool isAlpha(char aChar) {
 	return isalpha(aChar) != 0;
 }
 
-inline bool is_number(char aChar) {
+inline bool isNumber(char aChar) {
 	return isdigit(aChar) || aChar == '.';
 }
 
-inline bool is_comparator(char aChar) {
+inline bool isComparator(char aChar) {
 	return strchr("=<>", aChar) != nullptr;
 }
 
-inline bool is_quote(char aChar) {
-	return aChar == double_quote || aChar == single_quote;
+inline bool isQuote(char aChar) {
+	return aChar == doubleQuote || aChar == singleQuote;
 }
 
-inline bool is_punctuation(char aChar) {
+inline bool isPunctuation(char aChar) {
 	return strchr(",()", aChar) != nullptr;
 }
 
-TokenType get_punctuation_type(char aChar) {
+TokenType getPunctuationType(char aChar) {
 	switch (aChar) {
 	case comma:
 		return TokenType::comma;
-	case left_paren:
+	case leftParen:
 		return TokenType::lparen;
-	case right_paren:
+	case rightParen:
 		return TokenType::rparen;
 	default:
 		return TokenType::unknown;
 	}
 }
 
-inline bool is_separator(char aChar) {
-	return is_whitespace(aChar) || is_comparator(aChar) || is_quote(aChar) || is_punctuation(aChar);
+inline bool isSeparator(char aChar) {
+	return isWhiteSpace(aChar) || isComparator(aChar) || isQuote(aChar) || isPunctuation(aChar);
 }
 
 const Token& Tokenizer::peek(size_type anOffset) {
@@ -77,15 +77,15 @@ bool Tokenizer::next(size_type anOffset) {
 	return more();
 }
 
-bool Tokenizer::skip_if(TokenType aType) {
-	if (more() && peek().get_type() == aType) {
+bool Tokenizer::skipIf(TokenType aType) {
+	if (more() && peek().getType() == aType) {
 		next();
 		return true;
 	}
 	return false;
 }
 
-bool Tokenizer::skip_if(Keyword aKeyword) {
+bool Tokenizer::skipIf(Keyword aKeyword) {
 	if (more() && peek().get_keyword() == aKeyword) {
 		next();
 		return true;
@@ -96,56 +96,56 @@ bool Tokenizer::skip_if(Keyword aKeyword) {
 StatusResult Tokenizer::tokenize() {
 	StatusResult theResult(Error::no_error);
 	for (char peek = m_input.peek(); theResult && peek != -1; peek = m_input.peek()) {
-		if (is_whitespace(peek)) {
+		if (isWhiteSpace(peek)) {
 			m_input.get();
 		}
-		else if (is_alpha(peek)) {
-			std::string theData = _read_until(is_separator);
+		else if (isAlpha(peek)) {
+			std::string theData = _readUntil(isSeparator);
 			std::string theLowerCaseData(theData);
 			std::transform(theLowerCaseData.begin(), theLowerCaseData.end(), theLowerCaseData.begin(), ::tolower);
-			if (is_keyword(theLowerCaseData)) {
-				m_tokens.emplace_back(TokenType::keyword, theLowerCaseData, to_keyword(theLowerCaseData));
+			if (isKeyword(theLowerCaseData)) {
+				m_tokens.emplace_back(TokenType::keyword, theLowerCaseData, toKeyword(theLowerCaseData));
 			}
 			else {
 				m_tokens.emplace_back(TokenType::identifier, std::move(theData));
 			}
 		}
-		else if (is_punctuation(peek)) {
-			TokenType theType = get_punctuation_type(peek);
+		else if (isPunctuation(peek)) {
+			TokenType theType = getPunctuationType(peek);
 			m_tokens.emplace_back(theType, std::string(1, m_input.get()));
 		}
-		else if (is_number(peek)) {
-			std::string theData = _read_until(is_separator);
+		else if (isNumber(peek)) {
+			std::string theData = _readUntil(isSeparator);
 			TokenType theType = TokenType::number;
-			if (!std::all_of(theData.cbegin(), theData.cend(), is_number)) {
+			if (!std::all_of(theData.cbegin(), theData.cend(), isNumber)) {
 				theType = TokenType::identifier;
 			}
 			m_tokens.emplace_back(theType, std::move(theData));
 		}
-		else if (is_comparator(peek)) {
-			std::string theData = _read_while(is_comparator);
+		else if (isComparator(peek)) {
+			std::string theData = _readWhile(isComparator);
 			m_tokens.emplace_back(TokenType::comparator, std::move(theData));
 		}
-		else if (is_quote(peek)) {
+		else if (isQuote(peek)) {
 			m_input.get();
-			std::string theData = _read_until(peek);
+			std::string theData = _readUntil(peek);
 			if (m_input.peek() == peek) {
 				m_input.get();
 				m_tokens.emplace_back(TokenType::string, std::move(theData));
 			}
 			else {
-				theResult.set_error(Error::syntax_error, "A terminating quote is expected");
+				theResult.setError(Error::syntax_error, "A terminating quote is expected");
 			}
 		}
 		else {
-			std::string theData = _read_until(-1);
-			theResult.set_error(Error::syntax_error, "Unknown command - '" + theData + '\'');
+			std::string theData = _readUntil(-1);
+			theResult.setError(Error::syntax_error, "Unknown command - '" + theData + '\'');
 		}
 	}
 	return theResult;
 }
 
-std::string Tokenizer::_read_while(TokenizeCondition aCondition) {
+std::string Tokenizer::_readWhile(TokenizeCondition aCondition) {
 	std::string theData;
 	for (char theChar = m_input.peek(); theChar != -1 && aCondition(theChar); theChar = m_input.peek()) {
 		theData += m_input.get();
@@ -153,7 +153,7 @@ std::string Tokenizer::_read_while(TokenizeCondition aCondition) {
 	return theData;
 }
 
-std::string Tokenizer::_read_until(TokenizeCondition aCondition) {
+std::string Tokenizer::_readUntil(TokenizeCondition aCondition) {
 	std::string theData;
 	for (char theChar = m_input.peek(); theChar != -1 && !aCondition(theChar); theChar = m_input.peek()) {
 		theData += m_input.get();

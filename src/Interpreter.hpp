@@ -20,20 +20,20 @@ public:
 	Interpreter(const Interpreter&) = delete;
 	Interpreter& operator=(const Interpreter&) = delete;
 
-	virtual std::unique_ptr<Statement> get_statement(Tokenizer& aTokenizer) = 0;
+	virtual std::unique_ptr<Statement> getStatement(Tokenizer& aTokenizer) = 0;
 	virtual ~Interpreter() = default;
 
 	StatusResult process_input(Tokenizer& aTokenizer) {
-		if (auto theStatement = get_statement(aTokenizer)) {
+		if (auto theStatement = getStatement(aTokenizer)) {
 			return theStatement->run();
 		}
 
 		return m_next ? m_next->process_input(aTokenizer) :
-			StatusResult(Error::unknown_command, "Enter 'help' to get familiar with this clumsy DB engine");
+			StatusResult(Error::unknown_Command, "Enter 'help' to get familiar with this clumsy DB engine");
 	}
 
-	virtual Database* get_active_database() const {
-		return m_next ? m_next->get_active_database() : nullptr;
+	virtual Database* getActiveDatabase() const {
+		return m_next ? m_next->getActiveDatabase() : nullptr;
 	}
 protected:
 	Interpreter* m_next;

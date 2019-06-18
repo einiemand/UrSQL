@@ -31,7 +31,7 @@ StatusResult BasicStatement::parse() {
 
 StatusResult BasicStatement::validate() const {
 	return m_tokenizer.remaining() == 1 ? StatusResult(Error::no_error) :
-		StatusResult(Error::invalid_command, "Redundant input after '" + m_tokenizer.peek().get_data() + '\'');
+		StatusResult(Error::invalid_Command, "Redundant input after '" + m_tokenizer.peek().getData() + '\'');
 }
 
 StatusResult BasicStatement::execute() const {
@@ -42,16 +42,16 @@ StatusResult BasicStatement::execute() const {
 			"help    - show guide on how to use UrSQL\n"
 			"version - show UrSQL version\n"
 			"quit    - quit UrSQL";
-		theResult.set_message(theHelpMsg);
+		theResult.setMessage(theHelpMsg);
 		break;
 	}
 	case Keyword::version_kw: {
 		static const std::string theVersionMsg = "UrSQL 1.0";
-		theResult.set_message(theVersionMsg);
+		theResult.setMessage(theVersionMsg);
 		break;
 	}
 	case Keyword::quit_kw: {
-		theResult.set_error(Error::user_terminated, "Bye");
+		theResult.setError(Error::user_terminated, "Bye");
 		break;
 	}
 	default:

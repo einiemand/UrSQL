@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Attribute.hpp" />
     <ClInclude Include="src\BasicProcessor.hpp" />
     <ClInclude Include="src\Block.hpp" />
     <ClInclude Include="src\BufferStream.hpp" />
@@ -29,16 +30,21 @@
     <ClInclude Include="src\FolderReader.hpp" />
     <ClInclude Include="src\Interpreter.hpp" />
     <ClInclude Include="src\Keyword.hpp" />
+    <ClInclude Include="src\SQLInterpreter.hpp" />
+    <ClInclude Include="src\SQLStatement.hpp" />
     <ClInclude Include="src\Statement.hpp" />
     <ClInclude Include="src\Storable.hpp" />
     <ClInclude Include="src\Storage.hpp" />
-    <ClInclude Include="src\Table.hpp" />
+    <ClInclude Include="src\Entity.hpp" />
     <ClInclude Include="src\TOC.hpp" />
     <ClInclude Include="src\Token.hpp" />
     <ClInclude Include="src\Tokenizer.hpp" />
     <ClInclude Include="src\Util.hpp" />
+    <ClInclude Include="src\Value.hpp" />
+    <ClInclude Include="src\View.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Attribute.cpp" />
     <ClCompile Include="src\BasicProcessor.cpp" />
     <ClCompile Include="src\Block.cpp" />
     <ClCompile Include="src\BufferStream.cpp" />
@@ -49,13 +55,17 @@
     <ClCompile Include="src\FolderReader.cpp" />
     <ClCompile Include="src\Keyword.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\SQLInterpreter.cpp" />
+    <ClCompile Include="src\SQLStatement.cpp" />
     <ClCompile Include="src\Statement.cpp" />
     <ClCompile Include="src\Storable.cpp" />
     <ClCompile Include="src\Storage.cpp" />
-    <ClCompile Include="src\Table.cpp" />
+    <ClCompile Include="src\Entity.cpp" />
     <ClCompile Include="src\TOC.cpp" />
     <ClCompile Include="src\Token.cpp" />
     <ClCompile Include="src\Tokenizer.cpp" />
+    <ClCompile Include="src\Value.cpp" />
+    <ClCompile Include="src\View.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

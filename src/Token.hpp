@@ -25,11 +25,11 @@ public:
 	Token& operator=(const Token&) = default;
 	Token& operator=(Token&&) noexcept = default;
 
-	inline const std::string& get_data() const {
-		return m_data;
+	inline const std::string& getData() const {
+		return m_Data;
 	}
 
-	inline TokenType get_type() const {
+	inline TokenType getType() const {
 		return m_type;
 	}
 
@@ -38,7 +38,7 @@ public:
 	}
 private:
 	TokenType m_type;
-	std::string m_data;
+	std::string m_Data;
 	Keyword m_keyword;
 };
 

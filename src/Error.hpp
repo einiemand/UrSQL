@@ -21,16 +21,16 @@ enum class Error {
 	noDatabase_specified = 210,
 
 	//entity/DB related...
-	entity_exists = 300,
-	database_exists,
+	entityExists = 300,
+	databaseExists,
 	unknown_entity = 310,
-	unknown_database = 320,
+	unknown_Database = 320,
 
 	//type related...
 	unknown_type = 400,
-	unknown_attribute = 405,
-	invalid_attribute = 410,
-	invalid_arguments = 420,
+	unknown_Attribute = 405,
+	invalid_Attribute = 410,
+	invalid_Arguments = 420,
 	keyValue_mismatch = 430, //# of fieldnames doesn't match values...
 
 	//storage/io related...
@@ -47,12 +47,15 @@ enum class Error {
 	block_found = 630,
 	block_notFound = 640,
 
-	//foler related...
+	//folder related...
 	folder_notExist = 700,
 
+	//Value related...
+	conversion_fail = 800,
+
 	//command related...
-	unknown_command = 3000,
-	invalid_command = 3010,
+	unknown_Command = 3000,
+	invalid_Command = 3010,
 
 	//general purpose...
 	user_terminated = 4998,
@@ -75,24 +78,24 @@ public:
 		return m_code == Error::no_error;
 	}
 
-	inline Error get_code() const {
+	inline Error getCode() const {
 		return m_code;
 	}
 
-	void set_error(Error aCode, std::string aMsg) noexcept;
+	void setError(Error aCode, std::string aMsg) noexcept;
 
-	inline void set_message(std::string aMsg) noexcept {
-		set_error(get_code(), std::move(aMsg));
+	inline void setMessage(std::string aMsg) noexcept {
+		setError(getCode(), std::move(aMsg));
 	}
 
-	void show_error() const;
+	void showError() const;
 
 private:
 	Error m_code;
 	std::string m_msg;
 };
 
-void show_message(const char* what);
+void showMessage(const char* what);
 
 }
 

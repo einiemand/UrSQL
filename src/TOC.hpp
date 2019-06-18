@@ -12,17 +12,20 @@ public:
 	TOC();
 	~TOC() = default;
 
-	BlockType expected_block_type() const override;
+	TOC(const TOC&) = delete;
+	TOC& operator=(const TOC&) = delete;
+
+	BlockType expectedBlockType() const override;
 	void serialize(BufferWriter& aWriter) const override;
 	void deserialize(BufferReader& aReader) override;
 
-	inline bool entity_exists(const std::string& anEntityName) const {
+	inline bool entityExists(const std::string& anEntityName) const {
 		return m_map.count(anEntityName) == 1;
 	}
 
-	blocknum_t get_blocknum_by_name(const std::string& anEntityName) const;
+	blocknum_t getBlocknumByName(const std::string& anEntityName) const;
 
-	void add(const std::string& anEntityName, blocknum_t aBlockNum);
+	void add(const std::string& anEntityName, blocknum_t aBlocknum);
 
 	void drop(const std::string& anEntityName);
 

@@ -45,7 +45,7 @@ int main(int argc, char* argv[])
 	BasicProcessor theBasicProcessor(&theDBManager);
 
 	StatusResult theResult(Error::no_error);
-	while (theResult.get_code() != Error::user_terminated) {
+	while (theResult.getCode() != Error::user_terminated) {
 		defaultOutput << thePrevMark;
 		std::string theUserInput;
 		if (std::getline(std::cin, theUserInput, ';')) {
@@ -58,14 +58,14 @@ int main(int argc, char* argv[])
 				if (theResult) {
 					theResult = theBasicProcessor.process_input(theTokenizer);
 				}
-				theResult.show_error();
+				theResult.showError();
 			}
 		}
 
 	}
 	/*char theChar;
 
-	while (theResult.get_code() != Error::user_terminated) {
+	while (theResult.getCode() != Error::user_terminated) {
 		defaultOutput << thePrevMark;
 		std::string theUserInput;
 		while (std::cin.get(theChar) && theChar != ';') {
@@ -84,8 +84,8 @@ int main(int argc, char* argv[])
 			if (theResult) {
 				theResult = theBasicProcessor.process_input(theTokenizer);
 			}
-			if (!theResult && theResult.get_code() != Error::user_terminated) {
-				theResult.show_error();
+			if (!theResult && theResult.getCode() != Error::user_terminated) {
+				theResult.showError();
 			}
 		}
 	}*/

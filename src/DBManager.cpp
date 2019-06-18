@@ -13,7 +13,7 @@ DBManager::DBManager(Interpreter* anInterpreter) :
 {
 }
 
-std::unique_ptr<Statement> DBManager::get_statement(Tokenizer& aTokenizer) {
+std::unique_ptr<Statement> DBManager::getStatement(Tokenizer& aTokenizer) {
 	Keyword theKeyword = aTokenizer.peek().get_keyword();
 
 	switch (theKeyword) {
@@ -37,61 +37,61 @@ std::unique_ptr<Statement> DBManager::get_statement(Tokenizer& aTokenizer) {
 	return nullptr;
 }
 
-StatusResult DBManager::create_database(const std::string& aName) {
+StatusResult DBManager::createDatabase(const std::string& aName) {
 	StatusResult theResult(Error::no_error);
 	auto theNewDB = std::make_unique<Database>(aName, CreateNewFile{}, theResult);
 	if (theResult) {
-		_reset_active_db(std::move(theNewDB));
-		theResult.set_message("Query OK, database '" + aName + "' created");
+		_resetActiveDB(std::move(theNewDB));
+		theResult.setMessage("Query OK, database '" + aName + "' created");
 	}
 	return theResult;
 }
 
-StatusResult DBManager::drop_database(const std::string& aName) {
-	if (m_activeDB && m_activeDB->get_name() == aName) {
-		_release_active_db();
+StatusResult DBManager::dropDatabase(const std::string& aName) {
+	if (m_activeDB && m_activeDB->getName() == aName) {
+		_releaseActiveDB();
 	}
-	StatusResult theResult = DBManager::_delete_dbfile(aName);
+	StatusResult theResult = DBManager::_deleteDBFile(aName);
 	if (theResult) {
-		theResult.set_message("Query OK, database '" + aName + "' dropped");
+		theResult.setMessage("Query OK, database '" + aName + "' dropped");
 	}
 	return theResult;
 }
 
-StatusResult DBManager::use_database(const std::string& aName) {
+StatusResult DBManager::useDatabase(const std::string& aName) {
 	StatusResult theResult(Error::no_error);
-	if (!m_activeDB || m_activeDB->get_name() != aName) {
+	if (!m_activeDB || m_activeDB->getName() != aName) {
 		auto theNewDB = std::make_unique<Database>(aName, OpenExistingFile{}, theResult);
 		if (theResult) {
-			_reset_active_db(std::move(theNewDB));
+			_resetActiveDB(std::move(theNewDB));
 		}
 	}
 	if (theResult) {
-		theResult.set_message("Database changed");
+		theResult.setMessage("Database changed");
 	}
 	return theResult;
 }
 
-StatusResult DBManager::show_databases() {
+StatusResult DBManager::showDatabases() {
 	StringList theDBNames;
-	StatusResult theResult = DBManager::_collect_dbnames(theDBNames);
+	StatusResult theResult = DBManager::_collectDBNames(theDBNames);
 	if (theResult) {
 		if (!theDBNames.empty()) {
 			ShowDBView(theDBNames).show();
-			theResult.set_message("Showing databases");
+			theResult.setMessage("Showing databases");
 		}
 		else {
-			theResult.set_message("empty set");
+			theResult.setMessage("empty set");
 		}
 	}
 	return theResult;
 }
 
-StatusResult DBManager::describe_database(const std::string& aName) {
+StatusResult DBManager::describeDatabase(const std::string& aName) {
 	Database* theDB = nullptr;
 	StatusResult theResult(Error::no_error);
 	std::unique_ptr<Database> theDBHolder(nullptr);
-	if (m_activeDB && m_activeDB->get_name() == aName) {
+	if (m_activeDB && m_activeDB->getName() == aName) {
 		theDB = m_activeDB.get();
 	}
 	else {
@@ -100,28 +100,28 @@ StatusResult DBManager::describe_database(const std::string& aName) {
 	}
 	if (theResult) {
 		std::vector<BlockType> theBlockTypes;
-		theResult = (theDB->get_storage()).each_block(
+		theResult = (theDB->getStorage()).eachBlock(
 			[&theBlockTypes](Block& aBlock, blocknum_t)->StatusResult {
-				theBlockTypes.push_back(aBlock.get_type());
+				theBlockTypes.push_back(aBlock.getType());
 				return StatusResult(Error::no_error);
 			}
 		);
 		if (theResult) {
 			DescDBView(theBlockTypes).show();
-			theResult.set_message("Describing database '" + aName + '\'');
+			theResult.setMessage("Describing database '" + aName + '\'');
 		}
 	}
 	return theResult;
 }
 
-Database* DBManager::get_active_database() const {
+Database* DBManager::getActiveDatabase() const {
 	return m_activeDB.get();
 }
 
-StatusResult DBManager::database_exists(bool& exists, const std::string& aName) {
-	std::string theFullName = aName + Storage::default_file_extension;
-	FolderReader theFolderReader(Storage::default_storage_path);
-	return theFolderReader.each_file(
+StatusResult DBManager::databaseExists(bool& exists, const std::string& aName) {
+	std::string theFullName = aName + Storage::defaultFileExtension;
+	FolderReader theFolderReader(Storage::defaultStoragePath);
+	return theFolderReader.eachFile(
 		[&](const std::string& aFileName) {
 			if (aFileName == theFullName) {
 				exists = true;
@@ -131,26 +131,26 @@ StatusResult DBManager::database_exists(bool& exists, const std::string& aName) 
 	);
 }
 
-void DBManager::_reset_active_db(std::unique_ptr<Database>&& aNewDB) {
+void DBManager::_resetActiveDB(std::unique_ptr<Database>&& aNewDB) {
 	m_activeDB = std::move(aNewDB);
 }
 
-void DBManager::_release_active_db() {
-	_reset_active_db(nullptr);
+void DBManager::_releaseActiveDB() {
+	_resetActiveDB(nullptr);
 }
 
-StatusResult DBManager::_delete_dbfile(const std::string& aName) {
-	std::string theFilePath = Storage::get_dbfile_path(aName);
+StatusResult DBManager::_deleteDBFile(const std::string& aName) {
+	std::string theFilePath = Storage::getDBFilePath(aName);
 
 	return std::remove(theFilePath.c_str()) == 0 ? StatusResult(Error::no_error) :
 		StatusResult(Error::delete_error, "Cannot delete file '" + theFilePath + '\'');
 }
 
-StatusResult DBManager::_collect_dbnames(StringList& aDBNames) {
-	return FolderReader(Storage::default_storage_path).each_file(
+StatusResult DBManager::_collectDBNames(StringList& aDBNames) {
+	return FolderReader(Storage::defaultStoragePath).eachFile(
 		[&aDBNames](const std::string& aFileName)->bool {
-			if (Storage::has_default_extension(aFileName)) {
-				aDBNames.emplace_back(aFileName.substr(0, aFileName.length() - Storage::extension_length));
+			if (Storage::hasDefaultExtension(aFileName)) {
+				aDBNames.emplace_back(aFileName.substr(0, aFileName.length() - Storage::extensionLength));
 			}
 			return true;
 		}

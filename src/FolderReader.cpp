@@ -8,7 +8,7 @@ FolderReader::FolderReader(std::string aPath) :
 {
 }
 
-StatusResult FolderReader::each_file(FileVisitor aVisitor) const {
+StatusResult FolderReader::eachFile(FileVisitor aVisitor) const {
 	if (std::filesystem::exists(m_path)) {
 		for (const auto& theEntry : std::filesystem::directory_iterator(m_path)) {
 			std::string theFileName = theEntry.path().generic_string();

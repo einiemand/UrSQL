@@ -16,7 +16,7 @@ public:
 	FolderReader(const FolderReader&) = delete;
 	FolderReader& operator=(const FolderReader&) = delete;
 
-	StatusResult each_file(FileVisitor aVisitor) const;
+	StatusResult eachFile(FileVisitor aVisitor) const;
 private:
 	std::string m_path;
 };

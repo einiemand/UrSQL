@@ -4,59 +4,59 @@
 
 namespace UrSQL {
 
-const char* Storage::default_storage_path = "./tmp";
-const char* Storage::default_file_extension = ".db";
-const size_type Storage::extension_length = strlen(Storage::default_file_extension);
+const char* Storage::defaultStoragePath = "./tmp";
+const char* Storage::defaultFileExtension = ".db";
+const size_type Storage::extensionLength = strlen(Storage::defaultFileExtension);
 
 Storage::Storage(std::string aFileName, CreateNewFile, const TOC& aTOC, StatusResult& aResult) :
 	m_name(std::move(aFileName))
 {
-	aResult = _setup_toc(aTOC);
+	aResult = _setupTOC(aTOC);
 }
 
 Storage::Storage(std::string aFileName, OpenExistingFile, TOC& aTOC, StatusResult& aResult) :
 	m_name(std::move(aFileName))
 {
-	aResult = _load_toc(aTOC);
+	aResult = _loadTOC(aTOC);
 }
 
-std::string Storage::get_dbfile_path(const std::string& aDBName) {
+std::string Storage::getDBFilePath(const std::string& aDBName) {
 	std::ostringstream thePath;
-	thePath << default_storage_path << '/' << aDBName << default_file_extension;
+	thePath << defaultStoragePath << '/' << aDBName << defaultFileExtension;
 	return thePath.str();
 }
 
-bool Storage::has_default_extension(const std::string& aFileName) {
-	return aFileName.substr(aFileName.length() - Storage::extension_length) == Storage::default_file_extension;
+bool Storage::hasDefaultExtension(const std::string& aFileName) {
+	return aFileName.substr(aFileName.length() - Storage::extensionLength) == Storage::defaultFileExtension;
 }
 
-size_type Storage::_get_block_count() {
+size_type Storage::_getBlockCount() {
 	m_file.seekg(0, std::fstream::end);
 	size_type total = static_cast<size_type>(m_file.tellg());
 	return total / defaultBlockSize;
 }
 
-StatusResult Storage::_get_free_block_number(blocknum_t& aFreeBlockNum) {
-	StatusResult theResult = each_block(
-		[&aFreeBlockNum](Block& aBlock, blocknum_t aBlockNum)->StatusResult {
-			if (aBlock.get_type() == BlockType::free_type) {
-				aFreeBlockNum = aBlockNum;
+StatusResult Storage::_getFreeBlocknumber(blocknum_t& aFreeBlocknum) {
+	StatusResult theResult = eachBlock(
+		[&aFreeBlocknum](Block& aBlock, blocknum_t aBlocknum)->StatusResult {
+			if (aBlock.getType() == BlockType::free_type) {
+				aFreeBlocknum = aBlocknum;
 				return StatusResult(Error::block_found);
 			}
 			return StatusResult(Error::no_error);
 		}
 	);
-	if (theResult.get_code() == Error::block_found) {
+	if (theResult.getCode() == Error::block_found) {
 		return StatusResult(Error::no_error);
 	}
 	if (theResult) {
-		aFreeBlockNum = _get_block_count();
+		aFreeBlocknum = _getBlockCount();
 	}
 	return theResult;
 }
 
-StatusResult Storage::_setup_toc(const TOC& aTOC) {
-	std::string theFilePath = Storage::get_dbfile_path(m_name);
+StatusResult Storage::_setupTOC(const TOC& aTOC) {
+	std::string theFilePath = Storage::getDBFilePath(m_name);
 	//m_file.clear();
 
 	m_file.open(theFilePath, std::fstream::out | std::fstream::trunc);
@@ -64,22 +64,22 @@ StatusResult Storage::_setup_toc(const TOC& aTOC) {
 
 	m_file.open(theFilePath, std::fstream::in | std::fstream::out | std::fstream::binary);
 
-	if (storage_ready()) {
+	if (storageReady()) {
 		Block theBlock(aTOC);
-		return write_block(theBlock, aTOC.get_blocknum());
+		return writeBlock(theBlock, aTOC.getBlocknum());
 	}
 
 	return StatusResult(Error::write_error, "File '" + theFilePath + "' cannot be opened");
 }
 
-StatusResult Storage::_load_toc(TOC& aTOC) {
-	std::string theFilePath = Storage::get_dbfile_path(m_name);
+StatusResult Storage::_loadTOC(TOC& aTOC) {
+	std::string theFilePath = Storage::getDBFilePath(m_name);
 	m_file.open(theFilePath, std::fstream::in | std::fstream::out | std::fstream::binary);
 
-	if (storage_ready()) {
+	if (storageReady()) {
 		Block theBlock;
 
-		StatusResult theResult = read_block(theBlock, 0);
+		StatusResult theResult = readBlock(theBlock, 0);
 		if (theResult) {
 			aTOC.decode(theBlock, 0);
 		}
@@ -89,42 +89,42 @@ StatusResult Storage::_load_toc(TOC& aTOC) {
 	return StatusResult(Error::read_error, "File '" + m_name + "' cannot be opened");
 }
 
-StatusResult Storage::read_block(Block& aBlock, blocknum_t aBlockNum) {
+StatusResult Storage::readBlock(Block& aBlock, blocknum_t aBlocknum) {
 	StatusResult theResult(Error::no_error);
-	if (m_file.seekg(static_cast<int64_t>(aBlockNum) * defaultBlockSize)) {
+	if (m_file.seekg(static_cast<int64_t>(aBlocknum) * defaultBlockSize)) {
 		if (!m_file.read(reinterpret_cast<char*>(&aBlock), defaultBlockSize)) {
-			theResult.set_error(Error::read_error, "Unable to read blocks from '" + Storage::get_dbfile_path(m_name) + '\'');
+			theResult.setError(Error::read_error, "Unable to read blocks from '" + Storage::getDBFilePath(m_name) + '\'');
 		}
 	}
 	else {
-		theResult.set_error(Error::seek_error, "fstream offset error: " + std::to_string(aBlockNum));
+		theResult.setError(Error::seek_error, "fstream offset error: " + std::to_string(aBlocknum));
 	}
 	return theResult;
 }
 
-StatusResult Storage::write_block(const Block& aBlock, blocknum_t aBlockNum) {
+StatusResult Storage::writeBlock(const Block& aBlock, blocknum_t aBlocknum) {
 	StatusResult theResult(Error::no_error);
-	if (m_file.seekp(static_cast<int64_t>(aBlockNum) * defaultBlockSize)) {
+	if (m_file.seekp(static_cast<int64_t>(aBlocknum) * defaultBlockSize)) {
 		if (!m_file.write(reinterpret_cast<const char*>(&aBlock), defaultBlockSize)) {
-			theResult.set_error(Error::write_error, "Unable to write blocks to '" + Storage::get_dbfile_path(m_name) + '\'');
+			theResult.setError(Error::write_error, "Unable to write blocks to '" + Storage::getDBFilePath(m_name) + '\'');
 		}
 	}
 	else {
-		theResult.set_error(Error::seek_error, "fstream offset error: " + std::to_string(aBlockNum));
+		theResult.setError(Error::seek_error, "fstream offset error: " + std::to_string(aBlocknum));
 	}
 	return theResult;
 }
 
-StatusResult Storage::each_block(BlockVisitor aVisitor) {
-	size_type theBlockCnt = _get_block_count();
+StatusResult Storage::eachBlock(BlockVisitor aVisitor) {
+	size_type theBlockCnt = _getBlockCount();
 
 	StatusResult theResult(Error::no_error);
 
 	Block theBlock;
-	for (size_type theBlockNum = 0; theResult && theBlockNum < theBlockCnt; ++theBlockNum) {
-		theResult = read_block(theBlock, theBlockNum);
+	for (size_type theBlocknum = 0; theResult && theBlocknum < theBlockCnt; ++theBlocknum) {
+		theResult = readBlock(theBlock, theBlocknum);
 		if (theResult) {
-			theResult = aVisitor(theBlock, theBlockNum);
+			theResult = aVisitor(theBlock, theBlocknum);
 		}
 	}
 	return theResult;

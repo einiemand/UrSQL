@@ -31,8 +31,8 @@ public:
 	const Token& get();
 	bool next(size_type anOffset = 1);
 
-	bool skip_if(TokenType aType);
-	bool skip_if(Keyword aKeyword);
+	bool skipIf(TokenType aType);
+	bool skipIf(Keyword aKeyword);
 
 	StatusResult tokenize();
 
@@ -41,10 +41,10 @@ private:
 	std::vector<Token> m_tokens;
 	size_type m_index;
 
-	std::string _read_while(TokenizeCondition aCondition);
-	std::string _read_until(TokenizeCondition aCondition);
-	inline std::string _read_until(char aChar) {
-		return _read_until([aChar](char ch)->bool { return ch == aChar; });
+	std::string _readWhile(TokenizeCondition aCondition);
+	std::string _readUntil(TokenizeCondition aCondition);
+	inline std::string _readUntil(char aChar) {
+		return _readUntil([aChar](char ch)->bool { return ch == aChar; });
 	}
 };
 

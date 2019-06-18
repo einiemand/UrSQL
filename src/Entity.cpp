@@ -5,7 +5,7 @@ namespace UrSQL {
 
 
 
-BlockType Entity::expected_block_type() const {
+BlockType Entity::expectedBlockType() const {
 	return BlockType::entity_type;
 }
 

@@ -3,24 +3,24 @@
 
 namespace UrSQL {
 
-MonoStorable::MonoStorable(blocknum_t aBlockNum) :
+MonoStorable::MonoStorable(blocknum_t aBlocknum) :
 	Storable(),
-	m_blocknum(aBlockNum)
+	m_blocknum(aBlocknum)
 {
 }
 
 void MonoStorable::encode(Block& aBlock) const {
-	aBlock.set_type(expected_block_type());
-	BufferWriter theWriter(aBlock.get_data(), defaultBlockSize);
+	aBlock.setType(expectedBlockType());
+	BufferWriter theWriter(aBlock.getData(), defaultBlockSize);
 	serialize(theWriter);
 }
 
-void MonoStorable::decode(const Block& aBlock, blocknum_t aBlockNum) {
-	if (expected_block_type() != aBlock.get_type()) {
+void MonoStorable::decode(const Block& aBlock, blocknum_t aBlocknum) {
+	if (expectedBlockType() != aBlock.getType()) {
 		throw std::runtime_error("Block type is NOT correct!");
 	}
-	set_blocknum(aBlockNum);
-	BufferReader theReader(aBlock.get_data(), defaultBlockSize);
+	setBlocknum(aBlocknum);
+	BufferReader theReader(aBlock.getData(), defaultBlockSize);
 	deserialize(theReader);
 }
 
