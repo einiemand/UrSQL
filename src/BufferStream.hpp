@@ -17,7 +17,7 @@ public:
 	BufferWriter& operator<<(const T aNum) {
 		static constexpr size_type theTypeSize = sizeof(T);
 		if (m_pos + theTypeSize < m_size) {
-			memcpy(m_Buf + m_pos, &aNum, theTypeSize);
+			memcpy(m_buf + m_pos, &aNum, theTypeSize);
 			m_pos += theTypeSize;
 			return *this;
 		}
@@ -27,7 +27,7 @@ public:
 	BufferWriter& operator<<(const std::string& aString);
 
 private:
-	char* m_Buf;
+	char* m_buf;
 	size_type m_pos;
 	size_type m_size;
 };
@@ -44,7 +44,7 @@ public:
 	BufferReader& operator>>(T& aNum) {
 		static constexpr size_type theTypeSize = sizeof(T);
 		if (m_pos + theTypeSize < m_size) {
-			memcpy(&aNum, m_Buf + m_pos, theTypeSize);
+			memcpy(&aNum, m_buf + m_pos, theTypeSize);
 			m_pos += theTypeSize;
 			return *this;
 		}
@@ -54,7 +54,7 @@ public:
 	BufferReader& operator>>(std::string& aString);
 
 private:
-	const char* m_Buf;
+	const char* m_buf;
 	size_type m_pos;
 	size_type m_size;
 };

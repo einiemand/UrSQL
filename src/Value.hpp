@@ -34,7 +34,7 @@ public:
 	void deserialize(BufferReader& aReader) override;
 
 	inline void swap(Value& rhs) noexcept {
-		m_Base.swap(rhs.m_Base);
+		m_base.swap(rhs.m_base);
 	}
 
 	ValueType getType() const;
@@ -46,7 +46,7 @@ public:
 	friend bool operator==(const Value& lhs, const Value& rhs);
 
 private:
-	std::unique_ptr<ValueBase> m_Base;
+	std::unique_ptr<ValueBase> m_base;
 };
 
 }

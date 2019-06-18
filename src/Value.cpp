@@ -320,37 +320,37 @@ std::unique_ptr<ValueBase> ValueImpl<ValueBase::null_t>::copyAndConvert(ValueTyp
 }
 
 Value::Value() :
-	m_Base(std::make_unique<NullValue>())
+	m_base(std::make_unique<NullValue>())
 {
 }
 
 Value::Value(int_t anInt) :
-	m_Base(std::make_unique<IntValue>(anInt))
+	m_base(std::make_unique<IntValue>(anInt))
 {
 }
 
 Value::Value(float_t aFloat) :
-	m_Base(std::make_unique<FloatValue>(aFloat))
+	m_base(std::make_unique<FloatValue>(aFloat))
 {
 }
 
 Value::Value(bool_t aBool) :
-	m_Base(std::make_unique<BoolValue>(aBool))
+	m_base(std::make_unique<BoolValue>(aBool))
 {
 }
 
 Value::Value(varchar_t aString) :
-	m_Base(std::make_unique<VCharValue>(std::move(aString)))
+	m_base(std::make_unique<VCharValue>(std::move(aString)))
 {
 }
 
 Value::Value(const Value& rhs) :
-	m_Base(rhs.m_Base->copyAndConvert(rhs.getType()))
+	m_base(rhs.m_base->copyAndConvert(rhs.getType()))
 {
 }
 
 Value::Value(Value&& rhs) noexcept :
-	m_Base(std::move(rhs.m_Base))
+	m_base(std::move(rhs.m_base))
 {
 }
 
@@ -365,7 +365,7 @@ Value& Value::operator=(Value&& rhs) noexcept {
 }
 
 void Value::serialize(BufferWriter& aWriter) const {
-	aWriter << static_cast<char>(getType()) << m_Base->stringify();
+	aWriter << static_cast<char>(getType()) << m_base->stringify();
 }
 
 void Value::deserialize(BufferReader& aReader) {
@@ -383,28 +383,28 @@ void Value::deserialize(BufferReader& aReader) {
 }
 
 ValueType Value::getType() const {
-	return m_Base->type();
+	return m_base->type();
 }
 
 size_type Value::getSize() const {
-	return m_Base->size();
+	return m_base->size();
 }
 
 StatusResult Value::become(ValueType aType) {
-	m_Base = m_Base->copyAndConvert(aType);
+	m_base = m_base->copyAndConvert(aType);
 	return getType() == aType ? StatusResult(Error::no_error) : StatusResult(Error::conversion_fail, "Invalid ValueType");
 }
 
 size_type Value::hash() const {
-	return m_Base->hash();
+	return m_base->hash();
 }
 
 bool operator<(const Value& lhs, const Value& rhs) {
-	return lhs.m_Base->less(*rhs.m_Base);
+	return lhs.m_base->less(*rhs.m_base);
 }
 
 bool operator==(const Value& lhs, const Value& rhs) {
-	return lhs.m_Base->equal(*rhs.m_Base);
+	return lhs.m_base->equal(*rhs.m_base);
 }
 
 }
