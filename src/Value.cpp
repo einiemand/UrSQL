@@ -3,71 +3,43 @@
 
 namespace UrSQL {
 
-enum class ValueType : char {
-	int_type,
-	float_type,
-	bool_type,
-	varchar_type,
-	null_type
-};
-
-class ValueBase {
-public:
-	using int_t = Value::int_t;
-	using float_t = Value::float_t;
-	using bool_t = Value::bool_t;
-	using varchar_t = Value::varchar_t;
-	using null_t = Value::null_t;
-
-	virtual ValueType type() const = 0;
-	virtual size_type size() const = 0;
-	virtual std::unique_ptr<ValueBase> copyAndConvert(ValueType aType) const = 0;
-	virtual size_type hash() const = 0;
-	virtual std::string stringify() const = 0;
-
-	virtual bool less(const ValueBase& rhs) const = 0;
-	virtual bool equal(const ValueBase& rhs) const = 0;
-
-	virtual ~ValueBase() = default;
-};
+using int_t = Value::int_t;
+using float_t = Value::float_t;
+using bool_t = Value::bool_t;
+using varchar_t = Value::varchar_t;
+using null_t = Value::null_t;
 
 template<typename T>
 struct val_type_traits {};
 
 template<>
-struct val_type_traits<ValueBase::int_t> {
+struct val_type_traits<int_t> {
 	static constexpr ValueType val_type = ValueType::int_type;
 };
 
 template<>
-struct val_type_traits<ValueBase::float_t> {
+struct val_type_traits<float_t> {
 	static constexpr ValueType val_type = ValueType::float_type;
 };
 
 template<>
-struct val_type_traits<ValueBase::bool_t> {
+struct val_type_traits<bool_t> {
 	static constexpr ValueType val_type = ValueType::bool_type;
 };
 
 template<>
-struct val_type_traits<ValueBase::varchar_t> {
+struct val_type_traits<varchar_t> {
 	static constexpr ValueType val_type = ValueType::varchar_type;
 };
 
 template<>
-struct val_type_traits<ValueBase::null_t> {
+struct val_type_traits<null_t> {
 	static constexpr ValueType val_type = ValueType::null_type;
 };
 
 template<typename T>
 class ValueImpl : public ValueBase {
 public:
-	using ValueBase::int_t;
-	using ValueBase::float_t;
-	using ValueBase::bool_t;
-	using ValueBase::varchar_t;
-	using ValueBase::null_t;
-
 	static constexpr ValueType val_type = val_type_traits<T>::val_type;
 
 	ValueImpl() : ValueImpl(T{}) {}
@@ -102,6 +74,10 @@ public:
 		return std::to_string(m_val);
 	}
 
+	std::ostream& dump(std::ostream& anOutput) const override {
+		return anOutput << m_val;
+	}
+
 	bool less(const ValueBase& rhs) const override {
 		if (type() == rhs.type()) {
 			return m_val < dynamic_cast<const ValueImpl<T>&>(rhs).m_val;
@@ -126,14 +102,8 @@ private:
 };
 
 template<>
-class ValueImpl<ValueBase::varchar_t> : public ValueBase {
+class ValueImpl<varchar_t> : public ValueBase {
 public:
-	using ValueBase::int_t;
-	using ValueBase::float_t;
-	using ValueBase::bool_t;
-	using ValueBase::varchar_t;
-	using ValueBase::null_t;
-
 	static constexpr ValueType val_type = val_type_traits<varchar_t>::val_type;
 
 	ValueImpl(varchar_t aVal = "") :
@@ -166,6 +136,10 @@ public:
 		return m_val;
 	}
 
+	std::ostream& dump(std::ostream& anOutput) const override {
+		return anOutput << m_val;
+	}
+
 	bool less(const ValueBase& rhs) const override {
 		if (type() == rhs.type()) {
 			return m_val < dynamic_cast<const ValueImpl<varchar_t>&>(rhs).m_val;
@@ -191,13 +165,8 @@ private:
 };
 
 template<>
-class ValueImpl<ValueBase::null_t> : public ValueBase {
+class ValueImpl<null_t> : public ValueBase {
 public:
-	using ValueBase::int_t;
-	using ValueBase::float_t;
-	using ValueBase::bool_t;
-	using ValueBase::varchar_t;
-	using ValueBase::null_t;
 
 	static constexpr ValueType val_type = val_type_traits<null_t>::val_type;
 
@@ -226,6 +195,10 @@ public:
 		return "";
 	}
 
+	std::ostream& dump(std::ostream& anOutput) const override {
+		return anOutput << "NULL";
+	}
+
 	bool less(const ValueBase& rhs) const override {
 		return false;
 	}
@@ -235,14 +208,14 @@ public:
 	}
 };
 
-using IntValue = ValueImpl<ValueBase::int_t>;
-using FloatValue = ValueImpl<ValueBase::float_t>;
-using BoolValue = ValueImpl<ValueBase::bool_t>;
-using VCharValue = ValueImpl<ValueBase::varchar_t>;
-using NullValue = ValueImpl<ValueBase::null_t>;
+using IntValue = ValueImpl<int_t>;
+using FloatValue = ValueImpl<float_t>;
+using BoolValue = ValueImpl<bool_t>;
+using VCharValue = ValueImpl<varchar_t>;
+using NullValue = ValueImpl<null_t>;
 
 template<>
-std::unique_ptr<ValueBase> ValueImpl<ValueBase::int_t>::copyAndConvert(ValueType aType) const {
+std::unique_ptr<ValueBase> ValueImpl<int_t>::copyAndConvert(ValueType aType) const {
 	switch (aType) {
 	case ValueType::int_type:
 		return std::make_unique<IntValue>(m_val);
@@ -258,7 +231,7 @@ std::unique_ptr<ValueBase> ValueImpl<ValueBase::int_t>::copyAndConvert(ValueType
 }
 
 template<>
-std::unique_ptr<ValueBase> ValueImpl<ValueBase::float_t>::copyAndConvert(ValueType aType) const {
+std::unique_ptr<ValueBase> ValueImpl<float_t>::copyAndConvert(ValueType aType) const {
 	switch (aType) {
 	case ValueType::int_type:
 		return std::make_unique<IntValue>(static_cast<int_t>(m_val));
@@ -274,7 +247,7 @@ std::unique_ptr<ValueBase> ValueImpl<ValueBase::float_t>::copyAndConvert(ValueTy
 }
 
 template<>
-std::unique_ptr<ValueBase> ValueImpl<ValueBase::bool_t>::copyAndConvert(ValueType aType) const {
+std::unique_ptr<ValueBase> ValueImpl<bool_t>::copyAndConvert(ValueType aType) const {
 	switch (aType) {
 	case ValueType::int_type:
 		return std::make_unique<IntValue>(static_cast<int_t>(m_val));
@@ -289,7 +262,7 @@ std::unique_ptr<ValueBase> ValueImpl<ValueBase::bool_t>::copyAndConvert(ValueTyp
 	}
 }
 
-std::unique_ptr<ValueBase> ValueImpl<ValueBase::varchar_t>::copyAndConvert(ValueType aType) const {
+std::unique_ptr<ValueBase> ValueImpl<varchar_t>::copyAndConvert(ValueType aType) const {
 	switch (aType) {
 	case ValueType::int_type:
 		return std::make_unique<IntValue>(std::stoi(m_val));
@@ -304,7 +277,7 @@ std::unique_ptr<ValueBase> ValueImpl<ValueBase::varchar_t>::copyAndConvert(Value
 	}
 }
 
-std::unique_ptr<ValueBase> ValueImpl<ValueBase::null_t>::copyAndConvert(ValueType aType) const {
+std::unique_ptr<ValueBase> ValueImpl<null_t>::copyAndConvert(ValueType aType) const {
 	switch (aType) {
 	case ValueType::int_type:
 		return std::make_unique<IntValue>();
@@ -405,6 +378,10 @@ bool operator<(const Value& lhs, const Value& rhs) {
 
 bool operator==(const Value& lhs, const Value& rhs) {
 	return lhs.m_base->equal(*rhs.m_base);
+}
+
+std::ostream& operator<<(std::ostream& anOutput, const Value& aValue) {
+	return aValue.m_base->dump(anOutput);
 }
 
 }
