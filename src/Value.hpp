@@ -6,9 +6,32 @@
 
 namespace UrSQL {
 
-enum class ValueType : char;
+enum class ValueType : char {
+	int_type,
+	float_type,
+	bool_type,
+	varchar_type,
+	null_type
+};
 
-class ValueBase;
+namespace {
+
+class ValueBase {
+public:
+	virtual ValueType type() const = 0;
+	virtual size_type size() const = 0;
+	virtual std::unique_ptr<ValueBase> copyAndConvert(ValueType aType) const = 0;
+	virtual size_type hash() const = 0;
+	virtual std::string stringify() const = 0;
+	virtual std::ostream& dump(std::ostream& anOutput) const = 0;
+
+	virtual bool less(const ValueBase& rhs) const = 0;
+	virtual bool equal(const ValueBase& rhs) const = 0;
+
+	virtual ~ValueBase() = default;
+};
+
+}
 
 class Value : public Storable {
 public:
@@ -44,6 +67,7 @@ public:
 
 	friend bool operator<(const Value& lhs, const Value& rhs);
 	friend bool operator==(const Value& lhs, const Value& rhs);
+	friend std::ostream& operator<<(std::ostream& anOutput, const Value& aValue);
 
 private:
 	std::unique_ptr<ValueBase> m_base;
