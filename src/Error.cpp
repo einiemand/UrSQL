@@ -32,8 +32,8 @@ void StatusResult::showError() const {
 	static std::unordered_map<Error, const char*> err2msg{
 		{ Error::unexpected_identifier,"Unexpected identifier" },
 		{ Error::syntax_error,"Syntax error" },
-		{ Error::databaseExists,"Database alreay exists" },
-		{ Error::unknown_Database,"Unknown database" },
+		{ Error::database_exists,"Database alreay exists" },
+		{ Error::unknown_database,"Unknown database" },
 		{ Error::read_error,"Read error" },
 		{ Error::write_error,"Write error" },
 		{ Error::seek_error,"File seek error" },
@@ -42,8 +42,8 @@ void StatusResult::showError() const {
 		{ Error::block_fullData,"Block is full" },
 		{ Error::block_notEnoughData,"Block didn't hold enough data to be parsed" },
 		{ Error::folder_notExist,"Folder doesn't exist" },
-		{ Error::unknown_Command,"Unknown command" },
-		{ Error::invalid_Command,"Invalid command" },
+		{ Error::unknown_command,"Unknown command" },
+		{ Error::invalid_command,"Invalid command" },
 		{ Error::not_implemented,"Functionality not implemented yet" }
 	};
 	if (m_code != Error::no_error && m_code != Error::user_terminated) {

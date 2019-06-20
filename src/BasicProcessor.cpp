@@ -10,7 +10,7 @@ BasicProcessor::BasicProcessor(Interpreter* anInterpreter) :
 }
 
 std::unique_ptr<Statement> BasicProcessor::getStatement(Tokenizer& aTokenizer) {
-	Keyword theKeyword = aTokenizer.peek().get_keyword();
+	Keyword theKeyword = aTokenizer.peek().getKeyword();
 	switch (theKeyword) {
 	case Keyword::help_kw:
 	case Keyword::version_kw:

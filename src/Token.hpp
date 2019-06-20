@@ -33,7 +33,7 @@ public:
 		return m_type;
 	}
 
-	inline Keyword get_keyword() const {
+	inline Keyword getKeyword() const {
 		return m_keyword;
 	}
 private:

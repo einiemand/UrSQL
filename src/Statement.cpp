@@ -31,7 +31,7 @@ StatusResult BasicStatement::parse() {
 
 StatusResult BasicStatement::validate() const {
 	return m_tokenizer.remaining() == 1 ? StatusResult(Error::no_error) :
-		StatusResult(Error::invalid_Command, "Redundant input after '" + m_tokenizer.peek().getData() + '\'');
+		StatusResult(Error::invalid_command, "Redundant input after '" + m_tokenizer.peek().getData() + '\'');
 }
 
 StatusResult BasicStatement::execute() const {

@@ -21,16 +21,16 @@ enum class Error {
 	noDatabase_specified = 210,
 
 	//entity/DB related...
-	entityExists = 300,
-	databaseExists,
+	entity_exists = 300,
+	database_exists,
 	unknown_entity = 310,
-	unknown_Database = 320,
+	unknown_database = 320,
 
 	//type related...
 	unknown_type = 400,
-	unknown_Attribute = 405,
-	invalid_Attribute = 410,
-	invalid_Arguments = 420,
+	unknown_attribute = 405,
+	invalid_attribute = 410,
+	invalid_arguments = 420,
 	keyValue_mismatch = 430, //# of fieldnames doesn't match values...
 
 	//storage/io related...
@@ -54,8 +54,8 @@ enum class Error {
 	conversion_fail = 800,
 
 	//command related...
-	unknown_Command = 3000,
-	invalid_Command = 3010,
+	unknown_command = 3000,
+	invalid_command = 3010,
 
 	//general purpose...
 	user_terminated = 4998,

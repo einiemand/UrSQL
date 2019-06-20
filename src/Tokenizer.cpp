@@ -86,7 +86,7 @@ bool Tokenizer::skipIf(TokenType aType) {
 }
 
 bool Tokenizer::skipIf(Keyword aKeyword) {
-	if (more() && peek().get_keyword() == aKeyword) {
+	if (more() && peek().getKeyword() == aKeyword) {
 		next();
 		return true;
 	}

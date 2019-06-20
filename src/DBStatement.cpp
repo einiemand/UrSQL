@@ -48,11 +48,11 @@ public:
 			bool exists = false;
 			theResult = DBManager::databaseExists(exists, m_dbName);
 			if (theResult && exists) {
-				theResult.setError(Error::databaseExists, '\'' + m_dbName + '\'');
+				theResult.setError(Error::database_exists, '\'' + m_dbName + '\'');
 			}
 		}
 		else {
-			theResult.setError(Error::invalid_Command, "Redundant input after '" + m_dbName + '\'');
+			theResult.setError(Error::invalid_command, "Redundant input after '" + m_dbName + '\'');
 		}
 		return theResult;
 	}
@@ -102,11 +102,11 @@ public:
 			bool exists = false;
 			theResult = DBManager::databaseExists(exists, m_dbName);
 			if (theResult && !exists) {
-				theResult.setError(Error::unknown_Database, '\'' + m_dbName + '\'');
+				theResult.setError(Error::unknown_database, '\'' + m_dbName + '\'');
 			}
 		}
 		else {
-			theResult.setError(Error::invalid_Command, "Redundant input after '" + m_dbName + '\'');
+			theResult.setError(Error::invalid_command, "Redundant input after '" + m_dbName + '\'');
 		}
 		return theResult;
 	}
@@ -156,11 +156,11 @@ public:
 			bool exists = false;
 			theResult = DBManager::databaseExists(exists, m_dbName);
 			if (theResult && !exists) {
-				theResult.setError(Error::unknown_Database, '\'' + m_dbName + '\'');
+				theResult.setError(Error::unknown_database, '\'' + m_dbName + '\'');
 			}
 		}
 		else {
-			theResult.setError(Error::invalid_Command, "Redundant input after '" + m_dbName + '\'');
+			theResult.setError(Error::invalid_command, "Redundant input after '" + m_dbName + '\'');
 		}
 		return theResult;
 	}
@@ -190,7 +190,7 @@ public:
 
 	StatusResult validate() const override {
 		return !m_tokenizer.more() ? StatusResult(Error::no_error) :
-			StatusResult(Error::invalid_Command, "Redundant input after 'databases'");
+			StatusResult(Error::invalid_command, "Redundant input after 'databases'");
 	}
 
 	StatusResult execute() const override {
@@ -236,11 +236,11 @@ public:
 			bool exists = false;
 			theResult = DBManager::databaseExists(exists, m_dbName);
 			if (theResult && !exists) {
-				theResult.setError(Error::unknown_Database, '\'' + m_dbName + '\'');
+				theResult.setError(Error::unknown_database, '\'' + m_dbName + '\'');
 			}
 		}
 		else {
-			theResult.setError(Error::invalid_Command, "Redundant input after '" + m_dbName + '\'');
+			theResult.setError(Error::invalid_command, "Redundant input after '" + m_dbName + '\'');
 		}
 		return theResult;
 	}

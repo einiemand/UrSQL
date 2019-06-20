@@ -29,7 +29,7 @@ public:
 		}
 
 		return m_next ? m_next->process_input(aTokenizer) :
-			StatusResult(Error::unknown_Command, "Enter 'help' to get familiar with this clumsy DB engine");
+			StatusResult(Error::unknown_command, "Enter 'help' to get familiar with this clumsy DB engine");
 	}
 
 	virtual Database* getActiveDatabase() const {

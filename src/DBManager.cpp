@@ -14,13 +14,13 @@ DBManager::DBManager(Interpreter* anInterpreter) :
 }
 
 std::unique_ptr<Statement> DBManager::getStatement(Tokenizer& aTokenizer) {
-	Keyword theKeyword = aTokenizer.peek().get_keyword();
+	Keyword theKeyword = aTokenizer.peek().getKeyword();
 
 	switch (theKeyword) {
 	case Keyword::create_kw:
 	case Keyword::drop_kw:
 	case Keyword::describe_kw: {
-		if (aTokenizer.remaining() > 1 && aTokenizer.peek(1).get_keyword() == Keyword::database_kw) {
+		if (aTokenizer.remaining() > 1 && aTokenizer.peek(1).getKeyword() == Keyword::database_kw) {
 			return DBStatement::factory(theKeyword, aTokenizer, *this);
 		}
 		break;
@@ -28,7 +28,7 @@ std::unique_ptr<Statement> DBManager::getStatement(Tokenizer& aTokenizer) {
 	case Keyword::use_kw:
 		return DBStatement::factory(theKeyword, aTokenizer, *this);
 	case Keyword::show_kw: {
-		if (aTokenizer.remaining() > 1 && aTokenizer.peek(1).get_keyword() == Keyword::databases_kw) {
+		if (aTokenizer.remaining() > 1 && aTokenizer.peek(1).getKeyword() == Keyword::databases_kw) {
 			return DBStatement::factory(theKeyword, aTokenizer, *this);
 		}
 		break;
