@@ -16,7 +16,9 @@ public:
 private:
 	SQLInterpreter& m_interpreter;
 protected:
+	std::string m_name;
 
+	StatusResult parseTableName();
 };
 
 }
