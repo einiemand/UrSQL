@@ -2,6 +2,7 @@
 #ifndef VALUE_HPP
 #define VALUE_HPP
 #include "Storable.hpp"
+#include "Keyword.hpp"
 #include <memory>
 
 namespace UrSQL {
@@ -68,6 +69,9 @@ public:
 	friend bool operator<(const Value& lhs, const Value& rhs);
 	friend bool operator==(const Value& lhs, const Value& rhs);
 	friend std::ostream& operator<<(std::ostream& anOutput, const Value& aValue);
+
+	static bool keywordIsValueType(Keyword aKeyword);
+	static ValueType keyword2ValueType(Keyword aKeyword);
 
 private:
 	std::unique_ptr<ValueBase> m_base;

@@ -384,4 +384,19 @@ std::ostream& operator<<(std::ostream& anOutput, const Value& aValue) {
 	return aValue.m_base->dump(anOutput);
 }
 
+static const std::unordered_map<Keyword, ValueType> str2type{
+		{ Keyword::integer_kw,ValueType::int_type },
+		{ Keyword::float_kw,ValueType::float_type },
+		{ Keyword::boolean_kw,ValueType::bool_type },
+		{ Keyword::varchar_kw,ValueType::varchar_type }
+};
+
+bool Value::keywordIsValueType(Keyword aKeyword) {
+	return str2type.count(aKeyword) == 1;
+}
+
+ValueType Value::keyword2ValueType(Keyword aKeyword) {
+	return str2type.at(aKeyword);
+}
+
 }
