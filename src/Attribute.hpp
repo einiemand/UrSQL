@@ -58,7 +58,7 @@ public:
 	AttributeBuilder();
 	~AttributeBuilder() = default;
 
-	AttributeBuilder(const AttributeBuilder&) = delete;
+	AttributeBuilder(AttributeBuilder&&) = default;
 	AttributeBuilder& operator=(const AttributeBuilder&) = delete;
 	/*    Setters    */
 	inline void setName(std::string aName) {
@@ -83,6 +83,10 @@ public:
 
 	inline void setAutoIncr(bool isAutoIncr) {
 		m_isAutoIncr = isAutoIncr;
+	}
+
+	inline ValueType getType() const {
+		return m_type;
 	}
 	///*    Getters   */
 	//inline std::string& getName() {
