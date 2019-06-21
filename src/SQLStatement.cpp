@@ -11,7 +11,7 @@ SQLStatement::SQLStatement(Tokenizer& aTokenizer, SQLInterpreter& anInterpreter)
 {
 }
 
-StatusResult SQLStatement::parseTableName() {
+StatusResult SQLStatement::_parseTableName() {
 	StatusResult theResult(Error::no_error);
 	const Token& theNameToken = m_tokenizer.get();
 	if (theNameToken.getType() == TokenType::identifier) {
@@ -35,15 +35,14 @@ public:
 	StatusResult parse() override {
 		StatusResult theResult(Error::no_error);
 		if (m_tokenizer.next(2)) {
-			theResult = parseTableName();
-			if (theResult) {
+			if (theResult = _parseTableName()) {
 				if (m_tokenizer.skipIf(TokenType::lparen)) {
-					AttributeBuilder theBuilder;
-					theResult = parseAttributeName(theBuilder);
-					if (theResult) {
-						theResult = parseAttributeType(theBuilder);
-						if (theResult) {
-
+					if (theResult = _parseAttributeList()) {
+						if (m_tokenizer.skipIf(TokenType::rparen)) {
+							// success
+						}
+						else {
+							theResult.setError(Error::syntax_error, "Use ')' to terminate attribute list");
 						}
 					}
 				}
@@ -65,7 +64,7 @@ public:
 private:
 	std::vector<AttributeBuilder> m_builders;
 
-	StatusResult parseAttributeName(AttributeBuilder& aBuilder) {
+	StatusResult _parseAttributeName(AttributeBuilder& aBuilder) {
 		StatusResult theResult(Error::no_error);
 		if (m_tokenizer.more()) {
 			const Token& theNameToken = m_tokenizer.get();
@@ -82,7 +81,7 @@ private:
 		return theResult;
 	}
 
-	StatusResult parseAttributeType(AttributeBuilder& aBuilder) {
+	StatusResult _parseAttributeType(AttributeBuilder& aBuilder) {
 		StatusResult theResult(Error::no_error);
 		if (m_tokenizer.more()) {
 			const Token& theTypeToken = m_tokenizer.get();
@@ -99,6 +98,91 @@ private:
 		}
 		return theResult;
 	}
+
+	StatusResult _parseAttributeOptions(AttributeBuilder& aBuilder) {
+		StatusResult theResult(Error::no_error);
+		while (theResult && m_tokenizer.more() && m_tokenizer.peek().getType() != TokenType::comma) {
+			const Token& theToken = m_tokenizer.get();
+			switch (theToken.getKeyword()) {
+			case Keyword::auto_increment_kw:
+				aBuilder.setAutoIncr(true);
+				break;
+			case Keyword::primary_kw: {
+				if (m_tokenizer.skipIf(Keyword::key_kw)) {
+					aBuilder.setPrimary(true);
+				}
+				else {
+					theResult.setError(Error::syntax_error, "Expect 'key' after 'primary'");
+				}
+				break;
+			}
+			case Keyword::not_kw: {
+				if (m_tokenizer.skipIf(Keyword::null_kw)) {
+					aBuilder.setNullable(false);
+				}
+				else {
+					theResult.setError(Error::syntax_error, "Expect 'null' after 'not'");
+				}
+				break;
+			}
+			case Keyword::default_kw:
+				theResult = _parseDefaultValue(aBuilder);
+				break;
+			default:
+				theResult.setError(Error::syntax_error, "Invalid attribute option '" + theToken.getData() + '\'');
+			}
+		}
+		return theResult;
+	}
+
+	StatusResult _parseAttribute(AttributeBuilder& aBuilder) {
+		StatusResult theResult = _parseAttributeName(aBuilder);
+		if (theResult) {
+			theResult = _parseAttributeType(aBuilder);
+			if (theResult) {
+				theResult = _parseAttributeOptions(aBuilder);
+			}
+		}
+		return theResult;
+	}
+
+	StatusResult _parseAttributeList() {
+		StatusResult theResult(Error::no_error);
+		do {
+			AttributeBuilder theBuilder;
+			if (theResult = _parseAttribute(theBuilder)) {
+				m_builders.emplace_back(std::move(theBuilder));
+			}
+		} while (theResult && m_tokenizer.skipIf(TokenType::comma));
+
+		return theResult;
+	}
+
+	StatusResult _parseDefaultValue(AttributeBuilder& aBuilder) {
+		StatusResult theResult(Error::no_error);
+		if (m_tokenizer.more()) {
+			const Token& theValueToken = m_tokenizer.get();
+			TokenType theType = theValueToken.getType();
+			if (theType == TokenType::string || theType == TokenType::number) {
+				Value theValue(theValueToken.getData());
+				theResult = theValue.become(aBuilder.getType());
+				if (theResult) {
+					aBuilder.setDefaultValue(std::move(theValue));
+				}
+			}
+			else if (theType == TokenType::keyword && theValueToken.getKeyword() == Keyword::null_kw) {
+				aBuilder.setDefaultValue(Value{});
+			}
+			else {
+				theResult.setError(Error::syntax_error, "Invalid default value '" + theValueToken.getData() + '\'');
+			}
+		}
+		else {
+			theResult.setError(Error::syntax_error, "Default value unspecified");
+		}
+		return theResult;
+	}
+
 };
 
 }
