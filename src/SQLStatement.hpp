@@ -18,7 +18,7 @@ private:
 protected:
 	std::string m_name;
 
-	StatusResult parseTableName();
+	StatusResult _parseTableName();
 };
 
 }
