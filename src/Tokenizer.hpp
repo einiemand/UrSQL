@@ -12,6 +12,7 @@ namespace UrSQL {
 class Tokenizer {
 public:
 	using TokenizeCondition = std::function<bool(char)>;
+	using SkipCondition = std::function<bool(const Token&)>;
 
 	explicit Tokenizer(std::istream& anInput);
 	~Tokenizer() = default;
@@ -31,8 +32,15 @@ public:
 	const Token& get();
 	bool next(size_type anOffset = 1);
 
-	bool skipIf(TokenType aType);
-	bool skipIf(Keyword aKeyword);
+	inline bool skipIf(TokenType aType) {
+		return skipIf([aType](const Token& aToken) { return aToken.getType() == aType; });
+	}
+
+	inline bool skipIf(Keyword aKeyword) {
+		return skipIf([aKeyword](const Token& aToken) { return aToken.getKeyword() == aKeyword; });
+	}
+
+	bool skipIf(SkipCondition aCondition);
 
 	StatusResult tokenize();
 

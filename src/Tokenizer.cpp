@@ -77,16 +77,8 @@ bool Tokenizer::next(size_type anOffset) {
 	return more();
 }
 
-bool Tokenizer::skipIf(TokenType aType) {
-	if (more() && peek().getType() == aType) {
-		next();
-		return true;
-	}
-	return false;
-}
-
-bool Tokenizer::skipIf(Keyword aKeyword) {
-	if (more() && peek().getKeyword() == aKeyword) {
+bool Tokenizer::skipIf(SkipCondition aCondition) {
+	if (more() && aCondition(peek())) {
 		next();
 		return true;
 	}
