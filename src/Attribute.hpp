@@ -10,9 +10,10 @@ class Attribute : public Storable {
 public:
 	friend class AttributeBuilder;
 
+	Attribute() = default;
 	~Attribute() = default;
 
-	Attribute(const Attribute&) = delete;
+	Attribute(Attribute&&) = default;
 	Attribute& operator=(const Attribute&) = delete;
 
 	void serialize(BufferWriter& aWriter) const override;
