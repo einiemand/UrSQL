@@ -88,30 +88,6 @@ public:
 	inline ValueType getType() const {
 		return m_type;
 	}
-	///*    Getters   */
-	//inline std::string& getName() {
-	//	return m_name;
-	//}
-
-	//inline ValueType& getType() {
-	//	return m_type;
-	//}
-
-	//inline Value& getDefaultValue() {
-	//	return m_defaultValue;
-	//}
-
-	//inline bool& getNullable() {
-	//	return m_isNullable;
-	//}
-
-	//inline bool& getPrimary() {
-	//	return m_isPrimary;
-	//}
-
-	//inline bool& getAutoIncr() {
-	//	return m_isAutoIncr;
-	//}
 
 	inline Attribute build() const {
 		return Attribute(m_name, m_type, m_defaultValue, m_isNullable, m_isPrimary, m_isAutoIncr);
