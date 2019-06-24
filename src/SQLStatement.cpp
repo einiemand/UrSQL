@@ -1,6 +1,8 @@
 #include "SQLStatement.hpp"
 #include "Tokenizer.hpp"
 #include "Attribute.hpp"
+#include "Database.hpp"
+#include "SQLInterpreter.hpp"
 
 namespace UrSQL {
 
@@ -57,7 +59,27 @@ public:
 		return theResult;
 	}
 
-	StatusResult validate() const override;
+	StatusResult validate() const override {
+		StatusResult theResult(Error::no_error);
+		if (!m_tokenizer.more()) {
+			if (Database* theActiveDB = m_interpreter.getActiveDatabase()) {
+				if (!theActiveDB->entityExists(m_name)) {
+
+				}
+				else {
+					theResult.setError(Error::entity_exists, '\'' + m_name + '\'');
+				}
+			}
+			else {
+				theResult.setError(Error::unknown_database, "Specify the database first by 'use <DBName>'");
+			}
+		}
+		else {
+			theResult.setError(Error::invalid_command, "Redundant input after ')'");
+		}
+		return theResult;
+	}
+
 	StatusResult execute() const override;
 
 	~CreateTableStatement() override = default;
