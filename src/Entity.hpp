@@ -1,7 +1,7 @@
 #pragma once
 #ifndef TABLE_HPP
 #define TABLE_HPP
-#include "Storable.hpp"
+#include "Attribute.hpp"
 
 namespace UrSQL {
 
@@ -14,7 +14,7 @@ public:
 	void serialize(BufferWriter& aWriter) const override;
 	void deserialize(BufferReader& aReader) override;
 private:
-
+	std::vector<Attribute> m_attributes;
 };
 
 }
