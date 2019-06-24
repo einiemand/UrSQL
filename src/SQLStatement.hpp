@@ -13,9 +13,8 @@ public:
 	~SQLStatement() override = default;
 
 	static std::unique_ptr<SQLStatement> factory(Keyword aStmtType, Tokenizer& aTokenizer, SQLInterpreter& anInterpreter);
-private:
-	SQLInterpreter& m_interpreter;
 protected:
+	SQLInterpreter& m_interpreter;
 	std::string m_name;
 
 	StatusResult _parseTableName();
