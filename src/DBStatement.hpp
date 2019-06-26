@@ -12,7 +12,7 @@ public:
 	DBStatement(Tokenizer& aTokenizer, DBManager& aDBManager);
 	~DBStatement() override = default;
 
-	static std::unique_ptr<DBStatement> factory(Keyword aStmtType, Tokenizer& aTokenizer, DBManager& aDBManager);
+	static std::unique_ptr<DBStatement> factory(Tokenizer& aTokenizer, DBManager& aDBManager);
 protected:
 	DBManager& m_manager;
 };

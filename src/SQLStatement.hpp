@@ -12,7 +12,7 @@ public:
 	SQLStatement(Tokenizer& aTokenizer, SQLInterpreter& anInterpreter);
 	~SQLStatement() override = default;
 
-	static std::unique_ptr<SQLStatement> factory(Keyword aStmtType, Tokenizer& aTokenizer, SQLInterpreter& anInterpreter);
+	static std::unique_ptr<SQLStatement> factory(Tokenizer& aTokenizer, SQLInterpreter& anInterpreter);
 protected:
 	SQLInterpreter& m_interpreter;
 	std::string m_name;
