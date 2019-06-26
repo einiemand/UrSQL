@@ -254,8 +254,9 @@ private:
 
 
 /* -------------------------------Static DBStatement Methods------------------------------- */
-std::unique_ptr<DBStatement> DBStatement::factory(Keyword aStmtType, Tokenizer& aTokenizer, DBManager& aDBManager) {
-	switch (aStmtType) {
+std::unique_ptr<DBStatement> DBStatement::factory(Tokenizer& aTokenizer, DBManager& aDBManager) {
+	Keyword theKeyword = aTokenizer.peek().getKeyword();
+	switch (theKeyword) {
 	case Keyword::create_kw:
 		return std::make_unique<CreateDBStatement>(aTokenizer, aDBManager);
 	case Keyword::drop_kw:
