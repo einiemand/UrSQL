@@ -120,9 +120,6 @@ StatusResult Storage::eachBlock(BlockVisitor aVisitor) {
 			}
 		}
 	}
-	if (theResult) {
-		theResult.setError(Error::block_notFound);
-	}
 	return theResult;
 }
 
@@ -136,8 +133,11 @@ StatusResult Storage::findFreeBlocknumber(blocknum_t& aFreeBlocknum) {
 			return StatusResult(Error::no_error);
 		}
 	);
-	if (theResult.getCode() == Error::block_notFound) {
+	if (theResult) {
 		aFreeBlocknum = _getBlockCount();
+	}
+	if (theResult.getCode() == Error::block_found) {
+		theResult.setError(Error::no_error);
 	}
 	return theResult;
 }
