@@ -22,7 +22,7 @@ public:
 	Database(const Database&) = delete;
 	Database& operator=(const Database&) = delete;
 
-	StatusResult createTable(const std::vector<AttributeBuilder>& aBuilderList, const std::string& anEntityName);
+	StatusResult createTable(const AttributeList& anAttributeList, const std::string& anEntityName);
 
 	inline const std::string& getName() const {
 		return m_storage.getName();

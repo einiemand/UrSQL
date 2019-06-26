@@ -16,12 +16,12 @@ Database::Database(const std::string& aFileName, OpenExistingFile, StatusResult&
 {
 }
 
-StatusResult Database::createTable(const std::vector<AttributeBuilder>& aBuilderList, const std::string& anEntityName) {
+StatusResult Database::createTable(const AttributeList& anAttributeList, const std::string& anEntityName) {
 	StatusResult theResult(Error::no_error);
 	if (!entityExists(anEntityName)) {
 		auto theEntity = std::make_unique<Entity>();
-		for (const auto& theBuilder : aBuilderList) {
-			theEntity->addAttribute(theBuilder);
+		for (const auto& theAttribute : anAttributeList) {
+			theEntity->addAttribute(theAttribute);
 		}
 		Block theBlock(*theEntity);
 		blocknum_t theBlocknum = -1;
