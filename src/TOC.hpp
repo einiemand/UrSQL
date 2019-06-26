@@ -7,7 +7,7 @@ namespace UrSQL {
 
 class TOC : public MonoStorable {
 public:
-	using EntityNumMap = std::unordered_map<std::string, blocknum_t>;
+	using EntityMap = std::unordered_map<std::string, blocknum_t>;
 
 	TOC();
 	~TOC() = default;
@@ -20,17 +20,17 @@ public:
 	void deserialize(BufferReader& aReader) override;
 
 	inline bool entityExists(const std::string& anEntityName) const {
-		return m_map.count(anEntityName) == 1;
+		return m_entityMap.count(anEntityName) == 1;
 	}
 
-	blocknum_t getBlocknumByName(const std::string& anEntityName) const;
+	blocknum_t getEntityPosByName(const std::string& anEntityName) const;
 
 	void add(const std::string& anEntityName, blocknum_t aBlocknum);
 
 	void drop(const std::string& anEntityName);
 
 private:
-	EntityNumMap m_map;
+	EntityMap m_entityMap;
 };
 
 }
