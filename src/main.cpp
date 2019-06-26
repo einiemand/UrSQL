@@ -2,6 +2,7 @@
 #include "Tokenizer.hpp"
 #include "BasicProcessor.hpp"
 #include "DBManager.hpp"
+#include "SQLInterpreter.hpp"
 #include "Database.hpp"
 #include <sstream>
 #include <algorithm>
@@ -42,7 +43,8 @@ int main(int argc, char* argv[])
 	using namespace UrSQL;
 	static const char* const thePrevMark = "\nursql> ";
 	DBManager theDBManager;
-	BasicProcessor theBasicProcessor(&theDBManager);
+	SQLInterpreter theSQLInterpreter(&theDBManager);
+	BasicProcessor theBasicProcessor(&theSQLInterpreter);
 
 	StatusResult theResult(Error::no_error);
 	while (theResult.getCode() != Error::user_terminated) {
