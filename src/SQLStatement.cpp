@@ -3,6 +3,7 @@
 #include "Attribute.hpp"
 #include "Database.hpp"
 #include "SQLInterpreter.hpp"
+#include <unordered_set>
 
 namespace UrSQL {
 
@@ -62,17 +63,7 @@ public:
 	StatusResult validate() const override {
 		StatusResult theResult(Error::no_error);
 		if (!m_tokenizer.more()) {
-			if (Database* theActiveDB = m_interpreter.getActiveDatabase()) {
-				if (!theActiveDB->entityExists(m_name)) {
-
-				}
-				else {
-					theResult.setError(Error::entity_exists, '\'' + m_name + '\'');
-				}
-			}
-			else {
-				theResult.setError(Error::unknown_database, "Specify the database first by 'use <DBName>'");
-			}
+			theResult = _validateAttributes();
 		}
 		else {
 			theResult.setError(Error::invalid_command, "Redundant input after ')'");
@@ -80,7 +71,16 @@ public:
 		return theResult;
 	}
 
-	StatusResult execute() const override;
+	StatusResult execute() const override {
+		StatusResult theResult(Error::no_error);
+		if (Database* theActiveDB = m_interpreter.getActiveDatabase()) {
+
+		}
+		else {
+			theResult.setError(Error::unknown_database, "Specify the database first by 'use <DBName>'");
+		}
+		return theResult;
+	}
 
 	~CreateTableStatement() override = default;
 private:
@@ -203,6 +203,17 @@ private:
 			theResult.setError(Error::syntax_error, "Default value unspecified");
 		}
 		return theResult;
+	}
+
+	StatusResult _validateAttributes() const {
+		std::unordered_set<std::string> theAttrNames;
+		for (const auto& theBuilder : m_builders) {
+			const std::string& theName = theBuilder.getName();
+			if (theAttrNames.count(theName)) {
+				return StatusResult(Error::invalid_attribute, '\'' + theName + "' redefinition");
+			}
+		}
+		return StatusResult(Error::no_error);
 	}
 
 };
