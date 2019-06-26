@@ -82,7 +82,7 @@ public:
 		return m_code;
 	}
 
-	void setError(Error aCode, std::string aMsg) noexcept;
+	void setError(Error aCode, std::string aMsg = "") noexcept;
 
 	inline void setMessage(std::string aMsg) noexcept {
 		setError(getCode(), std::move(aMsg));
