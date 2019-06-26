@@ -24,4 +24,23 @@ void Entity::deserialize(BufferReader& aReader) {
 	}
 }
 
+bool Entity::attributeExistsByName(const std::string& aName) const {
+	return std::find_if(m_attributes.cbegin(), m_attributes.cend(),
+		[&aName](const auto& anAttribute)->bool {
+			return anAttribute.getName() == aName;
+		}
+	) != m_attributes.cend();
+}
+
+const Attribute& Entity::getAttributeByName(const std::string& aName) const {
+	if (attributeExistsByName(aName)) {
+		return *std::find_if(m_attributes.cbegin(), m_attributes.cend(),
+			[&aName](const auto& anAttribute)->bool {
+				return anAttribute.getName() == aName;
+			}
+		);
+	}
+	throw std::runtime_error("Check if attribute exists before getting it!");
+}
+
 }
