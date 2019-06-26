@@ -21,15 +21,15 @@ std::unique_ptr<Statement> DBManager::getStatement(Tokenizer& aTokenizer) {
 	case Keyword::drop_kw:
 	case Keyword::describe_kw: {
 		if (aTokenizer.remaining() > 1 && aTokenizer.peek(1).getKeyword() == Keyword::database_kw) {
-			return DBStatement::factory(theKeyword, aTokenizer, *this);
+			return DBStatement::factory(aTokenizer, *this);
 		}
 		break;
 	}
 	case Keyword::use_kw:
-		return DBStatement::factory(theKeyword, aTokenizer, *this);
+		return DBStatement::factory(aTokenizer, *this);
 	case Keyword::show_kw: {
 		if (aTokenizer.remaining() > 1 && aTokenizer.peek(1).getKeyword() == Keyword::databases_kw) {
-			return DBStatement::factory(theKeyword, aTokenizer, *this);
+			return DBStatement::factory(aTokenizer, *this);
 		}
 		break;
 	}
@@ -77,7 +77,7 @@ StatusResult DBManager::showDatabases() {
 	StatusResult theResult = DBManager::_collectDBNames(theDBNames);
 	if (theResult) {
 		if (!theDBNames.empty()) {
-			ShowDBView(theDBNames).show();
+			ShowDatabasesView(theDBNames).show();
 			theResult.setMessage("Showing databases");
 		}
 		else {
@@ -107,7 +107,7 @@ StatusResult DBManager::describeDatabase(const std::string& aName) {
 			}
 		);
 		if (theResult) {
-			DescDBView(theBlockTypes).show();
+			DescDatabaseView(theBlockTypes).show();
 			theResult.setMessage("Describing database '" + aName + '\'');
 		}
 	}
