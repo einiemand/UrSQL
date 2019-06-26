@@ -72,26 +72,19 @@ public:
 	}
 
 	StatusResult execute() const override {
-		StatusResult theResult(Error::no_error);
-		if (Database* theActiveDB = m_interpreter.getActiveDatabase()) {
-
-		}
-		else {
-			theResult.setError(Error::unknown_database, "Specify the database first by 'use <DBName>'");
-		}
-		return theResult;
+		return m_interpreter.createTable(m_attributes, m_name);
 	}
 
 	~CreateTableStatement() override = default;
 private:
-	std::vector<AttributeBuilder> m_builders;
+	AttributeList m_attributes;
 
-	StatusResult _parseAttributeName(AttributeBuilder& aBuilder) {
+	StatusResult _parseAttributeName(Attribute& anAttribute) {
 		StatusResult theResult(Error::no_error);
 		if (m_tokenizer.more()) {
 			const Token& theNameToken = m_tokenizer.get();
 			if (theNameToken.getType() == TokenType::identifier) {
-				aBuilder.setName(theNameToken.getData());
+				anAttribute.setName(theNameToken.getData());
 			}
 			else {
 				theResult.setError(Error::identifier_expected, "Attribute name is not an identifier");
@@ -103,13 +96,13 @@ private:
 		return theResult;
 	}
 
-	StatusResult _parseAttributeType(AttributeBuilder& aBuilder) {
+	StatusResult _parseAttributeType(Attribute& anAttribute) {
 		StatusResult theResult(Error::no_error);
 		if (m_tokenizer.more()) {
 			const Token& theTypeToken = m_tokenizer.get();
 			Keyword theKeyword = theTypeToken.getKeyword();
 			if (Value::keywordIsValueType(theKeyword)) {
-				aBuilder.setType(Value::keyword2ValueType(theKeyword));
+				anAttribute.setType(Value::keyword2ValueType(theKeyword));
 			}
 			else {
 				theResult.setError(Error::syntax_error, "Unknown value type '" + theTypeToken.getData() + '\'');
@@ -121,17 +114,17 @@ private:
 		return theResult;
 	}
 
-	StatusResult _parseAttributeOptions(AttributeBuilder& aBuilder) {
+	StatusResult _parseAttributeOptions(Attribute& anAttribute) {
 		StatusResult theResult(Error::no_error);
-		while (theResult && m_tokenizer.more() && m_tokenizer.peek().getType() != TokenType::comma) {
+		while (theResult && m_tokenizer.more() && m_tokenizer.peek().getType() == TokenType::keyword) {
 			const Token& theToken = m_tokenizer.get();
 			switch (theToken.getKeyword()) {
 			case Keyword::auto_increment_kw:
-				aBuilder.setAutoIncr(true);
+				anAttribute.setAutoIncr(true);
 				break;
 			case Keyword::primary_kw: {
 				if (m_tokenizer.skipIf(Keyword::key_kw)) {
-					aBuilder.setPrimary(true);
+					anAttribute.setPrimary(true);
 				}
 				else {
 					theResult.setError(Error::syntax_error, "Expect 'key' after 'primary'");
@@ -140,7 +133,7 @@ private:
 			}
 			case Keyword::not_kw: {
 				if (m_tokenizer.skipIf(Keyword::null_kw)) {
-					aBuilder.setNullable(false);
+					anAttribute.setNullable(false);
 				}
 				else {
 					theResult.setError(Error::syntax_error, "Expect 'null' after 'not'");
@@ -148,7 +141,7 @@ private:
 				break;
 			}
 			case Keyword::default_kw:
-				theResult = _parseDefaultValue(aBuilder);
+				theResult = _parseDefaultValue(anAttribute);
 				break;
 			default:
 				theResult.setError(Error::syntax_error, "Invalid attribute option '" + theToken.getData() + '\'');
@@ -157,12 +150,12 @@ private:
 		return theResult;
 	}
 
-	StatusResult _parseAttribute(AttributeBuilder& aBuilder) {
-		StatusResult theResult = _parseAttributeName(aBuilder);
+	StatusResult _parseAttribute(Attribute& anAttribute) {
+		StatusResult theResult = _parseAttributeName(anAttribute);
 		if (theResult) {
-			theResult = _parseAttributeType(aBuilder);
+			theResult = _parseAttributeType(anAttribute);
 			if (theResult) {
-				theResult = _parseAttributeOptions(aBuilder);
+				theResult = _parseAttributeOptions(anAttribute);
 			}
 		}
 		return theResult;
@@ -171,29 +164,29 @@ private:
 	StatusResult _parseAttributeList() {
 		StatusResult theResult(Error::no_error);
 		do {
-			AttributeBuilder theBuilder;
-			if (theResult = _parseAttribute(theBuilder)) {
-				m_builders.emplace_back(std::move(theBuilder));
+			Attribute theAttribute;
+			if (theResult = _parseAttribute(theAttribute)) {
+				m_attributes.emplace_back(std::move(theAttribute));
 			}
 		} while (theResult && m_tokenizer.skipIf(TokenType::comma));
 
 		return theResult;
 	}
 
-	StatusResult _parseDefaultValue(AttributeBuilder& aBuilder) {
+	StatusResult _parseDefaultValue(Attribute& anAttribute) {
 		StatusResult theResult(Error::no_error);
 		if (m_tokenizer.more()) {
 			const Token& theValueToken = m_tokenizer.get();
 			TokenType theType = theValueToken.getType();
 			if (theType == TokenType::string || theType == TokenType::number) {
 				Value theValue(theValueToken.getData());
-				theResult = theValue.become(aBuilder.getType());
+				theResult = theValue.become(anAttribute.getType());
 				if (theResult) {
-					aBuilder.setDefaultValue(std::move(theValue));
+					anAttribute.setDefaultValue(std::move(theValue));
 				}
 			}
 			else if (theType == TokenType::keyword && theValueToken.getKeyword() == Keyword::null_kw) {
-				aBuilder.setDefaultValue(Value{});
+				anAttribute.setDefaultValue(Value{});
 			}
 			else {
 				theResult.setError(Error::syntax_error, "Invalid default value '" + theValueToken.getData() + '\'');
@@ -207,8 +200,8 @@ private:
 
 	StatusResult _validateAttributes() const {
 		std::unordered_set<std::string> theAttrNames;
-		for (const auto& theBuilder : m_builders) {
-			const std::string& theName = theBuilder.getName();
+		for (const auto& theAttribute : m_attributes) {
+			const std::string& theName = theAttribute.getName();
 			if (theAttrNames.count(theName)) {
 				return StatusResult(Error::invalid_attribute, '\'' + theName + "' redefinition");
 			}
@@ -217,5 +210,15 @@ private:
 	}
 
 };
+
+std::unique_ptr<SQLStatement> SQLStatement::factory(Tokenizer& aTokenizer, SQLInterpreter& anInterpreter) {
+	Keyword theKeyword = aTokenizer.peek().getKeyword();
+	switch (theKeyword) {
+	case Keyword::create_kw:
+		return std::make_unique<CreateTableStatement>(aTokenizer, anInterpreter);
+	default:
+		return nullptr;
+	}
+}
 
 }
