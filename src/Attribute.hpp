@@ -74,6 +74,8 @@ private:
 	bool m_isAutoIncr;
 };
 
+using AttributeList = std::vector<Attribute>;
+
 } /* UrSQL */
 
 #endif
