@@ -23,28 +23,41 @@ protected:
 	static void printLine(const StringList& aFieldNames, const std::vector<size_type>& aWidths);
 };
 
-/* -------------------------------ShowDBView------------------------------- */
-class ShowDBView : public View {
+/* -------------------------------ShowDatabasesView------------------------------- */
+class ShowDatabasesView : public View {
 public:
-	ShowDBView(const StringList& aDBNames);
-	~ShowDBView() override = default;
+	ShowDatabasesView(const StringList& aDBNames);
+	~ShowDatabasesView() override = default;
 
 	void show() const override;
 private:
 	const StringList& m_dbNames;
 };
 
-/* -------------------------------DescDBView------------------------------- */
+/* -------------------------------DescDatabaseView------------------------------- */
 enum class BlockType : char;
 
-class DescDBView : public View {
+class DescDatabaseView : public View {
 public:
-	DescDBView(const std::vector<BlockType>& theTypes);
-	~DescDBView() override = default;
+	DescDatabaseView(const std::vector<BlockType>& theTypes);
+	~DescDatabaseView() override = default;
 
 	void show() const override;
 private:
 	const std::vector<BlockType>& m_types;
+};
+
+/* -------------------------------DescDatabaseView------------------------------- */
+class Entity;
+
+class DescTableView : public View {
+public:
+	DescTableView(const Entity& anEntity);
+	~DescTableView() override = default;
+
+	void show() const override;
+private:
+	const Entity& m_entity;
 };
 
 }

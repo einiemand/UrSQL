@@ -6,14 +6,14 @@
 
 namespace UrSQL {
 
-/* -------------------------------ShowDBView------------------------------- */
-ShowDBView::ShowDBView(const StringList& aDBNames) :
+/* -------------------------------ShowDatabasesView------------------------------- */
+ShowDatabasesView::ShowDatabasesView(const StringList& aDBNames) :
 	View(),
 	m_dbNames(aDBNames)
 {
 }
 
-void ShowDBView::show() const {
+void ShowDatabasesView::show() const {
 	static const std::string theHeader = "Database";
 	size_type theHorizontalWidth = theHeader.length();
 
@@ -35,33 +35,14 @@ void ShowDBView::show() const {
 	View::printHorizontalLine(theWidths);
 }
 
-/* -------------------------------View Static Methods------------------------------- */
-void View::printHorizontalLine(const std::vector<size_type>& aWidths) {
-	defaultOutput << View::vertex;
-	for (size_type aWidth : aWidths) {
-		defaultOutput << std::string(aWidth, View::horizontalEdge) << View::vertex;
-	}
-	defaultOutput << '\n';
-}
-
-void View::printLine(const StringList& aStrings, const std::vector<size_type>& aWidths) {
-	if (aStrings.size() != aWidths.size()) {
-		throw std::runtime_error("StringList size should be equal to aWidths size!");
-	}
-	size_type i = 0;
-	defaultOutput << View::verticalEdge;
-	for (; i < aStrings.size(); ++i) {
-		defaultOutput << std::setw(aWidths[i])  << std::left << ' ' + aStrings[i] << View::verticalEdge;
-	}
-	defaultOutput << '\n';
-}
-
-DescDBView::DescDBView(const std::vector<BlockType>& theTypes) :
+/* -------------------------------DescDatabaseView------------------------------- */
+DescDatabaseView::DescDatabaseView(const std::vector<BlockType>& theTypes) :
+	View(),
 	m_types(theTypes)
 {
 }
 
-void DescDBView::show() const {
+void DescDatabaseView::show() const {
 	static const std::string theFirstHeader = "Block", theSecondHeader = "Type";
 	static const size_type theFirstWidth = theFirstHeader.length() + 2;
 	static constexpr size_type theSecondWidth = 6 + 2;
@@ -93,6 +74,38 @@ void DescDBView::show() const {
 		View::printLine({ std::to_string(i),theTypeString }, { theFirstWidth,theSecondWidth });
 	}
 	View::printHorizontalLine({ theFirstWidth,theSecondWidth });
+}
+
+/* -------------------------------DescTableView------------------------------- */
+DescTableView::DescTableView(const Entity& anEntity) :
+	View(),
+	m_entity(anEntity)
+{
+}
+
+void DescTableView::show() const {
+
+}
+
+/* -------------------------------View Static Methods------------------------------- */
+void View::printHorizontalLine(const std::vector<size_type>& aWidths) {
+	defaultOutput << View::vertex;
+	for (size_type aWidth : aWidths) {
+		defaultOutput << std::string(aWidth, View::horizontalEdge) << View::vertex;
+	}
+	defaultOutput << '\n';
+}
+
+void View::printLine(const StringList& aStrings, const std::vector<size_type>& aWidths) {
+	if (aStrings.size() != aWidths.size()) {
+		throw std::runtime_error("StringList size should be equal to aWidths size!");
+	}
+	size_type i = 0;
+	defaultOutput << View::verticalEdge;
+	for (; i < aStrings.size(); ++i) {
+		defaultOutput << std::setw(aWidths[i])  << std::left << ' ' + aStrings[i] << View::verticalEdge;
+	}
+	defaultOutput << '\n';
 }
 
 } /* UrSQL */
