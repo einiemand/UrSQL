@@ -36,25 +36,6 @@ size_type Storage::_getBlockCount() {
 	return total / defaultBlockSize;
 }
 
-StatusResult Storage::_getFreeBlocknumber(blocknum_t& aFreeBlocknum) {
-	StatusResult theResult = eachBlock(
-		[&aFreeBlocknum](Block& aBlock, blocknum_t aBlocknum)->StatusResult {
-			if (aBlock.getType() == BlockType::free_type) {
-				aFreeBlocknum = aBlocknum;
-				return StatusResult(Error::block_found);
-			}
-			return StatusResult(Error::no_error);
-		}
-	);
-	if (theResult.getCode() == Error::block_found) {
-		return StatusResult(Error::no_error);
-	}
-	if (theResult) {
-		aFreeBlocknum = _getBlockCount();
-	}
-	return theResult;
-}
-
 StatusResult Storage::_setupTOC(const TOC& aTOC) {
 	std::string theFilePath = Storage::getDBFilePath(m_name);
 	//m_file.clear();
@@ -115,6 +96,15 @@ StatusResult Storage::writeBlock(const Block& aBlock, blocknum_t aBlocknum) {
 	return theResult;
 }
 
+StatusResult Storage::parseMonoStorable(MonoStorable& aMonoStorable, blocknum_t aBlocknum) {
+	Block theBlock;
+	StatusResult theResult = readBlock(theBlock, aBlocknum);
+	if (theResult) {
+		aMonoStorable.decode(theBlock, aBlocknum);
+	}
+	return theResult;
+}
+
 StatusResult Storage::eachBlock(BlockVisitor aVisitor) {
 	size_type theBlockCnt = _getBlockCount();
 
@@ -125,7 +115,29 @@ StatusResult Storage::eachBlock(BlockVisitor aVisitor) {
 		theResult = readBlock(theBlock, theBlocknum);
 		if (theResult) {
 			theResult = aVisitor(theBlock, theBlocknum);
+			if (theResult.getCode() == Error::block_found) {
+				return StatusResult(Error::no_error);
+			}
 		}
+	}
+	if (theResult) {
+		theResult.setError(Error::block_notFound);
+	}
+	return theResult;
+}
+
+StatusResult Storage::findFreeBlocknumber(blocknum_t& aFreeBlocknum) {
+	StatusResult theResult = eachBlock(
+		[&aFreeBlocknum](Block& aBlock, blocknum_t aBlocknum)->StatusResult {
+			if (aBlock.getType() == BlockType::free_type) {
+				aFreeBlocknum = aBlocknum;
+				return StatusResult(Error::block_found);
+			}
+			return StatusResult(Error::no_error);
+		}
+	);
+	if (theResult.getCode() == Error::block_notFound) {
+		aFreeBlocknum = _getBlockCount();
 	}
 	return theResult;
 }

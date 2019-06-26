@@ -13,6 +13,7 @@ struct CreateNewFile {};
 
 class Block;
 class TOC;
+class MonoStorable;
 
 class Storage {
 public:
@@ -36,7 +37,11 @@ public:
 	StatusResult readBlock(Block& aBlock, blocknum_t aBlocknum);
 	StatusResult writeBlock(const Block& aBlock, blocknum_t aBlocknum);
 
+	StatusResult parseMonoStorable(MonoStorable& aMonoStorable, blocknum_t aBlocknum);
+
 	StatusResult eachBlock(BlockVisitor aVisitor);
+
+	StatusResult findFreeBlocknumber(blocknum_t& aFreeBlocknum);
 
 	static const char* defaultStoragePath;
 	static const char* defaultFileExtension;
@@ -49,7 +54,6 @@ private:
 	std::fstream m_file;
 
 	size_type _getBlockCount();
-	StatusResult _getFreeBlocknumber(blocknum_t& aFreeBlocknum);
 
 	StatusResult _setupTOC(const TOC& aTOC);
 	StatusResult _loadTOC(TOC& aTOC);
