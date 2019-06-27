@@ -5,6 +5,8 @@
 
 namespace UrSQL {
 
+enum class ValueType : char;
+
 class View {
 public:
 	View() = default;
@@ -21,6 +23,7 @@ protected:
 
 	static void printHorizontalLine(const std::vector<size_type>& aWidths);
 	static void printLine(const StringList& aFieldNames, const std::vector<size_type>& aWidths);
+	static std::string valueType2String(ValueType aType);
 };
 
 /* -------------------------------ShowDatabasesView------------------------------- */
