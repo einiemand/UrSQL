@@ -1,6 +1,7 @@
 #include "View.hpp"
 #include "FolderReader.hpp"
 #include "Block.hpp"
+#include "Entity.hpp"
 #include <algorithm>
 #include <iomanip>
 
@@ -84,7 +85,37 @@ DescTableView::DescTableView(const Entity& anEntity) :
 }
 
 void DescTableView::show() const {
+	static const StringList theFieldTitles({ "Field","Type","Null","Key","Default","Extra" });
+	const auto& theAttributeList = m_entity.getAttributes();
+	std::vector<StringList> theEntityDisplay;
+	for (const auto& theAttribute : theAttributeList) {
+		std::string theTypeString = View::valueType2String(theAttribute.getType());
+		std::string theNullString = (theAttribute.getNullable() ? "YES" : "NO");
+		std::string theKeyString = (theAttribute.getPrimary() ? "PRI" : "");
+		std::string theDefaultValueString = theAttribute.getDefaultValue().stringify();
+		std::string theExtraString = "";
+		theEntityDisplay.emplace_back(StringList{ theAttribute.getName(),theTypeString,theNullString,theKeyString,theDefaultValueString,theExtraString });
+	}
+	std::vector<size_type> theWidths;
+	for (const std::string& theFieldTitle : theFieldTitles) {
+		theWidths.push_back(theFieldTitle.size());
+	}
+	for (const auto& theRowDisplay : theEntityDisplay) {
+		for (size_type col = 0; col < theFieldTitles.size(); ++col) {
+			theWidths[col] = std::max(theWidths[col], theRowDisplay[col].size());
+		}
+	}
+	for (size_type& theWidth : theWidths) {
+		theWidth += 2;
+	}
 
+	View::printHorizontalLine(theWidths);
+	View::printLine(theFieldTitles, theWidths);
+	View::printHorizontalLine(theWidths);
+	for (const auto& theRowDisplay : theEntityDisplay) {
+		View::printLine(theRowDisplay, theWidths);
+	}
+	View::printHorizontalLine(theWidths);
 }
 
 /* -------------------------------View Static Methods------------------------------- */
@@ -106,6 +137,16 @@ void View::printLine(const StringList& aStrings, const std::vector<size_type>& a
 		defaultOutput << std::setw(aWidths[i])  << std::left << ' ' + aStrings[i] << View::verticalEdge;
 	}
 	defaultOutput << '\n';
+}
+
+std::string View::valueType2String(ValueType aType) {
+	static const std::unordered_map<ValueType, const char*> theTypeMap{
+		{ ValueType::int_type, "int" },
+		{ ValueType::bool_type, "bool" },
+		{ ValueType::float_type,"float" },
+		{ ValueType::varchar_type,"varchar" },
+	};
+	return theTypeMap.at(aType);
 }
 
 } /* UrSQL */
