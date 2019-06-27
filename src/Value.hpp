@@ -66,6 +66,10 @@ public:
 	StatusResult become(ValueType aType);
 	size_type hash() const;
 
+	inline std::string stringify() const {
+		return m_base->stringify();
+	}
+
 	friend bool operator<(const Value& lhs, const Value& rhs);
 	friend bool operator==(const Value& lhs, const Value& rhs);
 	friend std::ostream& operator<<(std::ostream& anOutput, const Value& aValue);
