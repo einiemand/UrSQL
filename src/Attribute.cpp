@@ -6,7 +6,8 @@ namespace UrSQL {
 Attribute::Attribute() :
 	m_name(),
 	m_type(ValueType::null_type),
-	m_defaultValue(true),
+	m_defaultValue(),
+	m_isNullable(true),
 	m_isPrimary(false),
 	m_isAutoIncr(false)
 {
