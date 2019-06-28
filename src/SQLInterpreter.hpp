@@ -13,7 +13,9 @@ public:
 
 	std::unique_ptr<Statement> getStatement(Tokenizer& aTokenizer) override;
 
-	StatusResult createTable(const AttributeList& anAttributeList, const std::string& anEntityName);
+	StatusResult createTable(const AttributeList& anAttributeList, const std::string& anEntityName) const;
+	StatusResult describeTable(const std::string& anEntityName) const;
+
 private:
 
 };

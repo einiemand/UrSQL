@@ -20,14 +20,38 @@ std::unique_ptr<Statement> SQLInterpreter::getStatement(Tokenizer& aTokenizer) {
 		}
 		break;
 	}
+	case Keyword::describe_kw: {
+		if (aTokenizer.remaining() > 1 && aTokenizer.peek(1).getKeyword() == Keyword::table_kw) {
+			return SQLStatement::factory(aTokenizer, *this);
+		}
+		break;
+	}
 	}
 	return nullptr;
 }
 
-StatusResult SQLInterpreter::createTable(const AttributeList& anAttributeList, const std::string& anEntityName) {
+StatusResult SQLInterpreter::createTable(const AttributeList& anAttributeList, const std::string& anEntityName) const {
 	StatusResult theResult(Error::no_error);
 	if (Database* theActiveDB = getActiveDatabase()) {
 		theResult = theActiveDB->createTable(anAttributeList, anEntityName);
+		if (theResult) {
+			theResult.setMessage("Query ok, table '" + anEntityName + "' created");
+		}
+	}
+	else {
+		theResult.setError(Error::unknown_database, "Specify the database first by 'use <DBName>'");
+	}
+	return theResult;
+}
+
+StatusResult SQLInterpreter::describeTable(const std::string& anEntityName) const {
+	StatusResult theResult(Error::no_error);
+	if (Database* theActiveDB = getActiveDatabase()) {
+		size_type theAttributeCount;
+		theResult = theActiveDB->describeTable(anEntityName, theAttributeCount);
+		if (theResult) {
+			theResult.setMessage(std::to_string(theAttributeCount) + " row(s) in set");
+		}
 	}
 	else {
 		theResult.setError(Error::unknown_database, "Specify the database first by 'use <DBName>'");
