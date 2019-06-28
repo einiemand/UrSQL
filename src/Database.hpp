@@ -17,12 +17,13 @@ public:
 
 	Database(const std::string& aFileName, CreateNewFile, StatusResult& aResult);
 	Database(const std::string& aFileName, OpenExistingFile, StatusResult& aResult);
-	~Database() = default;
+	~Database();
 
 	Database(const Database&) = delete;
 	Database& operator=(const Database&) = delete;
 
 	StatusResult createTable(const AttributeList& anAttributeList, const std::string& anEntityName);
+	StatusResult describeTable(const std::string& anEntityName, size_type& theAttributeCount);
 
 	inline const std::string& getName() const {
 		return m_storage.getName();

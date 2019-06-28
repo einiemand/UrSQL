@@ -1,4 +1,5 @@
 #include "Database.hpp"
+#include "View.hpp"
 
 namespace UrSQL {
 
@@ -16,6 +17,10 @@ Database::Database(const std::string& aFileName, OpenExistingFile, StatusResult&
 {
 }
 
+Database::~Database() {
+	m_storage.writeBlock(Block(m_toc), 0);
+}
+
 StatusResult Database::createTable(const AttributeList& anAttributeList, const std::string& anEntityName) {
 	StatusResult theResult(Error::no_error);
 	if (!entityExists(anEntityName)) {
@@ -31,12 +36,26 @@ StatusResult Database::createTable(const AttributeList& anAttributeList, const s
 			if (theResult) {
 				m_toc.add(anEntityName, theBlocknum);
 				_addEntityToCache(std::move(theEntity), anEntityName);
-				theResult.setMessage("Query ok, table '" + anEntityName + "' created");
 			}
 		}
 	}
 	else {
 		theResult.setError(Error::entity_exists, '\'' + anEntityName + '\'');
+	}
+	return theResult;
+}
+
+StatusResult Database::describeTable(const std::string& anEntityName, size_type& theAttributeCount) {
+	StatusResult theResult(Error::no_error);
+	if (entityExists(anEntityName)) {
+		Entity* theEntity = getEntityByName(anEntityName, theResult);
+		if (theResult) {
+			DescTableView(*theEntity).show();
+			theAttributeCount = theEntity->getAttributes().size();
+		}
+	}
+	else {
+		theResult.setError(Error::unknown_entity, "\'" + anEntityName + '\'');
 	}
 	return theResult;
 }
