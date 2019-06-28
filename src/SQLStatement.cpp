@@ -116,9 +116,10 @@ private:
 
 	StatusResult _parseAttributeOptions(Attribute& anAttribute) {
 		StatusResult theResult(Error::no_error);
-		while (theResult && m_tokenizer.more() && m_tokenizer.peek().getType() == TokenType::keyword) {
+		while (theResult && m_tokenizer.more() && CreateTableStatement::_isValidAttributeOption(m_tokenizer.peek().getKeyword())) {
 			const Token& theToken = m_tokenizer.get();
-			switch (theToken.getKeyword()) {
+			Keyword theKeyword = theToken.getKeyword();
+			switch (theKeyword) {
 			case Keyword::auto_increment_kw:
 				anAttribute.setAutoIncr(true);
 				break;
@@ -140,10 +141,15 @@ private:
 				}
 				break;
 			}
-			case Keyword::default_kw:
-				theResult = _parseDefaultValue(anAttribute);
-				break;
-			default:
+								  //case Keyword::default_kw:
+								  //	theResult = _parseDefaultValue(anAttribute);
+								  //	break;
+			}
+		}
+		if (m_tokenizer.more()) {
+			const Token& theToken = m_tokenizer.peek();
+			TokenType theType = theToken.getType();
+			if (theType != TokenType::comma && theType != TokenType::rparen) {
 				theResult.setError(Error::syntax_error, "Invalid attribute option '" + theToken.getData() + '\'');
 			}
 		}
@@ -209,6 +215,46 @@ private:
 		return StatusResult(Error::no_error);
 	}
 
+	static bool _isValidAttributeOption(Keyword aKeyword) {
+		return aKeyword == Keyword::primary_kw || aKeyword == Keyword::auto_increment_kw || aKeyword == Keyword::not_kw;
+	}
+
+};
+
+/* -------------------------------DescTableStatement------------------------------- */
+class DescTableStatement : public SQLStatement {
+public:
+	DescTableStatement(Tokenizer& aTokenizer, SQLInterpreter& anInterpreter) :
+		SQLStatement(aTokenizer, anInterpreter)
+	{
+	}
+	~DescTableStatement() override = default;
+
+	StatusResult parse() override {
+		StatusResult theResult(Error::no_error);
+		if (m_tokenizer.next(2)) {
+			const Token& theNameToken = m_tokenizer.get();
+			if (theNameToken.getType() == TokenType::identifier) {
+				m_name = theNameToken.getData();
+			}
+			else {
+				theResult.setError(Error::unexpected_identifier, "'" + theNameToken.getData() + "' is not a valid table name");
+			}
+		}
+		else {
+			theResult.setError(Error::identifier_expected, "Table name unspecified");
+		}
+		return theResult;
+	}
+
+	StatusResult validate() const override {
+		return m_tokenizer.more() ?
+			StatusResult(Error::invalid_command, "Redundant input after '" + m_name + '\'') : StatusResult(Error::no_error);
+	}
+
+	StatusResult execute() const override {
+		return m_interpreter.describeTable(m_name);
+	}
 };
 
 std::unique_ptr<SQLStatement> SQLStatement::factory(Tokenizer& aTokenizer, SQLInterpreter& anInterpreter) {
@@ -216,6 +262,8 @@ std::unique_ptr<SQLStatement> SQLStatement::factory(Tokenizer& aTokenizer, SQLIn
 	switch (theKeyword) {
 	case Keyword::create_kw:
 		return std::make_unique<CreateTableStatement>(aTokenizer, anInterpreter);
+	case Keyword::describe_kw:
+		return std::make_unique<DescTableStatement>(aTokenizer, anInterpreter);
 	default:
 		return nullptr;
 	}
