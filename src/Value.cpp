@@ -192,7 +192,7 @@ public:
 	}
 
 	std::string stringify() const override {
-		return "";
+		return "NULL";
 	}
 
 	std::ostream& dump(std::ostream& anOutput) const override {
