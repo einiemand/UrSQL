@@ -1,5 +1,6 @@
 #include "Database.hpp"
 #include "View.hpp"
+#include "Row.hpp"
 
 namespace UrSQL {
 
@@ -18,24 +19,25 @@ Database::Database(const std::string& aFileName, OpenExistingFile, StatusResult&
 }
 
 Database::~Database() {
-	m_storage.writeBlock(Block(m_toc), 0);
+	_saveTOC();
+	_saveEntites();
 }
 
 StatusResult Database::createTable(const AttributeList& anAttributeList, const std::string& anEntityName) {
 	StatusResult theResult(Error::no_error);
-	if (!entityExists(anEntityName)) {
-		auto theEntity = std::make_unique<Entity>();
-		for (const auto& theAttribute : anAttributeList) {
-			theEntity->addAttribute(theAttribute);
-		}
-		Block theBlock(*theEntity);
-		blocknum_t theBlocknum = -1;
-		theResult = m_storage.findFreeBlocknumber(theBlocknum);
-		if (theResult) {
-			theResult = m_storage.writeBlock(theBlock, theBlocknum);
+	if (!_entityExists(anEntityName)) {
+		blocknum_t theBlocknum;
+		if (theResult = m_storage.findFreeBlocknumber(theBlocknum)) {
+			auto theEntity = std::make_unique<Entity>(theBlocknum);
+			for (const auto& theAttribute : anAttributeList) {
+				theEntity->addAttribute(theAttribute);
+			}
 			if (theResult) {
-				m_toc.add(anEntityName, theBlocknum);
-				_addEntityToCache(std::move(theEntity), anEntityName);
+				theResult = m_storage.writeBlock(Block(*theEntity), theBlocknum);
+				if (theResult) {
+					m_toc.add(anEntityName, theBlocknum);
+					_addEntityToCache(std::move(theEntity), anEntityName);
+				}
 			}
 		}
 	}
@@ -47,7 +49,7 @@ StatusResult Database::createTable(const AttributeList& anAttributeList, const s
 
 StatusResult Database::describeTable(const std::string& anEntityName, size_type& theAttributeCount) {
 	StatusResult theResult(Error::no_error);
-	if (entityExists(anEntityName)) {
+	if (_entityExists(anEntityName)) {
 		Entity* theEntity = getEntityByName(anEntityName, theResult);
 		if (theResult) {
 			DescTableView(*theEntity).show();
@@ -60,17 +62,60 @@ StatusResult Database::describeTable(const std::string& anEntityName, size_type&
 	return theResult;
 }
 
+StatusResult Database::insertIntoTable(const std::string& anEntityName, const StringList& aFieldNames, const StringList& aValueStrs) {
+	StatusResult theResult(Error::no_error);
+	if (_entityExists(anEntityName)) {
+		blocknum_t theBlocknum;
+		if (theResult = m_storage.findFreeBlocknumber(theBlocknum)) {
+			Entity* theEntity = getEntityByName(anEntityName, theResult);
+			Row theNewRow(theBlocknum);
+			if (theResult = theEntity->generateNewRow(theNewRow, aFieldNames, aValueStrs)) {
+				theResult = m_storage.writeBlock(Block(*theEntity), theBlocknum);
+			}
+		}
+	}
+	else {
+		theResult.setError(Error::unknown_entity, '\'' + anEntityName + '\'');
+	}
+	return theResult;
+}
+
 Entity* Database::getEntityByName(const std::string& anEntityName, StatusResult& aResult) {
-	if (entityExists(anEntityName)) {
-		if (!entityCached(anEntityName)) {
+	if (_entityExists(anEntityName)) {
+		if (!_entityCached(anEntityName)) {
 			blocknum_t theEntityPos = m_toc.getEntityPosByName(anEntityName);
-			auto theEntity = std::make_unique<Entity>();
-			aResult = m_storage.parseMonoStorable(*theEntity, theEntityPos);
-			m_entityCache[anEntityName] = std::move(theEntity);
+			auto theEntity = std::make_unique<Entity>(theEntityPos);
+			aResult = m_storage.parseMonoStorable(*theEntity);
+			if (aResult) {
+				m_entityCache[anEntityName] = std::move(theEntity);
+			}
 		}
 		return m_entityCache.at(anEntityName).get();
 	}
 	throw std::runtime_error("Check if entity exists before getting it!");
+}
+
+void Database::_addEntityToCache(std::unique_ptr<Entity>&& anEntity, const std::string& anEntityName) {
+	if (_entityCached(anEntityName)) {
+		throw std::runtime_error(anEntityName + " already cached");
+	}
+	m_entityCache.insert({ anEntityName,std::move(anEntity) });
+}
+
+void Database::_saveTOC() {
+	if (m_toc.isDirty()) {
+		m_storage.writeBlock(Block(m_toc), 0);
+	}
+}
+
+void Database::_saveEntites() {
+	for (const auto& theNameAndEntity : m_entityCache) {
+		Entity* theEntity = theNameAndEntity.second.get();
+		if (theEntity->isDirty()) {
+			blocknum_t theBlocknum = theEntity->getBlocknum();
+			m_storage.writeBlock(Block(*theEntity), theBlocknum);
+		}
+	}
 }
 
 } /* UrSQL */

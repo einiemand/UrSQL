@@ -25,6 +25,8 @@ public:
 	StatusResult createTable(const AttributeList& anAttributeList, const std::string& anEntityName);
 	StatusResult describeTable(const std::string& anEntityName, size_type& theAttributeCount);
 
+	StatusResult insertIntoTable(const std::string& anEntityName, const StringList& aFieldNames, const StringList& aValueStrs);
+
 	inline const std::string& getName() const {
 		return m_storage.getName();
 	}
@@ -33,23 +35,25 @@ public:
 		return m_storage;
 	}
 
-	inline bool entityExists(const std::string& anEntityName) const {
-		return m_toc.entityExists(anEntityName);
-	}
-
-	inline bool entityCached(const std::string& anEntityName) const {
-		return m_entityCache.count(anEntityName) == 1;
-	}
-
 	Entity* getEntityByName(const std::string& anEntityName, StatusResult& aResult);
 private:
 	TOC m_toc;
 	Storage m_storage;
 	EntityCache m_entityCache;
 
-	inline void _addEntityToCache(std::unique_ptr<Entity>&& anEntity, const std::string& anEntityName) {
-		m_entityCache[anEntityName] = std::move(anEntity);
+	inline bool _entityExists(const std::string& anEntityName) const {
+		return m_toc.entityExists(anEntityName);
 	}
+
+	inline bool _entityCached(const std::string& anEntityName) const {
+		return m_entityCache.count(anEntityName) == 1;
+	}
+
+	void _addEntityToCache(std::unique_ptr<Entity>&& anEntity, const std::string& anEntityName);
+
+	void _saveTOC();
+	void _saveEntites();
+
 };
 
 }
