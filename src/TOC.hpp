@@ -19,6 +19,14 @@ public:
 	void serialize(BufferWriter& aWriter) const override;
 	void deserialize(BufferReader& aReader) override;
 
+	inline bool isDirty() const {
+		return m_dirty;
+	}
+
+	inline void setDirty(bool anIsDirty) {
+		m_dirty = anIsDirty;
+	}
+
 	inline bool entityExists(const std::string& anEntityName) const {
 		return m_entityMap.count(anEntityName) == 1;
 	}
@@ -26,10 +34,10 @@ public:
 	blocknum_t getEntityPosByName(const std::string& anEntityName) const;
 
 	void add(const std::string& anEntityName, blocknum_t aBlocknum);
-
 	void drop(const std::string& anEntityName);
 
 private:
+	bool m_dirty;
 	EntityMap m_entityMap;
 };
 
