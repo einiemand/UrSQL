@@ -53,15 +53,15 @@ public:
 		return m_defaultValue;
 	}
 
-	inline bool getNullable() const {
+	inline bool isNullable() const {
 		return m_isNullable;
 	}
 
-	inline bool getPrimary() const {
+	inline bool isPrimary() const {
 		return m_isPrimary;
 	}
 
-	inline bool getAutoIncr() const {
+	inline bool isAutoIncr() const {
 		return m_isAutoIncr;
 	}
 
