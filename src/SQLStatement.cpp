@@ -55,7 +55,7 @@ StatusResult parseSequence(Tokenizer& aTokenizer, StringList& aContainer, TokenF
 
 template<typename ElemT, typename CompT>
 std::string examineOverlap(const std::vector<ElemT>& aContainer, std::function<CompT(const ElemT&)> anExtracter) {
-	std::unordered_set<theCompElem> theCompElemSet;
+	std::unordered_set<CompT> theCompElemSet;
 	for (const auto& theElem : aContainer) {
 		CompT theCompElem = anExtracter(theElem);
 		if (theCompElemSet.count(theCompElem)) {
@@ -363,7 +363,7 @@ public:
 	}
 
 	StatusResult execute() const override {
-
+		return m_interpreter.insertIntoTable(m_name, m_fieldNames, m_valueStrs);
 	}
 private:
 	StringList m_fieldNames;
