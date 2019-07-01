@@ -15,11 +15,10 @@ void MonoStorable::encode(Block& aBlock) const {
 	serialize(theWriter);
 }
 
-void MonoStorable::decode(const Block& aBlock, blocknum_t aBlocknum) {
+void MonoStorable::decode(const Block& aBlock) {
 	if (expectedBlockType() != aBlock.getType()) {
 		throw std::runtime_error("Block type is NOT correct!");
 	}
-	setBlocknum(aBlocknum);
 	BufferReader theReader(aBlock.getData(), defaultBlockSize);
 	deserialize(theReader);
 }

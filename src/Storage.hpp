@@ -37,7 +37,7 @@ public:
 	StatusResult readBlock(Block& aBlock, blocknum_t aBlocknum);
 	StatusResult writeBlock(const Block& aBlock, blocknum_t aBlocknum);
 
-	StatusResult parseMonoStorable(MonoStorable& aMonoStorable, blocknum_t aBlocknum);
+	StatusResult parseMonoStorable(MonoStorable& aMonoStorable);
 
 	StatusResult eachBlock(BlockVisitor aVisitor);
 

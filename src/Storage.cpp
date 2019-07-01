@@ -62,7 +62,7 @@ StatusResult Storage::_loadTOC(TOC& aTOC) {
 
 		StatusResult theResult = readBlock(theBlock, 0);
 		if (theResult) {
-			aTOC.decode(theBlock, 0);
+			aTOC.decode(theBlock);
 		}
 		return theResult;
 	}
@@ -96,11 +96,11 @@ StatusResult Storage::writeBlock(const Block& aBlock, blocknum_t aBlocknum) {
 	return theResult;
 }
 
-StatusResult Storage::parseMonoStorable(MonoStorable& aMonoStorable, blocknum_t aBlocknum) {
+StatusResult Storage::parseMonoStorable(MonoStorable& aMonoStorable) {
 	Block theBlock;
-	StatusResult theResult = readBlock(theBlock, aBlocknum);
+	StatusResult theResult = readBlock(theBlock, aMonoStorable.getBlocknum());
 	if (theResult) {
-		aMonoStorable.decode(theBlock, aBlocknum);
+		aMonoStorable.decode(theBlock);
 	}
 	return theResult;
 }

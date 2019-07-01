@@ -21,13 +21,13 @@ public:
 
 class MonoStorable : public Storable {
 public:
-	MonoStorable(blocknum_t aBlocknum = -1);
+	MonoStorable(blocknum_t aBlocknum);
 	~MonoStorable() override = default;
 
 	virtual BlockType expectedBlockType() const = 0;
 
 	void encode(Block& aBlock) const;
-	void decode(const Block& aBlock, blocknum_t aBlocknum);
+	void decode(const Block& aBlock);
 
 	inline blocknum_t getBlocknum() const {
 		return m_blocknum;
