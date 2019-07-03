@@ -397,6 +397,55 @@ private:
 	}
 };
 
+/* -------------------------------InsertStatement------------------------------- */
+class SelectStatement : public SQLStatement {
+public:
+	SelectStatement(Tokenizer& aTokenizer, SQLInterpreter& anInterpreter) :
+		SQLStatement(aTokenizer, anInterpreter)
+	{
+	}
+
+	~SelectStatement() override = default;
+
+	StatusResult parse() override {
+		StatusResult theResult(Error::no_error);
+		if (m_tokenizer.next()) {
+			if (!m_tokenizer.skipIf(TokenType::star)) {
+				theResult = parseSequence(m_tokenizer, m_fieldNames,
+					[](const Token& aToken)->bool {
+						return aToken.getType() == TokenType::identifier;
+					}
+				);
+			}
+			if (theResult) {
+				if (m_tokenizer.skipIf(Keyword::from_kw)) {
+					theResult = _parseTableName();
+				}
+				else {
+					theResult.setError(Error::keyword_expected, "'from'");
+				}
+
+			}
+		}
+		else {
+			theResult.setError(Error::identifier_expected, "Specify from which fields");
+		}
+		return theResult;
+	}
+
+	StatusResult validate() const override {
+		return !m_tokenizer.more() ?
+			StatusResult(Error::no_error) : StatusResult(Error::syntax_error, "Redundant input after '" + m_name + '\'');
+	}
+
+	StatusResult execute() const override {
+		return m_interpreter.selectFromTable(m_name, m_fieldNames);
+	}
+
+private:
+	StringList m_fieldNames;
+};
+
 std::unique_ptr<SQLStatement> SQLStatement::factory(Tokenizer& aTokenizer, SQLInterpreter& anInterpreter) {
 	Keyword theKeyword = aTokenizer.peek().getKeyword();
 	switch (theKeyword) {
@@ -406,6 +455,8 @@ std::unique_ptr<SQLStatement> SQLStatement::factory(Tokenizer& aTokenizer, SQLIn
 		return std::make_unique<DescTableStatement>(aTokenizer, anInterpreter);
 	case Keyword::insert_kw:
 		return std::make_unique<InsertStatement>(aTokenizer, anInterpreter);
+	case Keyword::select_kw:
+		return std::make_unique<SelectStatement>(aTokenizer, anInterpreter);
 	default:
 		return nullptr;
 	}
