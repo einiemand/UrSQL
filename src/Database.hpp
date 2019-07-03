@@ -11,6 +11,8 @@
 
 namespace UrSQL {
 
+class RowCollection;
+
 class Database {
 public:
 	using EntityCache = std::unordered_map< std::string, std::unique_ptr<Entity> >;
@@ -26,6 +28,7 @@ public:
 	StatusResult describeTable(const std::string& anEntityName, size_type& theAttributeCount);
 
 	StatusResult insertIntoTable(const std::string& anEntityName, const StringList& aFieldNames, const StringList& aValueStrs);
+	StatusResult selectFromTable(RowCollection& aRowCollection, const std::string& anEntityName, const StringList& aFieldNames);
 
 	inline const std::string& getName() const {
 		return m_storage.getName();

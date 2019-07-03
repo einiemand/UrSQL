@@ -80,12 +80,39 @@ StatusResult Database::insertIntoTable(const std::string& anEntityName, const St
 	return theResult;
 }
 
+StatusResult Database::selectFromTable(RowCollection& aRowCollection, const std::string& anEntityName, const StringList& aFieldNames) {
+	StatusResult theResult(Error::no_error);
+	if (_entityExists(anEntityName)) {
+		Entity* theEntity = getEntityByName(anEntityName, theResult);
+		for (auto iter = aFieldNames.cbegin(); iter != aFieldNames.cend() && theResult; ++iter) {
+			const std::string& theFieldName = *iter;
+			if (!theEntity->attributeExistsByName(theFieldName)) {
+				theResult.setError(Error::unknown_attribute, '\'' + theFieldName + '\'');
+			}
+		}
+		if (theResult) {
+			theResult = m_storage.visitBlocks(
+				[&aRowCollection](Block& aBlock, blocknum_t aBlocknum)->StatusResult {
+					Row theRow(aBlocknum);
+					theRow.decode(aBlock);
+					aRowCollection.addRow(std::move(theRow));
+					return StatusResult(Error::no_error);
+				},
+				theEntity->getRowPos());
+		}
+	}
+	else {
+		theResult.setError(Error::unknown_entity, '\'' + anEntityName + '\'');
+	}
+	return theResult;
+}
+
 Entity* Database::getEntityByName(const std::string& anEntityName, StatusResult& aResult) {
 	if (_entityExists(anEntityName)) {
 		if (!_entityCached(anEntityName)) {
 			blocknum_t theEntityPos = m_toc.getEntityPosByName(anEntityName);
 			auto theEntity = std::make_unique<Entity>(theEntityPos);
-			aResult = m_storage.parseMonoStorable(*theEntity);
+			aResult = m_storage.decodeMonoStorable(*theEntity);
 			if (aResult) {
 				m_entityCache[anEntityName] = std::move(theEntity);
 			}
