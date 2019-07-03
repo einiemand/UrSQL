@@ -37,9 +37,27 @@ public:
 	StatusResult readBlock(Block& aBlock, blocknum_t aBlocknum);
 	StatusResult writeBlock(const Block& aBlock, blocknum_t aBlocknum);
 
-	StatusResult parseMonoStorable(MonoStorable& aMonoStorable);
+	StatusResult decodeMonoStorable(MonoStorable& aMonoStorable);
 
 	StatusResult eachBlock(BlockVisitor aVisitor);
+
+	template<typename IterableT>
+	StatusResult visitBlocks(BlockVisitor aVisitor, const IterableT& anIterable) {
+		StatusResult theResult(Error::no_error);
+
+		Block theBlock;
+		for (auto iter = anIterable.cbegin(); iter != anIterable.cend() && theResult; ++iter) {
+			blocknum_t theBlocknum = *iter;
+			theResult = readBlock(theBlock, theBlocknum);
+			if (theResult) {
+				theResult = aVisitor(theBlock, theBlocknum);
+				if (theResult.getCode() == Error::block_found) {
+					return theResult;
+				}
+			}
+		}
+		return theResult;
+	}
 
 	StatusResult findFreeBlocknumber(blocknum_t& aFreeBlocknum);
 
@@ -53,7 +71,7 @@ private:
 	std::string m_name;
 	std::fstream m_file;
 
-	size_type _getBlockCount();
+	blocknum_t _getBlockCount();
 
 	StatusResult _setupTOC(const TOC& aTOC);
 	StatusResult _loadTOC(TOC& aTOC);

@@ -30,10 +30,10 @@ bool Storage::hasDefaultExtension(const std::string& aFileName) {
 	return aFileName.substr(aFileName.length() - Storage::extensionLength) == Storage::defaultFileExtension;
 }
 
-size_type Storage::_getBlockCount() {
+blocknum_t Storage::_getBlockCount() {
 	m_file.seekg(0, std::fstream::end);
 	size_type total = static_cast<size_type>(m_file.tellg());
-	return total / defaultBlockSize;
+	return static_cast<blocknum_t>(total / defaultBlockSize);
 }
 
 StatusResult Storage::_setupTOC(const TOC& aTOC) {
@@ -96,7 +96,7 @@ StatusResult Storage::writeBlock(const Block& aBlock, blocknum_t aBlocknum) {
 	return theResult;
 }
 
-StatusResult Storage::parseMonoStorable(MonoStorable& aMonoStorable) {
+StatusResult Storage::decodeMonoStorable(MonoStorable& aMonoStorable) {
 	Block theBlock;
 	StatusResult theResult = readBlock(theBlock, aMonoStorable.getBlocknum());
 	if (theResult) {
@@ -106,17 +106,17 @@ StatusResult Storage::parseMonoStorable(MonoStorable& aMonoStorable) {
 }
 
 StatusResult Storage::eachBlock(BlockVisitor aVisitor) {
-	size_type theBlockCnt = _getBlockCount();
+	blocknum_t theBlockCnt = _getBlockCount();
 
 	StatusResult theResult(Error::no_error);
 
 	Block theBlock;
-	for (size_type theBlocknum = 0; theResult && theBlocknum < theBlockCnt; ++theBlocknum) {
+	for (blocknum_t theBlocknum = 0; theResult && theBlocknum < theBlockCnt; ++theBlocknum) {
 		theResult = readBlock(theBlock, theBlocknum);
 		if (theResult) {
 			theResult = aVisitor(theBlock, theBlocknum);
 			if (theResult.getCode() == Error::block_found) {
-				return StatusResult(Error::no_error);
+				return theResult;
 			}
 		}
 	}
