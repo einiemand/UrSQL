@@ -45,6 +45,9 @@ public:
 
 	void addRowPosition(blocknum_t aBlocknum);
 	void dropRowPosition(blocknum_t aBlocknum);
+	inline const BlocknumSet& getRowPos() const {
+		return m_rowPos;
+	}
 
 	StatusResult generateNewRow(Row& aRow, const StringList& aFieldNames, const StringList& aValueStrs);
 private:
