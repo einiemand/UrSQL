@@ -294,15 +294,15 @@ public:
 	}
 };
 
-/* -------------------------------InsertIntoTableStatement------------------------------- */
-class InsertIntoTableStatement : public SQLStatement {
+/* -------------------------------InsertStatement------------------------------- */
+class InsertStatement : public SQLStatement {
 public:
-	InsertIntoTableStatement(Tokenizer& aTokenizer, SQLInterpreter& anInterpreter) :
+	InsertStatement(Tokenizer& aTokenizer, SQLInterpreter& anInterpreter) :
 		SQLStatement(aTokenizer, anInterpreter)
 	{
 	}
 
-	~InsertIntoTableStatement() override = default;
+	~InsertStatement() override = default;
 
 	StatusResult parse() override {
 		StatusResult theResult(Error::no_error);
@@ -405,7 +405,7 @@ std::unique_ptr<SQLStatement> SQLStatement::factory(Tokenizer& aTokenizer, SQLIn
 	case Keyword::describe_kw:
 		return std::make_unique<DescTableStatement>(aTokenizer, anInterpreter);
 	case Keyword::insert_kw:
-		return std::make_unique<InsertIntoTableStatement>(aTokenizer, anInterpreter);
+		return std::make_unique<InsertStatement>(aTokenizer, anInterpreter);
 	default:
 		return nullptr;
 	}
