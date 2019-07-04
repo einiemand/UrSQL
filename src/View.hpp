@@ -50,7 +50,7 @@ private:
 	const std::vector<BlockType>& m_types;
 };
 
-/* -------------------------------DescDatabaseView------------------------------- */
+/* -------------------------------DescTableView------------------------------- */
 class Entity;
 
 class DescTableView : public View {
@@ -61,6 +61,20 @@ public:
 	void show() const override;
 private:
 	const Entity& m_entity;
+};
+
+/* -------------------------------SelectRowView------------------------------- */
+class RowCollection;
+
+class SelectRowView : public View {
+public:
+	SelectRowView(const RowCollection& aRowCollection, const StringList& aFieldNames);
+	~SelectRowView() override = default;
+
+	void show() const override;
+private:
+	const RowCollection& m_rowCollection;
+	const StringList& m_fieldNames;
 };
 
 }

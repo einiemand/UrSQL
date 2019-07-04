@@ -2,6 +2,7 @@
 #include "FolderReader.hpp"
 #include "Block.hpp"
 #include "Entity.hpp"
+#include "Row.hpp"
 #include <algorithm>
 #include <iomanip>
 
@@ -21,7 +22,6 @@ void ShowDatabasesView::show() const {
 	for (const auto& theDBName : m_dbNames) {
 		theHorizontalWidth = std::max(theHorizontalWidth, theDBName.length());
 	}
-	theHorizontalWidth += 2;
 
 	const std::vector<size_type> theWidths({ theHorizontalWidth });
 
@@ -45,8 +45,8 @@ DescDatabaseView::DescDatabaseView(const std::vector<BlockType>& theTypes) :
 
 void DescDatabaseView::show() const {
 	static const std::string theFirstHeader = "Block", theSecondHeader = "Type";
-	static const size_type theFirstWidth = theFirstHeader.length() + 2;
-	static constexpr size_type theSecondWidth = 6 + 2;
+	static const size_type theFirstWidth = theFirstHeader.length();
+	static constexpr size_type theSecondWidth = 6;
 
 	View::printHorizontalLine({ theFirstWidth,theSecondWidth });
 	View::printLine({ theFirstHeader,theSecondHeader }, { theFirstWidth,theSecondWidth });
@@ -105,9 +105,6 @@ void DescTableView::show() const {
 			theWidths[col] = std::max(theWidths[col], theRowDisplay[col].size());
 		}
 	}
-	for (size_type& theWidth : theWidths) {
-		theWidth += 2;
-	}
 
 	View::printHorizontalLine(theWidths);
 	View::printLine(theFieldTitles, theWidths);
@@ -118,11 +115,48 @@ void DescTableView::show() const {
 	View::printHorizontalLine(theWidths);
 }
 
+/* -------------------------------SelectRowView------------------------------- */
+SelectRowView::SelectRowView(const RowCollection& aRowCollection, const StringList& aFieldNames) :
+	View(),
+	m_rowCollection(aRowCollection),
+	m_fieldNames(aFieldNames)
+{
+}
+
+void SelectRowView::show() const {
+	std::vector<StringList> theRowCollectionDisplay;
+	m_rowCollection.eachRow(
+		[&](const Row& aRow) {
+			StringList theRowDisplay;
+			for (const std::string& theFieldName : m_fieldNames) {
+				theRowDisplay.push_back(aRow.getField(theFieldName).stringify());
+			}
+			theRowCollectionDisplay.push_back(std::move(theRowDisplay));
+		}
+	);
+	std::vector<size_type> theWidths;
+	for (const std::string& theFieldName : m_fieldNames) {
+		theWidths.push_back(theFieldName.size());
+	}
+	for (size_type i = 0; i < m_rowCollection.size(); ++i) {
+		for (size_type j = 0; j < m_fieldNames.size(); ++j) {
+			theWidths[j] = std::max(theWidths[j], theRowCollectionDisplay[i][j].size());
+		}
+	}
+	View::printHorizontalLine(theWidths);
+	View::printLine(m_fieldNames, theWidths);
+	View::printHorizontalLine(theWidths);
+	for (const StringList& theRowDisplay : theRowCollectionDisplay) {
+		View::printLine(theRowDisplay, theWidths);
+	}
+	View::printHorizontalLine(theWidths);
+}
+
 /* -------------------------------View Static Methods------------------------------- */
 void View::printHorizontalLine(const std::vector<size_type>& aWidths) {
 	defaultOutput << View::vertex;
 	for (size_type aWidth : aWidths) {
-		defaultOutput << std::string(aWidth, View::horizontalEdge) << View::vertex;
+		defaultOutput << std::string(aWidth + 2, View::horizontalEdge) << View::vertex;
 	}
 	defaultOutput << '\n';
 }
@@ -131,10 +165,9 @@ void View::printLine(const StringList& aStrings, const std::vector<size_type>& a
 	if (aStrings.size() != aWidths.size()) {
 		throw std::runtime_error("StringList size should be equal to aWidths size!");
 	}
-	size_type i = 0;
 	defaultOutput << View::verticalEdge;
-	for (; i < aStrings.size(); ++i) {
-		defaultOutput << std::setw(aWidths[i])  << std::left << ' ' + aStrings[i] << View::verticalEdge;
+	for (size_type i = 0; i < aStrings.size(); ++i) {
+		defaultOutput << std::setw(aWidths[i] + 2)  << std::left << ' ' + aStrings[i] << View::verticalEdge;
 	}
 	defaultOutput << '\n';
 }
