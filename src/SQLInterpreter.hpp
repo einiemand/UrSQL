@@ -15,6 +15,7 @@ public:
 
 	StatusResult createTable(const AttributeList& anAttributeList, const std::string& anEntityName) const;
 	StatusResult describeTable(const std::string& anEntityName) const;
+	StatusResult dropTable(const std::string& anEntityName) const;
 
 	StatusResult insertIntoTable(const std::string& anEntityName, const StringList& aFieldNames, const StringList& aValueStrs) const;
 	StatusResult selectFromTable(const std::string& anEntityName, StringList& aFieldNames) const;

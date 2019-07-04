@@ -32,6 +32,12 @@ std::unique_ptr<Statement> SQLInterpreter::getStatement(Tokenizer& aTokenizer) {
 		return SQLStatement::factory(aTokenizer, *this);
 	case Keyword::select_kw:
 		return SQLStatement::factory(aTokenizer, *this);
+	case Keyword::drop_kw: {
+		if (aTokenizer.remaining() > 1 && aTokenizer.peek(1).getKeyword() == Keyword::table_kw) {
+			return SQLStatement::factory(aTokenizer, *this);
+		}
+		break;
+	}
 	}
 	return nullptr;
 }
@@ -57,6 +63,21 @@ StatusResult SQLInterpreter::describeTable(const std::string& anEntityName) cons
 		theResult = theActiveDB->describeTable(anEntityName, theAttributeCount);
 		if (theResult) {
 			theResult.setMessage(std::to_string(theAttributeCount) + " row(s) in set");
+		}
+	}
+	else {
+		theResult.setError(Error::noDatabase_specified, "Specify the database first by 'use <DBName>'");
+	}
+	return theResult;
+}
+
+StatusResult SQLInterpreter::dropTable(const std::string& anEntityName) const {
+	StatusResult theResult(Error::no_error);
+	if (Database* theActiveDB = getActiveDatabase()) {
+		size_type theRowCount;
+		theResult = theActiveDB->dropTable(anEntityName, theRowCount);
+		if (theResult) {
+			theResult.setMessage("Query ok, " + std::to_string(theRowCount) + " row(s) affected");
 		}
 	}
 	else {
