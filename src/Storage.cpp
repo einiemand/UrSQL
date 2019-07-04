@@ -9,13 +9,13 @@ const char* Storage::defaultFileExtension = ".db";
 const size_type Storage::extensionLength = strlen(Storage::defaultFileExtension);
 
 Storage::Storage(std::string aFileName, CreateNewFile, const TOC& aTOC, StatusResult& aResult) :
-	m_name(std::move(aFileName))
+	m_fileName(std::move(aFileName))
 {
 	aResult = _setupTOC(aTOC);
 }
 
 Storage::Storage(std::string aFileName, OpenExistingFile, TOC& aTOC, StatusResult& aResult) :
-	m_name(std::move(aFileName))
+	m_fileName(std::move(aFileName))
 {
 	aResult = _loadTOC(aTOC);
 }
@@ -37,7 +37,7 @@ blocknum_t Storage::_getBlockCount() {
 }
 
 StatusResult Storage::_setupTOC(const TOC& aTOC) {
-	std::string theFilePath = Storage::getDBFilePath(m_name);
+	std::string theFilePath = Storage::getDBFilePath(m_fileName);
 	//m_file.clear();
 
 	m_file.open(theFilePath, std::fstream::out | std::fstream::trunc);
@@ -54,7 +54,7 @@ StatusResult Storage::_setupTOC(const TOC& aTOC) {
 }
 
 StatusResult Storage::_loadTOC(TOC& aTOC) {
-	std::string theFilePath = Storage::getDBFilePath(m_name);
+	std::string theFilePath = Storage::getDBFilePath(m_fileName);
 	m_file.open(theFilePath, std::fstream::in | std::fstream::out | std::fstream::binary);
 
 	if (storageReady()) {
@@ -67,14 +67,14 @@ StatusResult Storage::_loadTOC(TOC& aTOC) {
 		return theResult;
 	}
 
-	return StatusResult(Error::read_error, "File '" + m_name + "' cannot be opened");
+	return StatusResult(Error::read_error, "File '" + m_fileName + "' cannot be opened");
 }
 
 StatusResult Storage::readBlock(Block& aBlock, blocknum_t aBlocknum) {
 	StatusResult theResult(Error::no_error);
 	if (m_file.seekg(static_cast<int64_t>(aBlocknum) * defaultBlockSize)) {
 		if (!m_file.read(reinterpret_cast<char*>(&aBlock), defaultBlockSize)) {
-			theResult.setError(Error::read_error, "Unable to read blocks from '" + Storage::getDBFilePath(m_name) + '\'');
+			theResult.setError(Error::read_error, "Unable to read blocks from '" + Storage::getDBFilePath(m_fileName) + '\'');
 		}
 	}
 	else {
@@ -87,7 +87,7 @@ StatusResult Storage::writeBlock(const Block& aBlock, blocknum_t aBlocknum) {
 	StatusResult theResult(Error::no_error);
 	if (m_file.seekp(static_cast<int64_t>(aBlocknum) * defaultBlockSize)) {
 		if (!m_file.write(reinterpret_cast<const char*>(&aBlock), defaultBlockSize)) {
-			theResult.setError(Error::write_error, "Unable to write blocks to '" + Storage::getDBFilePath(m_name) + '\'');
+			theResult.setError(Error::write_error, "Unable to write blocks to '" + Storage::getDBFilePath(m_fileName) + '\'');
 		}
 	}
 	else {

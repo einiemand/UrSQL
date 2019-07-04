@@ -34,7 +34,7 @@ public:
 	}
 
 	inline const std::string& getName() const {
-		return m_name;
+		return m_fileName;
 	}
 
 	StatusResult readBlock(Block& aBlock, blocknum_t aBlocknum);
@@ -82,7 +82,7 @@ public:
 	static std::string getDBFilePath(const std::string& aDBName);
 	static bool hasDefaultExtension(const std::string& aFileName);
 private:
-	std::string m_name;
+	std::string m_fileName;
 	std::fstream m_file;
 
 	blocknum_t _getBlockCount();
