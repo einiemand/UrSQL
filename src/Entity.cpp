@@ -107,8 +107,19 @@ StatusResult Entity::generateNewRow(Row& aRow, const StringList& aFieldNames, co
 		}
 	}
 
+	// Validate all required fields are given.
 	for (const Attribute& theAttribute : getAttributes()) {
 		const std::string& theAttributeName = theAttribute.getName();
+		if (!aRow.fieldExists(theAttributeName) && !theAttribute.isNullable()) {
+			theResult.setError(Error::invalid_arguments, '\'' + theAttributeName + "' is NOT nullable, but value is not given");
+			break;
+		}
+	}
+
+	// Add fields that are not specified by user.
+	for (auto iter = m_attributes.cbegin(); theResult && iter != m_attributes.cend(); ++iter) {
+		const auto& theAttribute = *iter;
+		const std::string& theAttributeName = iter->getName();
 		if (!aRow.fieldExists(theAttributeName)) {
 			if (theAttribute.isAutoIncr()) {
 				aRow.addField(theAttributeName, Value(getNextAutoincr()));
@@ -117,8 +128,7 @@ StatusResult Entity::generateNewRow(Row& aRow, const StringList& aFieldNames, co
 				aRow.addField(theAttributeName, theAttribute.getDefaultValue());
 			}
 			else {
-				theResult.setError(Error::invalid_arguments, '\'' + theAttributeName + "' is NOT nullable, but value is not given");
-				break;
+				throw std::runtime_error("Impossible: the attribute must be auto_increment or nullable!");
 			}
 		}
 	}
