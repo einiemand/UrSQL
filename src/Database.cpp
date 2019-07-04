@@ -70,7 +70,10 @@ StatusResult Database::insertIntoTable(const std::string& anEntityName, const St
 			Entity* theEntity = getEntityByName(anEntityName, theResult);
 			Row theNewRow(theBlocknum);
 			if (theResult = theEntity->generateNewRow(theNewRow, aFieldNames, aValueStrs)) {
-				theResult = m_storage.writeBlock(Block(*theEntity), theBlocknum);
+				theResult = m_storage.writeBlock(Block(theNewRow), theBlocknum);
+				if (theResult) {
+					theEntity->addRowPosition(theBlocknum);
+				}
 			}
 		}
 	}
@@ -93,8 +96,8 @@ StatusResult Database::selectFromTable(RowCollection& aRowCollection, const std:
 		if (theResult) {
 			theResult = m_storage.visitBlocks(
 				[&aRowCollection](Block& aBlock, blocknum_t aBlocknum)->StatusResult {
-					Row theRow(aBlocknum);
-					theRow.decode(aBlock);
+					auto theRow = std::make_unique<Row>(aBlocknum);
+					theRow->decode(aBlock);
 					aRowCollection.addRow(std::move(theRow));
 					return StatusResult(Error::no_error);
 				},
