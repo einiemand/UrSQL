@@ -62,6 +62,28 @@ StatusResult Database::describeTable(const std::string& anEntityName, size_type&
 	return theResult;
 }
 
+StatusResult Database::dropTable(const std::string& anEntityName, size_type& aRowCount) {
+	StatusResult theResult(Error::no_error);
+	if (_entityExists(anEntityName)) {
+		Entity* theEntity = getEntityByName(anEntityName, theResult);
+		const auto& theRowPositions = theEntity->getRowPos();
+		aRowCount = theRowPositions.size();
+		if (theResult) {
+			theResult = m_storage.releaseBlocks(
+				theRowPositions,
+				Storage::BlocknumExtractor<blocknum_t>([](const blocknum_t& aBlocknum)->blocknum_t { return aBlocknum; })
+			);
+			if (theResult) {
+				theResult = _dropEntity(anEntityName);
+			}
+		}
+	}
+	else {
+		theResult.setError(Error::unknown_entity, '\'' + anEntityName + '\'');
+	}
+	return theResult;
+}
+
 StatusResult Database::insertIntoTable(const std::string& anEntityName, const StringList& aFieldNames, const StringList& aValueStrs) {
 	StatusResult theResult(Error::no_error);
 	if (_entityExists(anEntityName)) {
@@ -151,6 +173,21 @@ void Database::_saveEntites() {
 			m_storage.writeBlock(Block(*theEntity), theBlocknum);
 		}
 	}
+}
+
+StatusResult Database::_dropEntity(const std::string& anEntityName) {
+	if (_entityExists(anEntityName)) {
+		blocknum_t theBlocknum = m_toc.getEntityPosByName(anEntityName);
+		StatusResult theResult = m_storage.releaseBlock(theBlocknum);
+		if (theResult) {
+			if (_entityCached(anEntityName)) {
+				m_entityCache.erase(anEntityName);
+			}
+			m_toc.drop(anEntityName);
+		}
+		return theResult;
+	}
+	throw std::runtime_error("Impossible: Trying to drop an entity that doesn't exist!");
 }
 
 } /* UrSQL */

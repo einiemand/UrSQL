@@ -26,6 +26,7 @@ public:
 
 	StatusResult createTable(const AttributeList& anAttributeList, const std::string& anEntityName);
 	StatusResult describeTable(const std::string& anEntityName, size_type& theAttributeCount);
+	StatusResult dropTable(const std::string& anEntityName, size_type& aRowCount);
 
 	StatusResult insertIntoTable(const std::string& anEntityName, const StringList& aFieldNames, const StringList& aValueStrs);
 	StatusResult selectFromTable(RowCollection& aRowCollection, const std::string& anEntityName, StringList& aFieldNames);
@@ -56,6 +57,8 @@ private:
 
 	void _saveTOC();
 	void _saveEntites();
+
+	StatusResult _dropEntity(const std::string& anEntityName);
 
 };
 
