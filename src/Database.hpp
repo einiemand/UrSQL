@@ -25,7 +25,6 @@ public:
 	Database& operator=(const Database&) = delete;
 
 	StatusResult createTable(const AttributeList& anAttributeList, const std::string& anEntityName);
-	StatusResult describeTable(const std::string& anEntityName, size_type& theAttributeCount);
 	StatusResult dropTable(const std::string& anEntityName, size_type& aRowCount);
 
 	StatusResult insertIntoTable(const std::string& anEntityName, const StringList& aFieldNames, const StringList& aValueStrs);
@@ -40,6 +39,10 @@ public:
 	}
 
 	Entity* getEntityByName(const std::string& anEntityName, StatusResult& aResult);
+
+	inline StringList collectEntityNames() const {
+		return m_toc.collectEntityNames();
+	}
 private:
 	TOC m_toc;
 	Storage m_storage;
@@ -53,7 +56,7 @@ private:
 		return m_entityCache.count(anEntityName) == 1;
 	}
 
-	void _addEntityToCache(std::unique_ptr<Entity>&& anEntity, const std::string& anEntityName);
+	void _addEntityToCache(const std::string& anEntityName, std::unique_ptr<Entity>&& anEntity);
 
 	void _saveTOC();
 	void _saveEntites();

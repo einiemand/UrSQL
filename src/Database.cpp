@@ -1,5 +1,4 @@
 #include "Database.hpp"
-#include "View.hpp"
 #include "Row.hpp"
 
 namespace UrSQL {
@@ -36,28 +35,13 @@ StatusResult Database::createTable(const AttributeList& anAttributeList, const s
 				theResult = m_storage.writeBlock(Block(*theEntity), theBlocknum);
 				if (theResult) {
 					m_toc.add(anEntityName, theBlocknum);
-					_addEntityToCache(std::move(theEntity), anEntityName);
+					_addEntityToCache(anEntityName, std::move(theEntity));
 				}
 			}
 		}
 	}
 	else {
 		theResult.setError(Error::entity_exists, '\'' + anEntityName + '\'');
-	}
-	return theResult;
-}
-
-StatusResult Database::describeTable(const std::string& anEntityName, size_type& theAttributeCount) {
-	StatusResult theResult(Error::no_error);
-	if (_entityExists(anEntityName)) {
-		Entity* theEntity = getEntityByName(anEntityName, theResult);
-		if (theResult) {
-			DescTableView(*theEntity).show();
-			theAttributeCount = theEntity->getAttributes().size();
-		}
-	}
-	else {
-		theResult.setError(Error::unknown_entity, "\'" + anEntityName + '\'');
 	}
 	return theResult;
 }
@@ -138,21 +122,24 @@ StatusResult Database::selectFromTable(RowCollection& aRowCollection, const std:
 }
 
 Entity* Database::getEntityByName(const std::string& anEntityName, StatusResult& aResult) {
+	Entity* theObserver = nullptr;
 	if (_entityExists(anEntityName)) {
 		if (!_entityCached(anEntityName)) {
 			blocknum_t theEntityPos = m_toc.getEntityPosByName(anEntityName);
 			auto theEntity = std::make_unique<Entity>(theEntityPos);
 			aResult = m_storage.decodeMonoStorable(*theEntity);
 			if (aResult) {
-				m_entityCache[anEntityName] = std::move(theEntity);
+				_addEntityToCache(anEntityName, std::move(theEntity));
 			}
 		}
-		return m_entityCache.at(anEntityName).get();
+		if (aResult) {
+			theObserver = m_entityCache[anEntityName].get();
+		}
 	}
-	throw std::runtime_error("Check if entity exists before getting it!");
+	return theObserver;
 }
 
-void Database::_addEntityToCache(std::unique_ptr<Entity>&& anEntity, const std::string& anEntityName) {
+void Database::_addEntityToCache(const std::string& anEntityName, std::unique_ptr<Entity>&& anEntity) {
 	if (_entityCached(anEntityName)) {
 		throw std::runtime_error(anEntityName + " already cached");
 	}
