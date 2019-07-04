@@ -36,6 +36,8 @@ public:
 	void add(const std::string& anEntityName, blocknum_t aBlocknum);
 	void drop(const std::string& anEntityName);
 
+	StringList collectEntityNames() const;
+
 private:
 	bool m_dirty;
 	EntityMap m_entityMap;

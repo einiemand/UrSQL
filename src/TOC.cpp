@@ -62,4 +62,12 @@ void TOC::drop(const std::string& anEntityName) {
 	makeDirty(true);
 }
 
+StringList TOC::collectEntityNames() const {
+	StringList theEntityNames;
+	for (const auto& thePair : m_entityMap) {
+		theEntityNames.push_back(thePair.first);
+	}
+	return theEntityNames;
+}
+
 }
