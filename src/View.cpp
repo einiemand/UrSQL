@@ -152,6 +152,30 @@ void SelectRowView::show() const {
 	View::printHorizontalLine(theWidths);
 }
 
+/* -------------------------------ShowTablesView------------------------------- */
+ShowTablesView::ShowTablesView(const std::string& aDBName, const StringList& anEntityNames) :
+	View(),
+	m_dbName(aDBName),
+	m_entityNames(anEntityNames)
+{
+}
+
+void ShowTablesView::show() const {
+	const std::string theTitle = "Tables_in_" + m_dbName;
+	size_type theWidth = theTitle.size();
+	for (const std::string& theEntityName : m_entityNames) {
+		theWidth = std::max(theWidth, theEntityName.size());
+	}
+	const std::vector<size_type> theWidths({ theWidth });
+	View::printHorizontalLine(theWidths);
+	View::printLine({ theTitle }, theWidths);
+	View::printHorizontalLine(theWidths);
+	for (const std::string& theEntityName : m_entityNames) {
+		View::printLine({ theEntityName }, theWidths);
+	}
+	View::printHorizontalLine(theWidths);
+}
+
 /* -------------------------------View Static Methods------------------------------- */
 void View::printHorizontalLine(const std::vector<size_type>& aWidths) {
 	defaultOutput << View::vertex;

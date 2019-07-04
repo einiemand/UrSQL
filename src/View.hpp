@@ -77,6 +77,18 @@ private:
 	const StringList& m_fieldNames;
 };
 
+/* -------------------------------ShowTablesView------------------------------- */
+class ShowTablesView : public View {
+public:
+	ShowTablesView(const std::string& aDBName, const StringList& anEntityNames);
+	~ShowTablesView() override = default;
+
+	void show() const override;
+private:
+	const std::string& m_dbName;
+	const StringList& m_entityNames;
+};
+
 }
 
 #endif
