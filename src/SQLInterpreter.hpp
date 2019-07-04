@@ -17,7 +17,7 @@ public:
 	StatusResult describeTable(const std::string& anEntityName) const;
 
 	StatusResult insertIntoTable(const std::string& anEntityName, const StringList& aFieldNames, const StringList& aValueStrs) const;
-	StatusResult selectFromTable(const std::string& anEntityName, const StringList& aFieldNames) const;
+	StatusResult selectFromTable(const std::string& anEntityName, StringList& aFieldNames) const;
 
 private:
 

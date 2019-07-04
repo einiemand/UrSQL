@@ -3,6 +3,7 @@
 #include "SQLStatement.hpp"
 #include "Database.hpp"
 #include "Row.hpp"
+#include "View.hpp"
 
 namespace UrSQL {
 
@@ -69,7 +70,7 @@ StatusResult SQLInterpreter::insertIntoTable(const std::string& anEntityName, co
 	if (Database* theActiveDB = getActiveDatabase()) {
 		theResult = theActiveDB->insertIntoTable(anEntityName, aFieldNames, aValueStrs);
 		if (theResult) {
-			theResult.setMessage("Query ok, " + std::to_string(aFieldNames.size()) + " row(s) inserted");
+			theResult.setMessage("Query ok, 1 row(s) inserted");
 		}
 	}
 	else {
@@ -78,13 +79,19 @@ StatusResult SQLInterpreter::insertIntoTable(const std::string& anEntityName, co
 	return theResult;
 }
 
-StatusResult SQLInterpreter::selectFromTable(const std::string& anEntityName, const StringList& aFieldNames) const {
+StatusResult SQLInterpreter::selectFromTable(const std::string& anEntityName, StringList& aFieldNames) const {
 	StatusResult theResult(Error::no_error);
 	if (Database* theActiveDB = getActiveDatabase()) {
 		RowCollection theRowCollection;
 		theResult = theActiveDB->selectFromTable(theRowCollection, anEntityName, aFieldNames);
 		if (theResult) {
-
+			if (theRowCollection.empty()) {
+				theResult.setMessage("empty set");
+			}
+			else {
+				SelectRowView(theRowCollection, aFieldNames).show();
+				theResult.setMessage("Query ok, " + std::to_string(theRowCollection.size()) + " row(s) affected");
+			}
 		}
 	}
 	else {
