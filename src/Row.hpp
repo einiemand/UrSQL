@@ -42,6 +42,10 @@ public:
 	RowCollection& operator=(const RowCollection&) = delete;
 
 	void addRow(Row aRow);
+
+	inline size_type size() const {
+		return m_rows.size();
+	}
 private:
 	RowList m_rows;
 };
