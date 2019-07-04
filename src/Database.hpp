@@ -28,7 +28,7 @@ public:
 	StatusResult describeTable(const std::string& anEntityName, size_type& theAttributeCount);
 
 	StatusResult insertIntoTable(const std::string& anEntityName, const StringList& aFieldNames, const StringList& aValueStrs);
-	StatusResult selectFromTable(RowCollection& aRowCollection, const std::string& anEntityName, const StringList& aFieldNames);
+	StatusResult selectFromTable(RowCollection& aRowCollection, const std::string& anEntityName, StringList& aFieldNames);
 
 	inline const std::string& getName() const {
 		return m_storage.getName();

@@ -80,7 +80,7 @@ StatusResult Database::insertIntoTable(const std::string& anEntityName, const St
 	return theResult;
 }
 
-StatusResult Database::selectFromTable(RowCollection& aRowCollection, const std::string& anEntityName, const StringList& aFieldNames) {
+StatusResult Database::selectFromTable(RowCollection& aRowCollection, const std::string& anEntityName, StringList& aFieldNames) {
 	StatusResult theResult(Error::no_error);
 	if (_entityExists(anEntityName)) {
 		Entity* theEntity = getEntityByName(anEntityName, theResult);
@@ -99,6 +99,11 @@ StatusResult Database::selectFromTable(RowCollection& aRowCollection, const std:
 					return StatusResult(Error::no_error);
 				},
 				theEntity->getRowPos());
+			if (theResult && aFieldNames.empty()) {
+				for (const Attribute& theAttribute : theEntity->getAttributes()) {
+					aFieldNames.push_back(theAttribute.getName());
+				}
+			}
 		}
 	}
 	else {
