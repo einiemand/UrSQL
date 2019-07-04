@@ -443,7 +443,7 @@ public:
 	}
 
 private:
-	StringList m_fieldNames;
+	mutable StringList m_fieldNames;
 };
 
 std::unique_ptr<SQLStatement> SQLStatement::factory(Tokenizer& aTokenizer, SQLInterpreter& anInterpreter) {
