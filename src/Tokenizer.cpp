@@ -10,6 +10,7 @@ constexpr char rightParen = ')';
 constexpr char comma = ',';
 constexpr char doubleQuote = '"';
 constexpr char singleQuote = '\'';
+constexpr char star = '*';
 
 Tokenizer::Tokenizer(std::istream& anInput) :
 	m_input(anInput),
@@ -39,7 +40,7 @@ inline bool isQuote(char aChar) {
 }
 
 inline bool isPunctuation(char aChar) {
-	return strchr(",()", aChar) != nullptr;
+	return strchr(",()*", aChar) != nullptr;
 }
 
 TokenType getPunctuationType(char aChar) {
@@ -50,6 +51,8 @@ TokenType getPunctuationType(char aChar) {
 		return TokenType::lparen;
 	case rightParen:
 		return TokenType::rparen;
+	case star:
+		return TokenType::star;
 	default:
 		return TokenType::unknown;
 	}
