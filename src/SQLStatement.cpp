@@ -164,6 +164,7 @@ private:
 			case Keyword::primary_kw: {
 				if (m_tokenizer.skipIf(Keyword::key_kw)) {
 					anAttribute.setPrimary(true);
+					anAttribute.setNullable(false);
 				}
 				else {
 					theResult.setError(Error::syntax_error, "Expect 'key' after 'primary'");
@@ -477,6 +478,31 @@ public:
 	}
 };
 
+/* -------------------------------ShowTablesStatement------------------------------- */
+class ShowTablesStatement : public SQLStatement {
+public:
+	ShowTablesStatement(Tokenizer& aTokenizer, SQLInterpreter& anInterpreter) :
+		SQLStatement(aTokenizer, anInterpreter)
+	{
+	}
+
+	~ShowTablesStatement() override = default;
+
+	StatusResult parse() override {
+		m_tokenizer.next(2);
+		return StatusResult(Error::no_error);
+	}
+
+	StatusResult validate() const override {
+		return !m_tokenizer.more() ?
+			StatusResult(Error::no_error) : StatusResult(Error::syntax_error, "Redundant input after '" + m_entityName + '\'');
+	}
+
+	StatusResult execute() const override {
+		return m_interpreter.showTables();
+	}
+};
+
 std::unique_ptr<SQLStatement> SQLStatement::factory(Tokenizer& aTokenizer, SQLInterpreter& anInterpreter) {
 	Keyword theKeyword = aTokenizer.peek().getKeyword();
 	switch (theKeyword) {
@@ -490,6 +516,8 @@ std::unique_ptr<SQLStatement> SQLStatement::factory(Tokenizer& aTokenizer, SQLIn
 		return std::make_unique<SelectStatement>(aTokenizer, anInterpreter);
 	case Keyword::drop_kw:
 		return std::make_unique<DropTableStatement>(aTokenizer, anInterpreter);
+	case Keyword::show_kw:
+		return std::make_unique<ShowTablesStatement>(aTokenizer, anInterpreter);
 	default:
 		return nullptr;
 	}
