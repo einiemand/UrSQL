@@ -51,7 +51,7 @@ void TOC::add(const std::string& anEntityName, blocknum_t aBlocknum) {
 		throw std::runtime_error("Check if entity exists before adding it to TOC!");
 	}
 	m_entityMap.insert({ anEntityName,aBlocknum });
-	setDirty(true);
+	makeDirty(true);
 }
 
 void TOC::drop(const std::string& anEntityName) {
@@ -59,7 +59,7 @@ void TOC::drop(const std::string& anEntityName) {
 		throw std::runtime_error("Check if entity exists before dropping it from TOC!");
 	}
 	m_entityMap.erase(anEntityName);
-	setDirty(true);
+	makeDirty(true);
 }
 
 }

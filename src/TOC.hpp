@@ -23,7 +23,7 @@ public:
 		return m_dirty;
 	}
 
-	inline void setDirty(bool anIsDirty) {
+	inline void makeDirty(bool anIsDirty) {
 		m_dirty = anIsDirty;
 	}
 
