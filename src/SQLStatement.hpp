@@ -15,7 +15,7 @@ public:
 	static std::unique_ptr<SQLStatement> factory(Tokenizer& aTokenizer, SQLInterpreter& anInterpreter);
 protected:
 	SQLInterpreter& m_interpreter;
-	std::string m_name;
+	std::string m_entityName;
 
 	StatusResult _parseTableName();
 };

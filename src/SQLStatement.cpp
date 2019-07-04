@@ -10,7 +10,7 @@ namespace UrSQL {
 SQLStatement::SQLStatement(Tokenizer& aTokenizer, SQLInterpreter& anInterpreter) :
 	Statement(aTokenizer),
 	m_interpreter(anInterpreter),
-	m_name()
+	m_entityName()
 {
 }
 
@@ -19,7 +19,7 @@ StatusResult SQLStatement::_parseTableName() {
 	if (m_tokenizer.more()) {
 		const Token& theNameToken = m_tokenizer.get();
 		if (theNameToken.getType() == TokenType::identifier) {
-			m_name = theNameToken.getData();
+			m_entityName = theNameToken.getData();
 		}
 		else {
 			theResult.setError(Error::identifier_expected, "Table name is not an identifier");
@@ -88,7 +88,7 @@ public:
 					}
 				}
 				else {
-					theResult.setError(Error::syntax_error, "'(' missing after table name '" + m_name + '\'');
+					theResult.setError(Error::syntax_error, "'(' missing after table name '" + m_entityName + '\'');
 				}
 			}
 		}
@@ -110,7 +110,7 @@ public:
 	}
 
 	StatusResult execute() const override {
-		return m_interpreter.createTable(m_attributes, m_name);
+		return m_interpreter.createTable(m_attributes, m_entityName);
 	}
 
 	~CreateTableStatement() override = default;
@@ -272,7 +272,7 @@ public:
 		if (m_tokenizer.next(2)) {
 			const Token& theNameToken = m_tokenizer.get();
 			if (theNameToken.getType() == TokenType::identifier) {
-				m_name = theNameToken.getData();
+				m_entityName = theNameToken.getData();
 			}
 			else {
 				theResult.setError(Error::unexpected_identifier, "'" + theNameToken.getData() + "' is not a valid table name");
@@ -286,11 +286,11 @@ public:
 
 	StatusResult validate() const override {
 		return m_tokenizer.more() ?
-			StatusResult(Error::invalid_command, "Redundant input after '" + m_name + '\'') : StatusResult(Error::no_error);
+			StatusResult(Error::invalid_command, "Redundant input after '" + m_entityName + '\'') : StatusResult(Error::no_error);
 	}
 
 	StatusResult execute() const override {
-		return m_interpreter.describeTable(m_name);
+		return m_interpreter.describeTable(m_entityName);
 	}
 };
 
@@ -336,7 +336,7 @@ public:
 					}
 				}
 				else {
-					theResult.setError(Error::syntax_error, "'(' missing after table name '" + m_name + "'");
+					theResult.setError(Error::syntax_error, "'(' missing after table name '" + m_entityName + "'");
 				}
 			}
 		}
@@ -363,7 +363,7 @@ public:
 	}
 
 	StatusResult execute() const override {
-		return m_interpreter.insertIntoTable(m_name, m_fieldNames, m_valueStrs);
+		return m_interpreter.insertIntoTable(m_entityName, m_fieldNames, m_valueStrs);
 	}
 private:
 	StringList m_fieldNames;
@@ -435,15 +435,46 @@ public:
 
 	StatusResult validate() const override {
 		return !m_tokenizer.more() ?
-			StatusResult(Error::no_error) : StatusResult(Error::syntax_error, "Redundant input after '" + m_name + '\'');
+			StatusResult(Error::no_error) : StatusResult(Error::syntax_error, "Redundant input after '" + m_entityName + '\'');
 	}
 
 	StatusResult execute() const override {
-		return m_interpreter.selectFromTable(m_name, m_fieldNames);
+		return m_interpreter.selectFromTable(m_entityName, m_fieldNames);
 	}
 
 private:
 	mutable StringList m_fieldNames;
+};
+
+/* -------------------------------DropTableStatement------------------------------- */
+class DropTableStatement : public SQLStatement {
+public:
+	DropTableStatement(Tokenizer& aTokenizer, SQLInterpreter& anInterpreter) :
+		SQLStatement(aTokenizer, anInterpreter)
+	{
+	}
+
+	~DropTableStatement() override = default;
+
+	StatusResult parse() override {
+		StatusResult theResult(Error::no_error);
+		if (m_tokenizer.next(2)) {
+			theResult = _parseTableName();
+		}
+		else {
+			theResult.setError(Error::identifier_expected, "Table name unspecified");
+		}
+		return theResult;
+	}
+
+	StatusResult validate() const override {
+		return !m_tokenizer.more() ?
+			StatusResult(Error::no_error) : StatusResult(Error::syntax_error, "Redundant input after '" + m_entityName + '\'');
+	}
+
+	StatusResult execute() const override {
+		return m_interpreter.dropTable(m_entityName);
+	}
 };
 
 std::unique_ptr<SQLStatement> SQLStatement::factory(Tokenizer& aTokenizer, SQLInterpreter& anInterpreter) {
@@ -457,6 +488,8 @@ std::unique_ptr<SQLStatement> SQLStatement::factory(Tokenizer& aTokenizer, SQLIn
 		return std::make_unique<InsertStatement>(aTokenizer, anInterpreter);
 	case Keyword::select_kw:
 		return std::make_unique<SelectStatement>(aTokenizer, anInterpreter);
+	case Keyword::drop_kw:
+		return std::make_unique<DropTableStatement>(aTokenizer, anInterpreter);
 	default:
 		return nullptr;
 	}
