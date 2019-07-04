@@ -49,7 +49,7 @@ void Entity::deserialize(BufferReader& aReader) {
 
 void Entity::addAttribute(Attribute anAttribute) {
 	m_attributes.emplace_back(std::move(anAttribute));
-	setDirty(true);
+	makeDirty(true);
 }
 
 bool Entity::attributeExistsByName(const std::string& aName) const {
@@ -72,7 +72,7 @@ const Attribute& Entity::getAttributeByName(const std::string& aName) const {
 }
 
 Entity::int_t Entity::getNextAutoincr() {
-	setDirty(true);
+	makeDirty(true);
 	return m_autoincr++;
 }
 
@@ -108,7 +108,8 @@ StatusResult Entity::generateNewRow(Row& aRow, const StringList& aFieldNames, co
 	}
 
 	// Validate all required fields are given.
-	for (const Attribute& theAttribute : getAttributes()) {
+	for (auto iter = m_attributes.cbegin(); theResult && iter != m_attributes.cend(); ++iter) {
+		const auto& theAttribute = *iter;
 		const std::string& theAttributeName = theAttribute.getName();
 		if (!aRow.fieldExists(theAttributeName) && !theAttribute.isNullable()) {
 			theResult.setError(Error::invalid_arguments, '\'' + theAttributeName + "' is NOT nullable, but value is not given");
