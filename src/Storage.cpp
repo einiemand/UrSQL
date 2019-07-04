@@ -96,6 +96,11 @@ StatusResult Storage::writeBlock(const Block& aBlock, blocknum_t aBlocknum) {
 	return theResult;
 }
 
+StatusResult Storage::releaseBlock(blocknum_t aBlocknum) {
+	Block theBlock(BlockType::free_type);
+	return writeBlock(theBlock, aBlocknum);
+}
+
 StatusResult Storage::decodeMonoStorable(MonoStorable& aMonoStorable) {
 	Block theBlock;
 	StatusResult theResult = readBlock(theBlock, aMonoStorable.getBlocknum());
