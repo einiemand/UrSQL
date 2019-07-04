@@ -349,7 +349,7 @@ public:
 	StatusResult validate() const override {
 		StatusResult theResult(Error::no_error);
 		if (!m_tokenizer.more()) {
-			if (m_fieldNames.size() != m_valueStrs.size()) {
+			if (m_fieldNames.size() == m_valueStrs.size()) {
 				theResult = _validateFieldNames();
 			}
 			else {
