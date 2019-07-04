@@ -111,7 +111,7 @@ StatusResult Entity::generateNewRow(Row& aRow, const StringList& aFieldNames, co
 	for (auto iter = m_attributes.cbegin(); theResult && iter != m_attributes.cend(); ++iter) {
 		const auto& theAttribute = *iter;
 		const std::string& theAttributeName = theAttribute.getName();
-		if (!aRow.fieldExists(theAttributeName) && !theAttribute.isNullable()) {
+		if (!aRow.fieldExists(theAttributeName) && !theAttribute.isAutoIncr() && !theAttribute.isNullable()) {
 			theResult.setError(Error::invalid_arguments, '\'' + theAttributeName + "' is NOT nullable, but value is not given");
 			break;
 		}
