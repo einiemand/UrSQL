@@ -1,8 +1,9 @@
 #pragma once
 #ifndef ROW_HPP
 #define ROW_HPP
-#include <unordered_map>
 #include "Value.hpp"
+#include <unordered_map>
+#include <functional>
 
 namespace UrSQL {
 
@@ -13,7 +14,7 @@ public:
 	Row(blocknum_t aBlocknum);
 	~Row() override = default;
 
-	Row(Row&&) = default;
+	Row(Row&&) noexcept = default;
 	Row& operator=(const Row&) = delete;
 
 	void serialize(BufferWriter& aWriter) const override;
@@ -21,19 +22,21 @@ public:
 
 	BlockType expectedBlockType() const override;
 
-	void addField(std::string aFieldName, Value aValue);
-	void updateField(std::string aFieldName, Value aValue);
-
 	inline bool fieldExists(const std::string& aFieldName) const {
 		return m_data.count(aFieldName) == 1;
 	}
+	const Value& getField(const std::string& aFieldName) const;
+	void addField(std::string aFieldName, Value aValue);
+	void updateField(std::string aFieldName, Value aValue);
 private:
 	DataMap m_data;
 };
 
 class RowCollection {
 public:
-	using RowList = std::vector<Row>;
+	using RowList = std::vector<std::unique_ptr<Row>>;
+	using RowVisitor = std::function<void(Row&)>;
+	using CleanRowVisitor = std::function<void(const Row&)>;
 
 	RowCollection() = default;
 	~RowCollection() = default;
@@ -41,11 +44,18 @@ public:
 	RowCollection(const RowCollection&) = delete;
 	RowCollection& operator=(const RowCollection&) = delete;
 
-	void addRow(Row aRow);
+	void addRow(std::unique_ptr<Row>&& aRow);
 
 	inline size_type size() const {
 		return m_rows.size();
 	}
+
+	inline bool empty() const {
+		return m_rows.empty();
+	}
+
+	void eachRow(RowVisitor aVisitor);
+	void eachRow(CleanRowVisitor aVisitor) const;
 private:
 	RowList m_rows;
 };
