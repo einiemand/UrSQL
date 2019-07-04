@@ -167,7 +167,7 @@ void View::printLine(const StringList& aStrings, const std::vector<size_type>& a
 	}
 	defaultOutput << View::verticalEdge;
 	for (size_type i = 0; i < aStrings.size(); ++i) {
-		defaultOutput << std::setw(aWidths[i] + 2)  << std::left << ' ' + aStrings[i] << View::verticalEdge;
+		defaultOutput << ' ' << std::setw(aWidths[i])  << std::left << aStrings[i] << ' ' << View::verticalEdge;
 	}
 	defaultOutput << '\n';
 }
