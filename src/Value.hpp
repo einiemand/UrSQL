@@ -66,6 +66,10 @@ public:
 	StatusResult become(ValueType aType);
 	size_type hash() const;
 
+	inline bool isNull() const {
+		return getType() == ValueType::null_type;
+	}
+
 	inline std::string stringify() const {
 		return m_base->stringify();
 	}
@@ -80,6 +84,22 @@ public:
 private:
 	std::unique_ptr<ValueBase> m_base;
 };
+
+inline bool operator!=(const Value& lhs, const Value& rhs) {
+	return !lhs.isNull() && !rhs.isNull() && !(lhs == rhs);
+}
+
+inline bool operator<=(const Value& lhs, const Value& rhs) {
+	return lhs == rhs || lhs < rhs;
+}
+
+inline bool operator>(const Value& lhs, const Value& rhs) {
+	return rhs < lhs;
+}
+
+inline bool operator>=(const Value& lhs, const Value& rhs) {
+	return rhs <= lhs;
+}
 
 }
 

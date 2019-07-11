@@ -52,9 +52,9 @@ public:
 	~ValueImpl() override = default;
 
 	ValueImpl(const ValueImpl&) = default;
-	ValueImpl(ValueImpl&&) = default;
+	ValueImpl(ValueImpl&&) noexcept = default;
 	ValueImpl& operator=(const ValueImpl&) = default;
-	ValueImpl& operator=(ValueImpl&&) = default;
+	ValueImpl& operator=(ValueImpl&&) noexcept = default;
 
 	ValueType type() const override {
 		return val_type;
@@ -82,18 +82,12 @@ public:
 		if (type() == rhs.type()) {
 			return m_val < dynamic_cast<const ValueImpl<T>&>(rhs).m_val;
 		}
-		if (rhs.type() == ValueType::null_type) {
-			return false;
-		}
 		throw std::runtime_error("Values of different types are not comparable");
 	}
 
 	bool equal(const ValueBase& rhs) const override {
 		if (type() == rhs.type()) {
 			return m_val == dynamic_cast<const ValueImpl<T>&>(rhs).m_val;
-		}
-		if (rhs.type() == ValueType::null_type) {
-			return false;
 		}
 		throw std::runtime_error("Values of different types are not comparable");
 	}
@@ -114,9 +108,9 @@ public:
 	~ValueImpl() override = default;
 
 	ValueImpl(const ValueImpl&) = default;
-	ValueImpl(ValueImpl&&) = default;
+	ValueImpl(ValueImpl&&) noexcept = default;
 	ValueImpl& operator=(const ValueImpl&) = default;
-	ValueImpl& operator=(ValueImpl&&) = default;
+	ValueImpl& operator=(ValueImpl&&) noexcept = default;
 
 	ValueType type() const override {
 		return val_type;
@@ -373,11 +367,11 @@ size_type Value::hash() const {
 }
 
 bool operator<(const Value& lhs, const Value& rhs) {
-	return lhs.m_base->less(*rhs.m_base);
+	return !lhs.isNull() && !rhs.isNull() && lhs.m_base->less(*rhs.m_base);
 }
 
 bool operator==(const Value& lhs, const Value& rhs) {
-	return lhs.m_base->equal(*rhs.m_base);
+	return !lhs.isNull() && !rhs.isNull() && lhs.m_base->equal(*rhs.m_base);
 }
 
 std::ostream& operator<<(std::ostream& anOutput, const Value& aValue) {
