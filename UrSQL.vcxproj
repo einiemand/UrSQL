@@ -27,6 +27,7 @@
     <ClInclude Include="src\DBManager.hpp" />
     <ClInclude Include="src\DBStatement.hpp" />
     <ClInclude Include="src\Error.hpp" />
+    <ClInclude Include="src\Filter.hpp" />
     <ClInclude Include="src\FolderReader.hpp" />
     <ClInclude Include="src\Interpreter.hpp" />
     <ClInclude Include="src\Keyword.hpp" />
@@ -53,6 +54,7 @@
     <ClCompile Include="src\DBManager.cpp" />
     <ClCompile Include="src\DBStatement.cpp" />
     <ClCompile Include="src\Error.cpp" />
+    <ClCompile Include="src\Filter.cpp" />
     <ClCompile Include="src\FolderReader.cpp" />
     <ClCompile Include="src\Keyword.cpp" />
     <ClCompile Include="src\main.cpp" />
