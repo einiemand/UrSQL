@@ -15,6 +15,7 @@ enum class Error {
 	unexpected_value = 135,
 	syntax_error = 140,
 	eof_error = 199,
+	invalid_comparator = 200,
 
 	//statement related...
 	statement_expected = 200,
