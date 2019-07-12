@@ -160,7 +160,22 @@ StatusResult Filter::validate(const Entity& anEntity) const {
 }
 
 bool Filter::match(const Row& aRow) const {
-	return false;
+	bool matched = m_expressions.empty() ? true : m_expressions.front().match(aRow);
+	for (size_type i = 0; i < m_relations.size(); ++i) {
+		if (m_relations[i] == ExpRelation::AND) {
+			if (!matched) {
+				continue;
+			}
+			matched = m_expressions[i + 1].match(aRow);
+		}
+		else {
+			if (matched) {
+				return true;
+			}
+			matched = m_expressions[i + 1].match(aRow);
+		}
+	}
+	return matched;
 }
 
 } /* UrSQL */
