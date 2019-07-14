@@ -3,6 +3,7 @@
 #include "Attribute.hpp"
 #include "Database.hpp"
 #include "SQLInterpreter.hpp"
+#include "Filter.hpp"
 #include <unordered_set>
 
 namespace UrSQL {
@@ -398,7 +399,7 @@ private:
 	}
 };
 
-/* -------------------------------InsertStatement------------------------------- */
+/* -------------------------------SelectStatement------------------------------- */
 class SelectStatement : public SQLStatement {
 public:
 	SelectStatement(Tokenizer& aTokenizer, SQLInterpreter& anInterpreter) :
@@ -421,6 +422,9 @@ public:
 			if (theResult) {
 				if (m_tokenizer.skipIf(Keyword::from_kw)) {
 					theResult = _parseTableName();
+					if (theResult && m_tokenizer.skipIf(Keyword::where_kw)) {
+						theResult = _parseFilter();
+					}
 				}
 				else {
 					theResult.setError(Error::keyword_expected, "'from'");
@@ -440,11 +444,16 @@ public:
 	}
 
 	StatusResult execute() const override {
-		return m_interpreter.selectFromTable(m_entityName, m_fieldNames);
+		return m_interpreter.selectFromTable(m_entityName, m_fieldNames, m_filter);
 	}
 
 private:
 	mutable StringList m_fieldNames;
+	Filter m_filter;
+
+	inline StatusResult _parseFilter() {
+		return m_filter.parse(m_tokenizer);
+	}
 };
 
 /* -------------------------------DropTableStatement------------------------------- */

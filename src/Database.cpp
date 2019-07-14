@@ -1,5 +1,6 @@
 #include "Database.hpp"
 #include "Row.hpp"
+#include "Filter.hpp"
 
 namespace UrSQL {
 
@@ -89,7 +90,11 @@ StatusResult Database::insertIntoTable(const std::string& anEntityName, const St
 	return theResult;
 }
 
-StatusResult Database::selectFromTable(RowCollection& aRowCollection, const std::string& anEntityName, StringList& aFieldNames) {
+StatusResult Database::selectFromTable(
+	RowCollection& aRowCollection,
+	const std::string& anEntityName,
+	StringList& aFieldNames,
+	const Filter& aFilter) {
 	StatusResult theResult(Error::no_error);
 	if (_entityExists(anEntityName)) {
 		Entity* theEntity = getEntityByName(anEntityName, theResult);
@@ -100,11 +105,16 @@ StatusResult Database::selectFromTable(RowCollection& aRowCollection, const std:
 			}
 		}
 		if (theResult) {
+			theResult = aFilter.validate(*theEntity);
+		}
+		if (theResult) {
 			theResult = m_storage.visitBlocks(
-				[&aRowCollection](Block& aBlock, blocknum_t aBlocknum)->StatusResult {
+				[&aRowCollection, &aFilter](Block& aBlock, blocknum_t aBlocknum)->StatusResult {
 					auto theRow = std::make_unique<Row>(aBlocknum);
 					theRow->decode(aBlock);
-					aRowCollection.addRow(std::move(theRow));
+					if (aFilter.match(*theRow)) {
+						aRowCollection.addRow(std::move(theRow));
+					}
 					return StatusResult(Error::no_error);
 				},
 				theEntity->getRowPos());

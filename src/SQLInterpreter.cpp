@@ -4,6 +4,7 @@
 #include "Database.hpp"
 #include "Row.hpp"
 #include "View.hpp"
+#include "Filter.hpp"
 
 namespace UrSQL {
 
@@ -129,11 +130,11 @@ StatusResult SQLInterpreter::insertIntoTable(const std::string& anEntityName, co
 	return theResult;
 }
 
-StatusResult SQLInterpreter::selectFromTable(const std::string& anEntityName, StringList& aFieldNames) const {
+StatusResult SQLInterpreter::selectFromTable(const std::string& anEntityName, StringList& aFieldNames, const Filter& aFilter) const {
 	StatusResult theResult(Error::no_error);
 	if (Database* theActiveDB = getActiveDatabase()) {
 		RowCollection theRowCollection;
-		theResult = theActiveDB->selectFromTable(theRowCollection, anEntityName, aFieldNames);
+		theResult = theActiveDB->selectFromTable(theRowCollection, anEntityName, aFieldNames, aFilter);
 		if (theResult) {
 			if (theRowCollection.empty()) {
 				theResult.setMessage("empty set");
