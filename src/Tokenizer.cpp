@@ -32,7 +32,7 @@ inline bool isNumber(char aChar) {
 }
 
 inline bool isComparator(char aChar) {
-	return strchr("=<>", aChar) != nullptr;
+	return strchr("!=<>", aChar) != nullptr;
 }
 
 inline bool isQuote(char aChar) {
