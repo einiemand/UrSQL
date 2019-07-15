@@ -31,6 +31,7 @@
     <ClInclude Include="src\FolderReader.hpp" />
     <ClInclude Include="src\Interpreter.hpp" />
     <ClInclude Include="src\Keyword.hpp" />
+    <ClInclude Include="src\Order.hpp" />
     <ClInclude Include="src\Row.hpp" />
     <ClInclude Include="src\SQLInterpreter.hpp" />
     <ClInclude Include="src\SQLStatement.hpp" />
@@ -58,6 +59,7 @@
     <ClCompile Include="src\FolderReader.cpp" />
     <ClCompile Include="src\Keyword.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Order.cpp" />
     <ClCompile Include="src\Row.cpp" />
     <ClCompile Include="src\SQLInterpreter.cpp" />
     <ClCompile Include="src\SQLStatement.cpp" />
