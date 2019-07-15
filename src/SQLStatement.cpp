@@ -475,7 +475,9 @@ private:
 					if (m_tokenizer.skipIf(Keyword::desc_kw)) {
 						m_order->setDesc(true);
 					}
-					else if (m_tokenizer.skipIf(Keyword::asc_kw)); // do nothing
+					else if (m_tokenizer.skipIf(Keyword::asc_kw)) {
+						// do nothing
+					}
 				}
 				else {
 					theResult.setError(Error::identifier_expected, '\'' + theToken.getData() + "' is not an identifier");
