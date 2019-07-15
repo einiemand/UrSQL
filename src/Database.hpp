@@ -13,6 +13,7 @@ namespace UrSQL {
 
 class RowCollection;
 class Filter;
+class Order;
 
 class Database {
 public:
@@ -29,7 +30,8 @@ public:
 	StatusResult dropTable(const std::string& anEntityName, size_type& aRowCount);
 
 	StatusResult insertIntoTable(const std::string& anEntityName, const StringList& aFieldNames, const StringList& aValueStrs);
-	StatusResult selectFromTable(RowCollection& aRowCollection, const std::string& anEntityName, StringList& aFieldNames, const Filter* aFilter);
+	StatusResult selectFromTable(RowCollection& aRowCollection, const std::string& anEntityName,
+		StringList& aFieldNames, const Filter* aFilter, const Order* anOrder);
 
 	inline const std::string& getName() const {
 		return m_storage.getName();

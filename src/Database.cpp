@@ -95,7 +95,8 @@ StatusResult Database::selectFromTable(
 	RowCollection& aRowCollection,
 	const std::string& anEntityName,
 	StringList& aFieldNames,
-	const Filter* aFilter) {
+	const Filter* aFilter,
+	const Order* anOrder) {
 	StatusResult theResult(Error::no_error);
 	if (_entityExists(anEntityName)) {
 		Entity* theEntity = getEntityByName(anEntityName, theResult);
@@ -107,6 +108,9 @@ StatusResult Database::selectFromTable(
 		}
 		if (theResult && aFilter) {
 			theResult = aFilter->validate(*theEntity);
+		}
+		if (theResult && anOrder) {
+			theResult = anOrder->validate(*theEntity);
 		}
 		if (theResult) {
 			theResult = m_storage.visitBlocks(
