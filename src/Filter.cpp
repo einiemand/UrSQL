@@ -160,7 +160,10 @@ StatusResult Filter::validate(const Entity& anEntity) const {
 }
 
 bool Filter::match(const Row& aRow) const {
-	bool matched = m_expressions.empty() ? true : m_expressions.front().match(aRow);
+	if (m_expressions.empty()) {
+		throw std::runtime_error("Impossible: calling Filter::match() but no filter is parsed!");
+	}
+	bool matched = m_expressions.front().match(aRow);
 	for (size_type i = 0; i < m_relations.size(); ++i) {
 		if (m_relations[i] == ExpRelation::AND) {
 			if (!matched) {
