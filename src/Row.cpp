@@ -1,5 +1,7 @@
 #include "Row.hpp"
 #include "BufferStream.hpp"
+#include "Order.hpp"
+#include <algorithm>
 
 namespace UrSQL {
 
@@ -65,6 +67,25 @@ void RowCollection::eachRow(RowVisitor aVisitor) {
 void RowCollection::eachRow(CleanRowVisitor aVisitor) const {
 	for (auto iter = m_rows.cbegin(); iter != m_rows.cend(); ++iter) {
 		aVisitor(*iter->get());
+	}
+}
+
+void RowCollection::reorder(const Order& anOrder) {
+	const std::string& theFieldName = anOrder.getFieldName();
+	bool isDesc = anOrder.isDesc();
+	if (isDesc) {
+		std::sort(m_rows.begin(), m_rows.end(),
+			[&theFieldName](const std::unique_ptr<Row>& lhs, const std::unique_ptr<Row>& rhs)->bool {
+				return lhs->getField(theFieldName) > rhs->getField(theFieldName);
+			}
+		);
+	}
+	else {
+		std::sort(m_rows.begin(), m_rows.end(),
+			[&theFieldName](const std::unique_ptr<Row>& lhs, const std::unique_ptr<Row>& rhs)->bool {
+				return lhs->getField(theFieldName) < rhs->getField(theFieldName);
+			}
+		);
 	}
 }
 

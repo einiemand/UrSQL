@@ -32,6 +32,8 @@ private:
 	DataMap m_data;
 };
 
+class Order;
+
 class RowCollection {
 public:
 	using RowList = std::vector<std::unique_ptr<Row>>;
@@ -56,6 +58,8 @@ public:
 
 	void eachRow(RowVisitor aVisitor);
 	void eachRow(CleanRowVisitor aVisitor) const;
+
+	void reorder(const Order& anOrder);
 private:
 	RowList m_rows;
 };
