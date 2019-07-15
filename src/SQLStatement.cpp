@@ -4,6 +4,7 @@
 #include "Database.hpp"
 #include "SQLInterpreter.hpp"
 #include "Filter.hpp"
+#include "Order.hpp"
 #include <unordered_set>
 
 namespace UrSQL {
@@ -403,7 +404,10 @@ private:
 class SelectStatement : public SQLStatement {
 public:
 	SelectStatement(Tokenizer& aTokenizer, SQLInterpreter& anInterpreter) :
-		SQLStatement(aTokenizer, anInterpreter)
+		SQLStatement(aTokenizer, anInterpreter),
+		m_fieldNames(),
+		m_filter(nullptr),
+		m_order(nullptr)
 	{
 	}
 
@@ -425,6 +429,9 @@ public:
 					if (theResult && m_tokenizer.skipIf(Keyword::where_kw)) {
 						theResult = _parseFilter();
 					}
+					if (theResult && m_tokenizer.skipIf(Keyword::order_kw)) {
+						theResult = _parseOrderBy();
+					}
 				}
 				else {
 					theResult.setError(Error::keyword_expected, "'from'");
@@ -444,15 +451,44 @@ public:
 	}
 
 	StatusResult execute() const override {
-		return m_interpreter.selectFromTable(m_entityName, m_fieldNames, m_filter);
+		return m_interpreter.selectFromTable(m_entityName, m_fieldNames, m_filter.get(), m_order.get());
 	}
 
 private:
 	mutable StringList m_fieldNames;
-	Filter m_filter;
+	std::unique_ptr<Filter> m_filter;
+	std::unique_ptr<Order> m_order;
 
-	inline StatusResult _parseFilter() {
-		return m_filter.parse(m_tokenizer);
+	StatusResult _parseFilter() {
+		m_filter = std::make_unique<Filter>();
+		return m_filter->parse(m_tokenizer);
+	}
+
+	StatusResult _parseOrderBy() {
+		StatusResult theResult(Error::no_error);
+		if (m_tokenizer.skipIf(Keyword::by_kw)) {
+			if (m_tokenizer.more()) {
+				const Token& theToken = m_tokenizer.get();
+				if (theToken.getType() == TokenType::identifier) {
+					m_order = std::make_unique<Order>();
+					m_order->setFieldName(theToken.getData());
+					if (m_tokenizer.skipIf(Keyword::desc_kw)) {
+						m_order->setDesc(true);
+					}
+					else if (m_tokenizer.skipIf(Keyword::asc_kw)); // do nothing
+				}
+				else {
+					theResult.setError(Error::identifier_expected, '\'' + theToken.getData() + "' is not an identifier");
+				}
+			}
+			else {
+				theResult.setError(Error::identifier_expected, "Specify the field name to be ordered by");
+			}
+		}
+		else {
+			theResult.setError(Error::keyword_expected, "'by'");
+		}
+		return theResult;
 	}
 };
 
@@ -518,6 +554,7 @@ std::unique_ptr<SQLStatement> SQLStatement::factory(Tokenizer& aTokenizer, SQLIn
 	case Keyword::create_kw:
 		return std::make_unique<CreateTableStatement>(aTokenizer, anInterpreter);
 	case Keyword::describe_kw:
+	case Keyword::desc_kw:
 		return std::make_unique<DescTableStatement>(aTokenizer, anInterpreter);
 	case Keyword::insert_kw:
 		return std::make_unique<InsertStatement>(aTokenizer, anInterpreter);
