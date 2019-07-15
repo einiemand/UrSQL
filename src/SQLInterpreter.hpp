@@ -7,6 +7,7 @@
 namespace UrSQL {
 
 class Filter;
+class Order;
 
 class SQLInterpreter : public Interpreter {
 public:
@@ -21,7 +22,7 @@ public:
 	StatusResult showTables() const;
 
 	StatusResult insertIntoTable(const std::string& anEntityName, const StringList& aFieldNames, const StringList& aValueStrs) const;
-	StatusResult selectFromTable(const std::string& anEntityName, StringList& aFieldNames, const Filter& aFilter) const;
+	StatusResult selectFromTable(const std::string& anEntityName, StringList& aFieldNames, const Filter* aFilter, const Order* anOrder) const;
 
 private:
 

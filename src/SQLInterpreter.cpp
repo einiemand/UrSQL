@@ -5,6 +5,7 @@
 #include "Row.hpp"
 #include "View.hpp"
 #include "Filter.hpp"
+#include "Order.hpp"
 
 namespace UrSQL {
 
@@ -23,7 +24,8 @@ std::unique_ptr<Statement> SQLInterpreter::getStatement(Tokenizer& aTokenizer) {
 		}
 		break;
 	}
-	case Keyword::describe_kw: {
+	case Keyword::describe_kw:
+	case Keyword::desc_kw: {
 		if (aTokenizer.remaining() > 1 && aTokenizer.peek(1).getKeyword() == Keyword::table_kw) {
 			return SQLStatement::factory(aTokenizer, *this);
 		}
@@ -130,7 +132,11 @@ StatusResult SQLInterpreter::insertIntoTable(const std::string& anEntityName, co
 	return theResult;
 }
 
-StatusResult SQLInterpreter::selectFromTable(const std::string& anEntityName, StringList& aFieldNames, const Filter& aFilter) const {
+StatusResult SQLInterpreter::selectFromTable(
+	const std::string& anEntityName,
+	StringList& aFieldNames,
+	const Filter* aFilter,
+	const Order* anOrder) const {
 	StatusResult theResult(Error::no_error);
 	if (Database* theActiveDB = getActiveDatabase()) {
 		RowCollection theRowCollection;
@@ -140,6 +146,9 @@ StatusResult SQLInterpreter::selectFromTable(const std::string& anEntityName, St
 				theResult.setMessage("empty set");
 			}
 			else {
+				if (anOrder) {
+					theRowCollection.reorder(*anOrder);
+				}
 				SelectRowView(theRowCollection, aFieldNames).show();
 				theResult.setMessage("Query ok, " + std::to_string(theRowCollection.size()) + " row(s) affected");
 			}
