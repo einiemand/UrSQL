@@ -266,6 +266,7 @@ std::unique_ptr<DBStatement> DBStatement::factory(Tokenizer& aTokenizer, DBManag
 	case Keyword::show_kw:
 		return std::make_unique<ShowDBStatement>(aTokenizer, aDBManager);
 	case Keyword::describe_kw:
+	case Keyword::desc_kw:
 		return std::make_unique<DescDBStatement>(aTokenizer, aDBManager);
 	default:
 		return nullptr;
