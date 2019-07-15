@@ -1,6 +1,7 @@
 #include "Database.hpp"
 #include "Row.hpp"
 #include "Filter.hpp"
+#include "Order.hpp"
 
 namespace UrSQL {
 
@@ -94,7 +95,7 @@ StatusResult Database::selectFromTable(
 	RowCollection& aRowCollection,
 	const std::string& anEntityName,
 	StringList& aFieldNames,
-	const Filter& aFilter) {
+	const Filter* aFilter) {
 	StatusResult theResult(Error::no_error);
 	if (_entityExists(anEntityName)) {
 		Entity* theEntity = getEntityByName(anEntityName, theResult);
@@ -104,15 +105,15 @@ StatusResult Database::selectFromTable(
 				theResult.setError(Error::unknown_attribute, '\'' + theFieldName + '\'');
 			}
 		}
-		if (theResult) {
-			theResult = aFilter.validate(*theEntity);
+		if (theResult && aFilter) {
+			theResult = aFilter->validate(*theEntity);
 		}
 		if (theResult) {
 			theResult = m_storage.visitBlocks(
-				[&aRowCollection, &aFilter](Block& aBlock, blocknum_t aBlocknum)->StatusResult {
+				[&aRowCollection, aFilter](Block& aBlock, blocknum_t aBlocknum)->StatusResult {
 					auto theRow = std::make_unique<Row>(aBlocknum);
 					theRow->decode(aBlock);
-					if (aFilter.match(*theRow)) {
+					if (!aFilter || aFilter->match(*theRow)) {
 						aRowCollection.addRow(std::move(theRow));
 					}
 					return StatusResult(Error::no_error);
