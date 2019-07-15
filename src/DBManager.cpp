@@ -19,7 +19,8 @@ std::unique_ptr<Statement> DBManager::getStatement(Tokenizer& aTokenizer) {
 	switch (theKeyword) {
 	case Keyword::create_kw:
 	case Keyword::drop_kw:
-	case Keyword::describe_kw: {
+	case Keyword::describe_kw:
+	case Keyword::desc_kw: {
 		if (aTokenizer.remaining() > 1 && aTokenizer.peek(1).getKeyword() == Keyword::database_kw) {
 			return DBStatement::factory(aTokenizer, *this);
 		}
