@@ -140,7 +140,7 @@ StatusResult SQLInterpreter::selectFromTable(
 	StatusResult theResult(Error::no_error);
 	if (Database* theActiveDB = getActiveDatabase()) {
 		RowCollection theRowCollection;
-		theResult = theActiveDB->selectFromTable(theRowCollection, anEntityName, aFieldNames, aFilter);
+		theResult = theActiveDB->selectFromTable(theRowCollection, anEntityName, aFieldNames, aFilter, anOrder);
 		if (theResult) {
 			if (theRowCollection.empty()) {
 				theResult.setMessage("empty set");
