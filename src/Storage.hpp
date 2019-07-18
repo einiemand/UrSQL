@@ -19,9 +19,6 @@ class Storage {
 public:
 	using BlockVisitor = std::function<StatusResult(Block&, blocknum_t)>;
 
-	template<typename RawT>
-	using BlocknumExtractor = std::function<blocknum_t(const RawT&)>;
-
 	Storage(std::string aFileName, CreateNewFile, const TOC& aTOC, StatusResult& aResult);
 	Storage(std::string aFileName, OpenExistingFile, TOC& aTOC, StatusResult& aResult);
 	~Storage() = default;
@@ -41,12 +38,11 @@ public:
 	StatusResult writeBlock(const Block& aBlock, blocknum_t aBlocknum);
 	StatusResult releaseBlock(blocknum_t aBlocknum);
 
-	template<typename IterableT, typename RawT>
-	StatusResult releaseBlocks(const IterableT& aContainer, BlocknumExtractor<RawT> anExtractor) {
+	template<typename IterableT>
+	StatusResult releaseBlocks(const IterableT& aBlocknumContainer) {
 		StatusResult theResult(Error::no_error);
-		for (auto iter = aContainer.cbegin(); theResult && iter != aContainer.cend(); ++iter) {
-			blocknum_t theBlocknum = anExtractor(*iter);
-			theResult = releaseBlock(theBlocknum);
+		for (auto iter = aBlocknumContainer.cbegin(); theResult && iter != aBlocknumContainer.cend(); ++iter) {
+			theResult = releaseBlock(*iter);
 		}
 		return theResult;
 	}
