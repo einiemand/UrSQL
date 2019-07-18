@@ -550,6 +550,50 @@ public:
 	}
 };
 
+/* -------------------------------DeleteStatement------------------------------- */
+class DeleteStatement : public SQLStatement {
+public:
+	DeleteStatement(Tokenizer& aTokenizer, SQLInterpreter& anInterpreter) :
+		SQLStatement(aTokenizer, anInterpreter),
+		m_filter(nullptr)
+	{
+	}
+
+	~DeleteStatement() = default;
+
+	StatusResult parse() override {
+		StatusResult theResult(Error::no_error);
+		if (m_tokenizer.next() && m_tokenizer.skipIf(Keyword::from_kw)) {
+			theResult = _parseTableName();
+			if (theResult) {
+				if (m_tokenizer.skipIf(Keyword::where_kw)) {
+					m_filter = std::make_unique<Filter>();
+					theResult = m_filter->parse(m_tokenizer);
+				}
+				else {
+					theResult.setError(Error::keyword_expected, "'where'");
+				}
+			}
+		}
+		else {
+			theResult.setError(Error::keyword_expected, "'from'");
+		}
+		return theResult;
+	}
+
+	StatusResult validate() const override {
+		return !m_tokenizer.more() ? 
+			StatusResult(Error::no_error) : StatusResult(Error::syntax_error, "Redundant input after filter");
+	}
+
+	StatusResult execute() const override {
+		return m_interpreter.deleteFromTable(m_entityName, m_filter.get());
+	}
+
+private:
+	std::unique_ptr<Filter> m_filter;
+};
+
 std::unique_ptr<SQLStatement> SQLStatement::factory(Tokenizer& aTokenizer, SQLInterpreter& anInterpreter) {
 	Keyword theKeyword = aTokenizer.peek().getKeyword();
 	switch (theKeyword) {
@@ -566,6 +610,8 @@ std::unique_ptr<SQLStatement> SQLStatement::factory(Tokenizer& aTokenizer, SQLIn
 		return std::make_unique<DropTableStatement>(aTokenizer, anInterpreter);
 	case Keyword::show_kw:
 		return std::make_unique<ShowTablesStatement>(aTokenizer, anInterpreter);
+	case Keyword::delete_kw:
+		return std::make_unique<DeleteStatement>(aTokenizer, anInterpreter);
 	default:
 		return nullptr;
 	}
