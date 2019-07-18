@@ -47,6 +47,8 @@ std::unique_ptr<Statement> SQLInterpreter::getStatement(Tokenizer& aTokenizer) {
 		}
 		break;
 	}
+	case Keyword::delete_kw:
+		return SQLStatement::factory(aTokenizer, *this);
 	}
 	return nullptr;
 }
@@ -153,6 +155,17 @@ StatusResult SQLInterpreter::selectFromTable(
 				theResult.setMessage("Query ok, " + std::to_string(theRowCollection.size()) + " row(s) affected");
 			}
 		}
+	}
+	else {
+		theResult.setError(Error::noDatabase_specified, "Specify the database first by 'use <DBName>'");
+	}
+	return theResult;
+}
+
+StatusResult SQLInterpreter::deleteFromTable(const std::string& anEntityName, const Filter* aFilter) const {
+	StatusResult theResult(Error::no_error);
+	if (Database* theActiveDB = getActiveDatabase()) {
+		theResult = theActiveDB->deleteFromTable(anEntityName, aFilter);
 	}
 	else {
 		theResult.setError(Error::noDatabase_specified, "Specify the database first by 'use <DBName>'");

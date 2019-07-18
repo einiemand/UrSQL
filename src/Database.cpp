@@ -55,10 +55,7 @@ StatusResult Database::dropTable(const std::string& anEntityName, size_type& aRo
 		const auto& theRowPositions = theEntity->getRowPos();
 		aRowCount = theRowPositions.size();
 		if (theResult) {
-			theResult = m_storage.releaseBlocks(
-				theRowPositions,
-				Storage::BlocknumExtractor<blocknum_t>([](const blocknum_t& aBlocknum)->blocknum_t { return aBlocknum; })
-			);
+			theResult = m_storage.releaseBlocks(theRowPositions);
 			if (theResult) {
 				theResult = _dropEntity(anEntityName);
 			}
@@ -126,6 +123,45 @@ StatusResult Database::selectFromTable(
 			if (theResult && aFieldNames.empty()) {
 				for (const Attribute& theAttribute : theEntity->getAttributes()) {
 					aFieldNames.push_back(theAttribute.getName());
+				}
+			}
+		}
+	}
+	else {
+		theResult.setError(Error::unknown_entity, '\'' + anEntityName + '\'');
+	}
+	return theResult;
+}
+
+StatusResult Database::deleteFromTable(const std::string& anEntityName, const Filter* aFilter) {
+	StatusResult theResult(Error::no_error);
+	if (_entityExists(anEntityName)) {
+		Entity* theEntity = getEntityByName(anEntityName, theResult);
+		if (theResult && aFilter) {
+			theResult = aFilter->validate(*theEntity);
+		}
+		if (theResult) {
+			std::vector<blocknum_t> theBlocknums;
+			theResult = m_storage.visitBlocks(
+				[aFilter, &theBlocknums](Block& aBlock, blocknum_t aBlocknum) {
+					if (aFilter) {
+						Row theRow(aBlocknum);
+						theRow.decode(aBlock);
+						if (aFilter->match(theRow)) {
+							theBlocknums.push_back(aBlocknum);
+						}
+					}
+					return StatusResult(Error::no_error);
+				},
+				theEntity->getRowPos()
+			);
+			if (theResult) {
+				theResult = m_storage.releaseBlocks(theBlocknums);
+				if (theResult) {
+					for (blocknum_t theBlocknum : theBlocknums) {
+						theEntity->dropRowPosition(theBlocknum);
+					}
+					theResult.setMessage("Query ok, " + std::to_string(theBlocknums.size()) + " row(s) affected");
 				}
 			}
 		}

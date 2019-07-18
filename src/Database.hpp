@@ -32,6 +32,7 @@ public:
 	StatusResult insertIntoTable(const std::string& anEntityName, const StringList& aFieldNames, const StringList& aValueStrs);
 	StatusResult selectFromTable(RowCollection& aRowCollection, const std::string& anEntityName,
 		StringList& aFieldNames, const Filter* aFilter, const Order* anOrder);
+	StatusResult deleteFromTable(const std::string& anEntityName, const Filter* aFilter);
 
 	inline const std::string& getName() const {
 		return m_storage.getName();
