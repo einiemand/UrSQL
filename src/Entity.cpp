@@ -81,6 +81,7 @@ void Entity::addRowPosition(blocknum_t aBlocknum) {
 		throw std::runtime_error("Impossible: attempting to add a new row position that's ALREADY recorded");
 	}
 	m_rowPos.insert(aBlocknum);
+	makeDirty(true);
 }
 
 void Entity::dropRowPosition(blocknum_t aBlocknum) {
@@ -88,6 +89,7 @@ void Entity::dropRowPosition(blocknum_t aBlocknum) {
 		throw std::runtime_error("Impossible: attempting to drop a row position that's NOT recorded");
 	}
 	m_rowPos.erase(aBlocknum);
+	makeDirty(true);
 }
 
 StatusResult Entity::generateNewRow(Row& aRow, const StringList& aFieldNames, const StringList& aValueStrs) {
