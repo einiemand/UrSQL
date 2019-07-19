@@ -36,6 +36,10 @@ public:
 	inline Keyword getKeyword() const {
 		return m_keyword;
 	}
+
+	inline bool isValue() const {
+		return getType() == TokenType::string || getType() == TokenType::number;
+	}
 private:
 	TokenType m_type;
 	std::string m_Data;
