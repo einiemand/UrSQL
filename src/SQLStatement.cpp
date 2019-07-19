@@ -5,6 +5,7 @@
 #include "SQLInterpreter.hpp"
 #include "Filter.hpp"
 #include "Order.hpp"
+#include "Row.hpp"
 #include <unordered_set>
 
 namespace UrSQL {
@@ -582,7 +583,7 @@ public:
 	}
 
 	StatusResult validate() const override {
-		return !m_tokenizer.more() ? 
+		return !m_tokenizer.more() ?
 			StatusResult(Error::no_error) : StatusResult(Error::syntax_error, "Redundant input after filter");
 	}
 
@@ -594,6 +595,112 @@ private:
 	std::unique_ptr<Filter> m_filter;
 };
 
+/* -------------------------------UpdateStatement------------------------------- */
+class UpdateStatement : public SQLStatement {
+public:
+	UpdateStatement(Tokenizer& aTokenizer, SQLInterpreter& anInterpreter) :
+		SQLStatement(aTokenizer, anInterpreter),
+		m_fieldMap(),
+		m_filter(nullptr)
+	{
+	}
+
+	~UpdateStatement() override = default;
+
+	StatusResult parse() {
+		m_tokenizer.next();
+		StatusResult theResult = _parseTableName();
+		if (m_tokenizer.skipIf(Keyword::set_kw)) {
+
+		}
+		else {
+			theResult.setError(Error::keyword_expected, "'set'");
+		}
+		return theResult;
+	}
+
+	StatusResult validate() const {
+
+	}
+
+	StatusResult execute() const {
+
+	}
+private:
+	Row::DataMap m_fieldMap;
+	std::unique_ptr<Filter> m_filter;
+
+	StatusResult _parseFieldValues() {
+
+	}
+
+	StatusResult _parseOneFieldValue() {
+		std::string theFieldName;
+		StatusResult theResult = _parseFieldName(theFieldName);
+		if (theResult) {
+			if (m_tokenizer.skipIf([](const Token& aToken) { return aToken.getData() == "="; })) {
+				Value theValue;
+				theResult = _parseValue(theValue);
+			}
+			else {
+				theResult.setError(Error::syntax_error, "Missing '=' after field name");
+			}
+		}
+		return theResult;
+	}
+
+	StatusResult _parseFieldName(std::string& aFieldName) {
+		StatusResult theResult(Error::no_error);
+		if (m_tokenizer.more()) {
+			const Token& theFieldToken = m_tokenizer.get();
+			if (theFieldToken.getType() == TokenType::identifier) {
+				const std::string& theFieldName = theFieldToken.getData();
+				if (!m_fieldMap.count(theFieldName)) {
+					aFieldName = theFieldName;
+				}
+				else {
+					theResult.setError(Error::keyValue_mismatch, '\'' + aFieldName + "' are repeating");
+				}
+			}
+			else {
+				theResult.setError(Error::identifier_expected, "Which fields are you trying to modify?");
+			}
+		}
+		else {
+			theResult.setError(Error::syntax_error, "Fields and values missing");
+		}
+		return theResult;
+	}
+
+	StatusResult _parseValue(Value& aValue) {
+		StatusResult theResult(Error::no_error);
+		if (m_tokenizer.more()) {
+			const Token& theValueToken = m_tokenizer.get();
+			if (theValueToken.isValue()) {
+				const std::string& theTokenData = theValueToken.getData();
+				aValue = theTokenData;
+				if (theValueToken.getType() == TokenType::number) {
+					if (std::any_of(theTokenData.cbegin(), theTokenData.cend(),
+						[](char aChar) { return aChar == '.'; })) {
+						theResult = aValue.become(ValueType::float_type);
+					}
+					else {
+						theResult = aValue.become(ValueType::int_type);
+					}
+				}
+			}
+			else {
+				theResult.setError(Error::syntax_error, '\'' + theValueToken.getData() + "' is neither a string nor a number");
+			}
+		}
+		else {
+			theResult.setError(Error::value_expected, "What value to assign??");
+		}
+		return theResult;
+	}
+};
+
+// factory function
 std::unique_ptr<SQLStatement> SQLStatement::factory(Tokenizer& aTokenizer, SQLInterpreter& anInterpreter) {
 	Keyword theKeyword = aTokenizer.peek().getKeyword();
 	switch (theKeyword) {
