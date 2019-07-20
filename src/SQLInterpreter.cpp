@@ -2,7 +2,6 @@
 #include "Tokenizer.hpp"
 #include "SQLStatement.hpp"
 #include "Database.hpp"
-#include "Row.hpp"
 #include "View.hpp"
 #include "Filter.hpp"
 #include "Order.hpp"
@@ -48,6 +47,8 @@ std::unique_ptr<Statement> SQLInterpreter::getStatement(Tokenizer& aTokenizer) {
 		break;
 	}
 	case Keyword::delete_kw:
+		return SQLStatement::factory(aTokenizer, *this);
+	case Keyword::update_kw:
 		return SQLStatement::factory(aTokenizer, *this);
 	}
 	return nullptr;
@@ -166,6 +167,17 @@ StatusResult SQLInterpreter::deleteFromTable(const std::string& anEntityName, co
 	StatusResult theResult(Error::no_error);
 	if (Database* theActiveDB = getActiveDatabase()) {
 		theResult = theActiveDB->deleteFromTable(anEntityName, aFilter);
+	}
+	else {
+		theResult.setError(Error::noDatabase_specified, "Specify the database first by 'use <DBName>'");
+	}
+	return theResult;
+}
+
+StatusResult SQLInterpreter::updateTable(const std::string& anEntityName, const Row::DataMap& aFieldValues, const Filter* aFilter) const {
+	StatusResult theResult(Error::no_error);
+	if (Database* theActiveDB = getActiveDatabase()) {
+		theResult = theActiveDB->updateTable(anEntityName, aFieldValues, aFilter);
 	}
 	else {
 		theResult.setError(Error::noDatabase_specified, "Specify the database first by 'use <DBName>'");

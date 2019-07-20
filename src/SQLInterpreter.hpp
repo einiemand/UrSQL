@@ -3,6 +3,7 @@
 #define SQLINTERPRETER_HPP
 #include "Interpreter.hpp"
 #include "Attribute.hpp"
+#include "Row.hpp"
 
 namespace UrSQL {
 
@@ -24,6 +25,7 @@ public:
 	StatusResult insertIntoTable(const std::string& anEntityName, const StringList& aFieldNames, const StringList& aValueStrs) const;
 	StatusResult selectFromTable(const std::string& anEntityName, StringList& aFieldNames, const Filter* aFilter, const Order* anOrder) const;
 	StatusResult deleteFromTable(const std::string& anEntityName, const Filter* aFilter) const;
+	StatusResult updateTable(const std::string& anEntityName, const Row::DataMap& aFieldValues, const Filter* aFilter) const;
 
 private:
 
