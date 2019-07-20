@@ -46,8 +46,7 @@ StatusResult Storage::_setupTOC(const TOC& aTOC) {
 	m_file.open(theFilePath, std::fstream::in | std::fstream::out | std::fstream::binary);
 
 	if (storageReady()) {
-		Block theBlock(aTOC);
-		return writeBlock(theBlock, aTOC.getBlocknum());
+		return saveMonoStorable(aTOC);
 	}
 
 	return StatusResult(Error::write_error, "File '" + theFilePath + "' cannot be opened");
@@ -108,6 +107,10 @@ StatusResult Storage::decodeMonoStorable(MonoStorable& aMonoStorable) {
 		aMonoStorable.decode(theBlock);
 	}
 	return theResult;
+}
+
+StatusResult Storage::saveMonoStorable(const MonoStorable& aMonoStorable) {
+	return writeBlock(Block(aMonoStorable), aMonoStorable.getBlocknum());
 }
 
 StatusResult Storage::eachBlock(BlockVisitor aVisitor) {

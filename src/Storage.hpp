@@ -48,6 +48,7 @@ public:
 	}
 
 	StatusResult decodeMonoStorable(MonoStorable& aMonoStorable);
+	StatusResult saveMonoStorable(const MonoStorable& aMonoStorable);
 
 	StatusResult eachBlock(BlockVisitor aVisitor);
 
