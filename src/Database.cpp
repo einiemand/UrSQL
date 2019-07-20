@@ -1,5 +1,4 @@
 #include "Database.hpp"
-#include "Row.hpp"
 #include "Filter.hpp"
 #include "Order.hpp"
 
@@ -34,7 +33,7 @@ StatusResult Database::createTable(const AttributeList& anAttributeList, const s
 				theEntity->addAttribute(theAttribute);
 			}
 			if (theResult) {
-				theResult = m_storage.writeBlock(Block(*theEntity), theBlocknum);
+				theResult = m_storage.saveMonoStorable(*theEntity);
 				if (theResult) {
 					m_toc.add(anEntityName, theBlocknum);
 					_addEntityToCache(anEntityName, std::move(theEntity));
@@ -75,7 +74,7 @@ StatusResult Database::insertIntoTable(const std::string& anEntityName, const St
 			Entity* theEntity = getEntityByName(anEntityName, theResult);
 			Row theNewRow(theBlocknum);
 			if (theResult = theEntity->generateNewRow(theNewRow, aFieldNames, aValueStrs)) {
-				theResult = m_storage.writeBlock(Block(theNewRow), theBlocknum);
+				theResult = m_storage.saveMonoStorable(theNewRow);
 				if (theResult) {
 					theEntity->addRowPosition(theBlocknum);
 				}
@@ -172,6 +171,60 @@ StatusResult Database::deleteFromTable(const std::string& anEntityName, const Fi
 	return theResult;
 }
 
+StatusResult Database::updateTable(const std::string& anEntityName, const Row::DataMap& aFieldValues, const Filter* aFilter) {
+	StatusResult theResult(Error::no_error);
+	if (_entityExists(anEntityName)) {
+		Entity* theEntity = getEntityByName(anEntityName, theResult);
+
+		for (auto iter = aFieldValues.cbegin(); theResult && iter != aFieldValues.cend(); ++iter) {
+			const std::string& theAttributeName = iter->first;
+			if (theEntity->attributeExistsByName(theAttributeName)) {
+				const Attribute& theAttribute = theEntity->getAttributeByName(theAttributeName);
+				if (theAttribute.getType() != iter->second.getType()) {
+					theResult.setError(Error::keyValue_mismatch, '\'' + theAttributeName + '\'');
+				}
+			}
+			else {
+				theResult.setError(Error::unknown_attribute, '\'' + theAttributeName + '\'');
+			}
+		}
+
+		if (theResult && aFilter) {
+			theResult = aFilter->validate(*theEntity);
+		}
+
+		if (theResult) {
+			size_type theRowCount = 0;
+			theResult = m_storage.visitBlocks(
+				[this, aFilter, &aFieldValues, &theRowCount](Block& aBlock, blocknum_t aBlocknum) {
+					StatusResult theSubResult(Error::no_error);
+					Row theRow(aBlocknum);
+					theRow.decode(aBlock);
+					if (!aFilter || aFilter->match(theRow)) {
+						for (const auto& theKVPair : aFieldValues) {
+							theRow.updateField(theKVPair.first, theKVPair.second);
+						}
+						theSubResult = m_storage.saveMonoStorable(theRow);
+						if (theSubResult) {
+							++theRowCount;
+						}
+					}
+					return theSubResult;
+				},
+				theEntity->getRowPos()
+			);
+			if (theResult) {
+				theResult.setMessage("Query ok, " + std::to_string(theRowCount) + " row(s) affected");
+			}
+		}
+		return theResult;
+	}
+	else {
+		theResult.setError(Error::unknown_entity, '\'' + anEntityName + '\'');
+	}
+	return theResult;
+}
+
 Entity* Database::getEntityByName(const std::string& anEntityName, StatusResult& aResult) {
 	Entity* theObserver = nullptr;
 	if (_entityExists(anEntityName)) {
@@ -199,7 +252,7 @@ void Database::_addEntityToCache(const std::string& anEntityName, std::unique_pt
 
 void Database::_saveTOC() {
 	if (m_toc.isDirty()) {
-		m_storage.writeBlock(Block(m_toc), 0);
+		m_storage.saveMonoStorable(m_toc);
 	}
 }
 
@@ -207,8 +260,7 @@ void Database::_saveEntites() {
 	for (const auto& theNameAndEntity : m_entityCache) {
 		Entity* theEntity = theNameAndEntity.second.get();
 		if (theEntity->isDirty()) {
-			blocknum_t theBlocknum = theEntity->getBlocknum();
-			m_storage.writeBlock(Block(*theEntity), theBlocknum);
+			m_storage.saveMonoStorable(*theEntity);
 		}
 	}
 }

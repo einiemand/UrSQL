@@ -5,13 +5,13 @@
 #include "TOC.hpp"
 #include "Entity.hpp"
 #include "Attribute.hpp"
+#include "Row.hpp"
 #include <memory>
 #include <fstream>
 #include <unordered_map>
 
 namespace UrSQL {
 
-class RowCollection;
 class Filter;
 class Order;
 
@@ -33,6 +33,7 @@ public:
 	StatusResult selectFromTable(RowCollection& aRowCollection, const std::string& anEntityName,
 		StringList& aFieldNames, const Filter* aFilter, const Order* anOrder);
 	StatusResult deleteFromTable(const std::string& anEntityName, const Filter* aFilter);
+	StatusResult updateTable(const std::string& anEntityName, const Row::DataMap& aFieldValues, const Filter* aFilter);
 
 	inline const std::string& getName() const {
 		return m_storage.getName();
