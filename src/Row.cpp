@@ -52,6 +52,7 @@ void Row::updateField(std::string aFieldName, Value aValue) {
 	if (!m_data.count(aFieldName)) {
 		throw std::runtime_error("Impossible: trying to update a field that doesn't exist");
 	}
+	m_data[std::move(aFieldName)] = std::move(aValue);
 }
 
 void RowCollection::addRow(std::unique_ptr<Row>&& aRow) {
