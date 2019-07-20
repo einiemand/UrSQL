@@ -611,7 +611,11 @@ public:
 		m_tokenizer.next();
 		StatusResult theResult = _parseTableName();
 		if (m_tokenizer.skipIf(Keyword::set_kw)) {
-
+			theResult = _parseFieldValues();
+			if (theResult && m_tokenizer.skipIf(Keyword::where_kw)) {
+				m_filter = std::make_unique<Filter>();
+				theResult = m_filter->parse(m_tokenizer);
+			}
 		}
 		else {
 			theResult.setError(Error::keyword_expected, "'set'");
@@ -620,18 +624,23 @@ public:
 	}
 
 	StatusResult validate() const {
-
+		return !m_tokenizer.more() ?
+			StatusResult(Error::no_error) : StatusResult(Error::syntax_error, "Redundant input");
 	}
 
 	StatusResult execute() const {
-
+		return m_interpreter.updateTable(m_entityName, m_fieldMap, m_filter.get());
 	}
 private:
 	Row::DataMap m_fieldMap;
 	std::unique_ptr<Filter> m_filter;
 
 	StatusResult _parseFieldValues() {
-
+		StatusResult theResult(Error::no_error);
+		do {
+			theResult = _parseOneFieldValue();
+		} while (theResult && m_tokenizer.skipIf(TokenType::comma));
+		return theResult;
 	}
 
 	StatusResult _parseOneFieldValue() {
@@ -641,6 +650,9 @@ private:
 			if (m_tokenizer.skipIf([](const Token& aToken) { return aToken.getData() == "="; })) {
 				Value theValue;
 				theResult = _parseValue(theValue);
+				if (theResult) {
+					m_fieldMap.insert({ std::move(theFieldName),std::move(theValue) });
+				}
 			}
 			else {
 				theResult.setError(Error::syntax_error, "Missing '=' after field name");
@@ -719,6 +731,8 @@ std::unique_ptr<SQLStatement> SQLStatement::factory(Tokenizer& aTokenizer, SQLIn
 		return std::make_unique<ShowTablesStatement>(aTokenizer, anInterpreter);
 	case Keyword::delete_kw:
 		return std::make_unique<DeleteStatement>(aTokenizer, anInterpreter);
+	case Keyword::update_kw:
+		return std::make_unique<UpdateStatement>(aTokenizer, anInterpreter);
 	default:
 		return nullptr;
 	}
