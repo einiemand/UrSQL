@@ -66,17 +66,20 @@ StatusResult Database::dropTable(const std::string& anEntityName, size_type& aRo
 	return theResult;
 }
 
-StatusResult Database::insertIntoTable(const std::string& anEntityName, const StringList& aFieldNames, const StringList& aValueStrs) {
+StatusResult Database::insertIntoTable(const std::string& anEntityName, const StringList& aFieldNames, const std::vector<StringList>& aValueStrsOfRows) {
 	StatusResult theResult(Error::no_error);
 	if (_entityExists(anEntityName)) {
-		blocknum_t theBlocknum;
-		if (theResult = m_storage.findFreeBlocknumber(theBlocknum)) {
-			Entity* theEntity = getEntityByName(anEntityName, theResult);
-			Row theNewRow(theBlocknum);
-			if (theResult = theEntity->generateNewRow(theNewRow, aFieldNames, aValueStrs)) {
-				theResult = m_storage.saveMonoStorable(theNewRow);
-				if (theResult) {
-					theEntity->addRowPosition(theBlocknum);
+		Entity* theEntity = getEntityByName(anEntityName, theResult);
+		for (auto iter = aValueStrsOfRows.cbegin(); theResult && iter != aValueStrsOfRows.cend(); ++iter) {
+			const StringList& theRowValueStrs = *iter;
+			blocknum_t theBlocknum;
+			if (theResult = m_storage.findFreeBlocknumber(theBlocknum)) {
+				Row theNewRow(theBlocknum);
+				if (theResult = theEntity->generateNewRow(theNewRow, aFieldNames, theRowValueStrs)) {
+					theResult = m_storage.saveMonoStorable(theNewRow);
+					if (theResult) {
+						theEntity->addRowPosition(theBlocknum);
+					}
 				}
 			}
 		}
@@ -152,8 +155,8 @@ StatusResult Database::deleteFromTable(const std::string& anEntityName, const Fi
 					}
 					return StatusResult(Error::no_error);
 				},
-				theEntity->getRowPos()
-			);
+				theEntity->getRowPos());
+
 			if (theResult) {
 				theResult = m_storage.releaseBlocks(theBlocknums);
 				if (theResult) {
@@ -175,7 +178,6 @@ StatusResult Database::updateTable(const std::string& anEntityName, const Row::D
 	StatusResult theResult(Error::no_error);
 	if (_entityExists(anEntityName)) {
 		Entity* theEntity = getEntityByName(anEntityName, theResult);
-
 		for (auto iter = aFieldValues.cbegin(); theResult && iter != aFieldValues.cend(); ++iter) {
 			const std::string& theAttributeName = iter->first;
 			if (theEntity->attributeExistsByName(theAttributeName)) {
@@ -211,8 +213,8 @@ StatusResult Database::updateTable(const std::string& anEntityName, const Row::D
 					}
 					return theSubResult;
 				},
-				theEntity->getRowPos()
-			);
+				theEntity->getRowPos());
+
 			if (theResult) {
 				theResult.setMessage("Query ok, " + std::to_string(theRowCount) + " row(s) affected");
 			}

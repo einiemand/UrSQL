@@ -29,7 +29,7 @@ public:
 	StatusResult createTable(const AttributeList& anAttributeList, const std::string& anEntityName);
 	StatusResult dropTable(const std::string& anEntityName, size_type& aRowCount);
 
-	StatusResult insertIntoTable(const std::string& anEntityName, const StringList& aFieldNames, const StringList& aValueStrs);
+	StatusResult insertIntoTable(const std::string& anEntityName, const StringList& aFieldNames, const std::vector<StringList>& aValueStrsOfRows);
 	StatusResult selectFromTable(RowCollection& aRowCollection, const std::string& anEntityName,
 		StringList& aFieldNames, const Filter* aFilter, const Order* anOrder);
 	StatusResult deleteFromTable(const std::string& anEntityName, const Filter* aFilter);
