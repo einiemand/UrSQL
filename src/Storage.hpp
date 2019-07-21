@@ -3,7 +3,6 @@
 #define STORAGE_HPP
 #include "Error.hpp"
 #include <fstream>
-#include <set>
 #include <functional>
 
 namespace UrSQL {
