@@ -2,7 +2,6 @@
 #ifndef TABLE_HPP
 #define TABLE_HPP
 #include "Attribute.hpp"
-#include <set>
 #include <algorithm>
 
 namespace UrSQL {
@@ -11,7 +10,7 @@ class Row;
 
 class Entity : public MonoStorable {
 public:
-	using BlocknumSet = std::set<blocknum_t>;
+	using BlocknumList = std::vector<blocknum_t>;
 	using int_t = Value::int_t;
 
 	Entity(blocknum_t aBlocknum);
@@ -45,7 +44,7 @@ public:
 
 	void addRowPosition(blocknum_t aBlocknum);
 	void dropRowPosition(blocknum_t aBlocknum);
-	inline const BlocknumSet& getRowPos() const {
+	inline const BlocknumList& getRowPos() const {
 		return m_rowPos;
 	}
 
@@ -54,7 +53,10 @@ private:
 	bool m_dirty;
 	AttributeList m_attributes;
 	size_type m_autoincr;
-	BlocknumSet m_rowPos;
+	BlocknumList m_rowPos;
+
+	bool _blocknumExists(blocknum_t aBlocknum) const;
+	size_type _indexOfBlocknum(blocknum_t aBlocknum) const;
 };
 
 }

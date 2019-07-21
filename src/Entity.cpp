@@ -43,7 +43,7 @@ void Entity::deserialize(BufferReader& aReader) {
 	for (; theRowCount > 0; --theRowCount) {
 		blocknum_t theBlocknum;
 		aReader >> theBlocknum;
-		m_rowPos.insert(theBlocknum);
+		m_rowPos.push_back(theBlocknum);
 	}
 }
 
@@ -77,18 +77,18 @@ Entity::int_t Entity::getNextAutoincr() {
 }
 
 void Entity::addRowPosition(blocknum_t aBlocknum) {
-	if (m_rowPos.count(aBlocknum)) {
+	if (_blocknumExists(aBlocknum)) {
 		throw std::runtime_error("Impossible: attempting to add a new row position that's ALREADY recorded");
 	}
-	m_rowPos.insert(aBlocknum);
+	m_rowPos.push_back(aBlocknum);
 	makeDirty(true);
 }
 
 void Entity::dropRowPosition(blocknum_t aBlocknum) {
-	if (!m_rowPos.count(aBlocknum)) {
+	if (!_blocknumExists(aBlocknum)) {
 		throw std::runtime_error("Impossible: attempting to drop a row position that's NOT recorded");
 	}
-	m_rowPos.erase(aBlocknum);
+	m_rowPos.erase(m_rowPos.cbegin() + _indexOfBlocknum(aBlocknum));
 	makeDirty(true);
 }
 
@@ -136,6 +136,17 @@ StatusResult Entity::generateNewRow(Row& aRow, const StringList& aFieldNames, co
 		}
 	}
 	return theResult;
+}
+
+bool Entity::_blocknumExists(blocknum_t aBlocknum) const {
+	return std::find(m_rowPos.cbegin(), m_rowPos.cend(), aBlocknum) != m_rowPos.cend();
+}
+
+size_type Entity::_indexOfBlocknum(blocknum_t aBlocknum) const {
+	if (_blocknumExists(aBlocknum)) {
+		return std::distance(m_rowPos.cbegin(), std::find(m_rowPos.cbegin(), m_rowPos.cend(), aBlocknum));
+	}
+	throw std::runtime_error("Cannot find block number in Entity's row numbers");
 }
 
 }
