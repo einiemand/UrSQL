@@ -121,12 +121,15 @@ StatusResult SQLInterpreter::showTables() const {
 	return theResult;
 }
 
-StatusResult SQLInterpreter::insertIntoTable(const std::string& anEntityName, const StringList& aFieldNames, const StringList& aValueStrs) const {
+StatusResult SQLInterpreter::insertIntoTable(
+	const std::string& anEntityName,
+	const StringList& aFieldNames,
+	const std::vector<StringList>& aValueStrsOfRows) const {
 	StatusResult theResult(Error::no_error);
 	if (Database* theActiveDB = getActiveDatabase()) {
-		theResult = theActiveDB->insertIntoTable(anEntityName, aFieldNames, aValueStrs);
+		theResult = theActiveDB->insertIntoTable(anEntityName, aFieldNames, aValueStrsOfRows);
 		if (theResult) {
-			theResult.setMessage("Query ok, 1 row(s) inserted");
+			theResult.setMessage("Query ok, " + std::to_string(aValueStrsOfRows.size()) + " row(s) inserted");
 		}
 	}
 	else {
