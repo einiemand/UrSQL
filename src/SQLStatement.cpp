@@ -312,35 +312,13 @@ public:
 		StatusResult theResult(Error::no_error);
 		if (m_tokenizer.next() && m_tokenizer.skipIf(Keyword::into_kw)) {
 			if (theResult = _parseTableName()) {
-				if (m_tokenizer.skipIf(TokenType::lparen)) {
-					if (theResult = _parseFieldNames()) {
-						if (m_tokenizer.skipIf(TokenType::rparen)) {
-							if (m_tokenizer.skipIf(Keyword::values_kw)) {
-								if (m_tokenizer.skipIf(TokenType::lparen)) {
-									if (theResult = _parseValueStrings()) {
-										if (m_tokenizer.skipIf(TokenType::rparen)) {
-											//  success
-										}
-										else {
-											theResult.setError(Error::syntax_error, "')' missing");
-										}
-									}
-								}
-								else {
-									theResult.setError(Error::syntax_error, "'(' missing after 'values'");
-								}
-							}
-							else {
-								theResult.setError(Error::syntax_error, "'values' missing");
-							}
-						}
-						else {
-							theResult.setError(Error::syntax_error, "')' missing");
-						}
+				if (theResult = _parseFieldNames()) {
+					if (m_tokenizer.skipIf(Keyword::values_kw)) {
+						theResult = _parseMultipleRows();
 					}
-				}
-				else {
-					theResult.setError(Error::syntax_error, "'(' missing after table name '" + m_entityName + "'");
+					else {
+						theResult.setError(Error::syntax_error, "'values' missing");
+					}
 				}
 			}
 		}
@@ -353,7 +331,8 @@ public:
 	StatusResult validate() const override {
 		StatusResult theResult(Error::no_error);
 		if (!m_tokenizer.more()) {
-			if (m_fieldNames.size() == m_valueStrs.size()) {
+			if (std::all_of(m_valueStrs.cbegin(), m_valueStrs.cend(),
+				[this](const StringList& aRowValueStrs) { return aRowValueStrs.size() == m_fieldNames.size(); })) {
 				theResult = _validateFieldNames();
 			}
 			else {
@@ -371,23 +350,57 @@ public:
 	}
 private:
 	StringList m_fieldNames;
-	StringList m_valueStrs;
+	std::vector<StringList> m_valueStrs;
 
-	inline StatusResult _parseFieldNames() {
-		return parseSequence(m_tokenizer, m_fieldNames,
-			[](const auto& aToken)->bool {
-				return aToken.getType() == TokenType::identifier;
+	StatusResult _parseFieldNames() {
+		StatusResult theResult(Error::no_error);
+		if (m_tokenizer.skipIf(TokenType::lparen)) {
+			theResult = parseSequence(m_tokenizer, m_fieldNames,
+				[](const auto& aToken)->bool {
+					return aToken.getType() == TokenType::identifier;
+				}
+			);
+			if (theResult) {
+				if (m_tokenizer.skipIf(TokenType::rparen)) {
+					// success
+				}
+				else {
+					theResult.setError(Error::syntax_error, "')' missing");
+				}
 			}
-		);
+		}
+		else {
+			theResult.setError(Error::syntax_error, "'(' missing after table name '" + m_entityName + "'");
+		}
+		return theResult;
 	}
 
-	inline StatusResult _parseValueStrings() {
-		return parseSequence(m_tokenizer, m_valueStrs,
-			[](const auto& aToken)->bool {
-				TokenType theType = aToken.getType();
-				return theType == TokenType::string || theType == TokenType::number;
+	StatusResult _parseMultipleRows() {
+		StatusResult theResult(Error::no_error);
+		do {
+			theResult = _parseOneRow();
+		} while (theResult && m_tokenizer.skipIf(TokenType::comma));
+		return theResult;
+	}
+
+	StatusResult _parseOneRow() {
+		StatusResult theResult(Error::no_error);
+		if (m_tokenizer.skipIf(TokenType::lparen)) {
+			m_valueStrs.push_back({});
+			if (theResult = parseSequence(m_tokenizer, m_valueStrs.back(),
+				[](const Token& aToken) { return aToken.isValue(); })) {
+				if (m_tokenizer.skipIf(TokenType::rparen)) {
+					//  success
+				}
+				else {
+					theResult.setError(Error::syntax_error, "')' missing");
+				}
 			}
-		);
+		}
+		else {
+			theResult.setError(Error::syntax_error, "'(' missing after 'values' or ','");
+		}
+		return theResult;
 	}
 
 	StatusResult _validateFieldNames() const {
