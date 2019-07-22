@@ -4,6 +4,65 @@
 
 namespace UrSQL {
 
+#ifdef ENABLE_BLOCKCACHE
+/* -------------------------------BlockCache------------------------------- */
+BlockCache::BlockCache(size_type aCapacity) :
+	m_capacity(aCapacity),
+	m_seq(),
+	m_pos()
+{
+}
+
+bool BlockCache::contains(blocknum_t aBlocknum) {
+	return m_pos.count(aBlocknum) == 1;
+}
+
+void BlockCache::put(blocknum_t aBlocknum, const Block& aBlock) {
+	if (contains(aBlocknum)) {
+		_touch(aBlocknum)->second = std::make_unique<Block>(aBlock);
+	}
+	else {
+		_add(aBlocknum, aBlock);
+	}
+}
+
+const Block& BlockCache::get(blocknum_t aBlocknum) {
+	if (!contains(aBlocknum)) {
+		throw std::runtime_error("Impossible: getting a block that's not in cache");
+	}
+	return *(_touch(aBlocknum)->second);
+}
+
+BlockCache::UseSequence::iterator BlockCache::_touch(blocknum_t aBlocknum) {
+	if (contains(aBlocknum)) {
+		auto theIter = m_pos[aBlocknum];
+		m_seq.push_front(std::move(*theIter));
+		m_seq.erase(theIter);
+		m_pos[aBlocknum] = m_seq.begin();
+	}
+	return m_seq.begin();
+}
+
+void BlockCache::_add(blocknum_t aBlocknum, const Block& aBlock) {
+	m_seq.push_front({ aBlocknum,std::make_unique<Block>(aBlock) });
+	m_pos[aBlocknum] = m_seq.begin();
+	_adjustSize();
+}
+
+void BlockCache::_adjustSize() {
+	if (m_seq.size() > m_capacity) {
+		_removeTail();
+	}
+}
+
+void BlockCache::_removeTail() {
+	blocknum_t theBlocknum = m_seq.back().first;
+	m_seq.pop_back();
+	m_pos.erase(theBlocknum);
+}
+#endif
+
+/* -------------------------------Storage------------------------------- */
 const char* Storage::defaultStoragePath = "./tmp";
 const char* Storage::defaultFileExtension = ".db";
 const size_type Storage::extensionLength = strlen(Storage::defaultFileExtension);
@@ -70,11 +129,22 @@ StatusResult Storage::_loadTOC(TOC& aTOC) {
 }
 
 StatusResult Storage::readBlock(Block& aBlock, blocknum_t aBlocknum) {
+#ifdef ENABLE_BLOCKCACHE
+	if (m_blockCache.contains(aBlocknum)) {
+		aBlock = m_blockCache.get(aBlocknum);
+		return StatusResult(Error::no_error);
+	}
+#endif
 	StatusResult theResult(Error::no_error);
 	if (m_file.seekg(static_cast<int64_t>(aBlocknum) * defaultBlockSize)) {
 		if (!m_file.read(reinterpret_cast<char*>(&aBlock), defaultBlockSize)) {
 			theResult.setError(Error::read_error, "Unable to read blocks from '" + Storage::getDBFilePath(m_fileName) + '\'');
 		}
+#ifdef ENABLE_BLOCKCACHE
+		else {
+			m_blockCache.put(aBlocknum, aBlock);
+		}
+#endif
 	}
 	else {
 		theResult.setError(Error::seek_error, "fstream offset error: " + std::to_string(aBlocknum));
@@ -88,6 +158,11 @@ StatusResult Storage::writeBlock(const Block& aBlock, blocknum_t aBlocknum) {
 		if (!m_file.write(reinterpret_cast<const char*>(&aBlock), defaultBlockSize)) {
 			theResult.setError(Error::write_error, "Unable to write blocks to '" + Storage::getDBFilePath(m_fileName) + '\'');
 		}
+#ifdef ENABLE_BLOCKCACHE
+		else {
+			m_blockCache.put(aBlocknum, aBlock);
+		}
+#endif
 	}
 	else {
 		theResult.setError(Error::seek_error, "fstream offset error: " + std::to_string(aBlocknum));

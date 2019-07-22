@@ -5,12 +5,46 @@
 #include <fstream>
 #include <functional>
 
+#ifndef ENABLE_BLOCKCACHE
+#define ENABLE_BLOCKCACHE
+#endif
+
 namespace UrSQL {
+
+class Block;
+
+#ifdef ENABLE_BLOCKCACHE
+class BlockCache {
+public:
+	using UseSequence = std::list< std::pair<blocknum_t, std::unique_ptr<Block>> >;
+ 	using CacheMap = std::unordered_map<blocknum_t, UseSequence::iterator>;
+
+	BlockCache(size_type aCapacity = BlockCache::capacity);
+	~BlockCache() = default;
+
+	BlockCache(const BlockCache&) = delete;
+	BlockCache& operator=(const BlockCache&) = delete;
+
+	bool contains(blocknum_t aBlocknum);
+	void put(blocknum_t aBlocknum, const Block& aBlock);
+	const Block& get(blocknum_t aBlocknum);
+
+	static constexpr size_type capacity = 50;
+private:
+	const size_type m_capacity;
+	UseSequence m_seq;
+	CacheMap m_pos;
+
+	UseSequence::iterator _touch(blocknum_t aBlocknum);
+	void _add(blocknum_t aBlocknum, const Block& aBlock);
+	void _adjustSize();
+	void _removeTail();
+};
+#endif
 
 struct OpenExistingFile {};
 struct CreateNewFile {};
 
-class Block;
 class TOC;
 class MonoStorable;
 
@@ -80,6 +114,9 @@ public:
 private:
 	std::string m_fileName;
 	std::fstream m_file;
+#ifdef ENABLE_BLOCKCACHE
+	BlockCache m_blockCache;
+#endif
 
 	blocknum_t _getBlockCount();
 
