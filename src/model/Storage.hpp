@@ -4,6 +4,9 @@
 #include "../Error.hpp"
 #include <fstream>
 #include <functional>
+#include <list>
+#include <memory>
+#include <unordered_map>
 
 #ifndef ENABLE_BLOCKCACHE
 #define ENABLE_BLOCKCACHE

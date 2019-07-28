@@ -15,8 +15,6 @@ enum class ValueType : char {
 	null_type
 };
 
-namespace {
-
 class ValueBase {
 public:
 	virtual ValueType type() const = 0;
@@ -32,12 +30,10 @@ public:
 	virtual ~ValueBase() = default;
 };
 
-}
-
 class Value : public Storable {
 public:
 	using int_t = typename size_trait<sizeof(void*)>::int_t;
-	using float_t = float_t;
+	using float_t = float;
 	using bool_t = bool;
 	using varchar_t = std::string;
 	using null_t = void;

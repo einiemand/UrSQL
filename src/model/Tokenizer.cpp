@@ -2,6 +2,7 @@
 #include "../Keyword.hpp"
 #include "Token.hpp"
 #include <algorithm>
+#include <cstring>
 
 namespace UrSQL {
 

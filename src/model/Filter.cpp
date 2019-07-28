@@ -1,4 +1,3 @@
-#pragma once
 #include "Filter.hpp"
 #include "Tokenizer.hpp"
 #include "Row.hpp"

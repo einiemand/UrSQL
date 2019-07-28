@@ -2,6 +2,7 @@
 #ifndef SQLSTATEMENT_HPP
 #define SQLSTATEMENT_HPP
 #include "Statement.hpp"
+#include <memory>
 
 namespace UrSQL {
 

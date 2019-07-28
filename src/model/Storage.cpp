@@ -1,6 +1,7 @@
 #include "Storage.hpp"
 #include "TOC.hpp"
 #include <sstream>
+#include <cstring>
 
 namespace UrSQL {
 

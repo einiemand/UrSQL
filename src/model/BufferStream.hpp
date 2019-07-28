@@ -2,6 +2,8 @@
 #ifndef BUFFERSTREAM_HPP
 #define BUFFERSTREAM_HPP
 #include "../Error.hpp"
+#include <type_traits>
+#include <cstring>
 
 namespace UrSQL {
 
@@ -15,7 +17,7 @@ public:
 	BufferWriter(const BufferWriter&) = delete;
 	BufferWriter& operator=(const BufferWriter&) = delete;
 
-	template<typename T, typename = std::enable_if_t< std::is_arithmetic_v<T> >>
+	template<typename T, typename = std::enable_if_t< std::is_arithmetic<T>::value > >
 	BufferWriter& operator<<(const T aNum) {
 		static constexpr size_type theTypeSize = sizeof(T);
 		if (m_pos + theTypeSize < m_size) {
@@ -43,7 +45,7 @@ public:
 	BufferReader(const BufferReader&) = delete;
 	BufferReader& operator=(const BufferReader&) = delete;
 
-	template<typename T, typename = std::enable_if_t< std::is_arithmetic_v<T> >>
+	template<typename T, typename = std::enable_if_t< std::is_arithmetic<T>::value >>
 	BufferReader& operator>>(T& aNum) {
 		static constexpr size_type theTypeSize = sizeof(T);
 		if (m_pos + theTypeSize < m_size) {

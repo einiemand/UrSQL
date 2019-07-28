@@ -32,8 +32,8 @@ private:
 };
 
 void trim_input(std::string& aString) {
-	aString.erase(aString.begin(), std::find_if_not(aString.begin(), aString.end(), std::isspace));
-	aString.erase(aString.length() - (std::find_if_not(aString.rbegin(), aString.rend(), std::isspace) - aString.rbegin()));
+	aString.erase(aString.begin(), std::find_if_not(aString.begin(), aString.end(), [](char aChar) { return std::isspace(aChar); }));
+	aString.erase(aString.length() - (std::find_if_not(aString.rbegin(), aString.rend(), [](char aChar) { return std::isspace(aChar); }) - aString.rbegin()));
 }
 
 }
