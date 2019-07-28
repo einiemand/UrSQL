@@ -2,7 +2,7 @@
 #ifndef VALUE_HPP
 #define VALUE_HPP
 #include "Storable.hpp"
-#include "Keyword.hpp"
+#include "../Keyword.hpp"
 #include <memory>
 
 namespace UrSQL {

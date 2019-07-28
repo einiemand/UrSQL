@@ -1,7 +1,7 @@
 #pragma once
 #ifndef FOLDERREADER_HPP
 #define FOLDERREADER_HPP
-#include "Error.hpp"
+#include "../Error.hpp"
 #include <functional>
 
 namespace UrSQL {

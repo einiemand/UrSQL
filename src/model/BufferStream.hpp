@@ -1,7 +1,7 @@
 #pragma once
 #ifndef BUFFERSTREAM_HPP
 #define BUFFERSTREAM_HPP
-#include "Error.hpp"
+#include "../Error.hpp"
 
 namespace UrSQL {
 

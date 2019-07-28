@@ -1,8 +1,8 @@
 #pragma once
 #ifndef INTERPRETER_HPP
 #define INTERPRETER_HPP
-#include "Error.hpp"
-#include "Statement.hpp"
+#include "../Error.hpp"
+#include "../model/Statement.hpp"
 #include <memory>
 
 namespace UrSQL {

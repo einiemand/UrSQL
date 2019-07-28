@@ -1,8 +1,8 @@
 #pragma once
 #ifndef STATEMENT_HPP
 #define STATEMENT_HPP
-#include "Error.hpp"
-#include "Keyword.hpp"
+#include "../Error.hpp"
+#include "../Keyword.hpp"
 
 namespace UrSQL {
 

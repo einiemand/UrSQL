@@ -1,9 +1,9 @@
 #include "Error.hpp"
-#include "Tokenizer.hpp"
-#include "BasicProcessor.hpp"
-#include "DBManager.hpp"
-#include "SQLInterpreter.hpp"
-#include "Database.hpp"
+#include "model/Tokenizer.hpp"
+#include "controller/BasicProcessor.hpp"
+#include "controller/DBManager.hpp"
+#include "controller/SQLInterpreter.hpp"
+#include "model/Database.hpp"
 #include <sstream>
 #include <algorithm>
 #include <chrono>

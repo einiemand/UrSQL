@@ -1,9 +1,9 @@
 #include "DBManager.hpp"
-#include "Tokenizer.hpp"
-#include "Database.hpp"
-#include "FolderReader.hpp"
-#include "DBStatement.hpp"
-#include "View.hpp"
+#include "../model/Tokenizer.hpp"
+#include "../model/Database.hpp"
+#include "../model/FolderReader.hpp"
+#include "../model/DBStatement.hpp"
+#include "../view/View.hpp"
 
 namespace UrSQL {
 

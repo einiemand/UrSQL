@@ -1,7 +1,7 @@
 #pragma once
 #ifndef BLOCK_HPP
 #define BLOCK_HPP
-#include "Util.hpp"
+#include "../Util.hpp"
 #include <unordered_map>
 
 namespace UrSQL {

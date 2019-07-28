@@ -1,10 +1,10 @@
 #include "SQLInterpreter.hpp"
-#include "Tokenizer.hpp"
-#include "SQLStatement.hpp"
-#include "Database.hpp"
-#include "View.hpp"
-#include "Filter.hpp"
-#include "Order.hpp"
+#include "../model/Tokenizer.hpp"
+#include "../model/SQLStatement.hpp"
+#include "../model/Database.hpp"
+#include "../view/View.hpp"
+#include "../model/Filter.hpp"
+#include "../model/Order.hpp"
 
 namespace UrSQL {
 

@@ -2,8 +2,8 @@
 #ifndef SQLINTERPRETER_HPP
 #define SQLINTERPRETER_HPP
 #include "Interpreter.hpp"
-#include "Attribute.hpp"
-#include "Row.hpp"
+#include "../model/Attribute.hpp"
+#include "../model/Row.hpp"
 
 namespace UrSQL {
 

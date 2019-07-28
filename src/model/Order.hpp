@@ -1,7 +1,7 @@
 #pragma once
 #ifndef ORDER_HPP
 #define ORDER_HPP
-#include "Error.hpp"
+#include "../Error.hpp"
 #include <string>
 
 namespace UrSQL {
