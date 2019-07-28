@@ -183,9 +183,8 @@ private:
 				}
 				break;
 			}
-								  //case Keyword::default_kw:
-								  //	theResult = _parseDefaultValue(anAttribute);
-								  //	break;
+			default:
+				break;
 			}
 		}
 		if (m_tokenizer.more()) {

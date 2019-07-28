@@ -50,6 +50,8 @@ std::unique_ptr<Statement> SQLInterpreter::getStatement(Tokenizer& aTokenizer) {
 		return SQLStatement::factory(aTokenizer, *this);
 	case Keyword::update_kw:
 		return SQLStatement::factory(aTokenizer, *this);
+	default:
+		return nullptr;
 	}
 	return nullptr;
 }

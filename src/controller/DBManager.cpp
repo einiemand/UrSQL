@@ -34,6 +34,8 @@ std::unique_ptr<Statement> DBManager::getStatement(Tokenizer& aTokenizer) {
 		}
 		break;
 	}
+	default:
+		return nullptr;
 	}
 	return nullptr;
 }

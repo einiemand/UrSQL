@@ -17,7 +17,7 @@ public:
 	BufferWriter(const BufferWriter&) = delete;
 	BufferWriter& operator=(const BufferWriter&) = delete;
 
-	template<typename T, typename = std::enable_if_t< std::is_arithmetic<T>::value > >
+	template<typename T, typename = std::enable_if_t< std::is_arithmetic_v<T> > >
 	BufferWriter& operator<<(const T aNum) {
 		static constexpr size_type theTypeSize = sizeof(T);
 		if (m_pos + theTypeSize < m_size) {
@@ -45,7 +45,7 @@ public:
 	BufferReader(const BufferReader&) = delete;
 	BufferReader& operator=(const BufferReader&) = delete;
 
-	template<typename T, typename = std::enable_if_t< std::is_arithmetic<T>::value >>
+	template<typename T, typename = std::enable_if_t< std::is_arithmetic_v<T> >>
 	BufferReader& operator>>(T& aNum) {
 		static constexpr size_type theTypeSize = sizeof(T);
 		if (m_pos + theTypeSize < m_size) {

@@ -31,7 +31,7 @@ private:
 	}
 };
 
-void trim_input(std::string& aString) {
+void trimInput(std::string& aString) {
 	aString.erase(aString.begin(), std::find_if_not(aString.begin(), aString.end(), [](char aChar) { return std::isspace(aChar); }));
 	aString.erase(aString.length() - (std::find_if_not(aString.rbegin(), aString.rend(), [](char aChar) { return std::isspace(aChar); }) - aString.rbegin()));
 }
@@ -52,7 +52,7 @@ int main(int argc, char* argv[])
 		std::string theUserInput;
 		if (std::getline(std::cin, theUserInput, ';')) {
 			TimeCounter theCounter;
-			trim_input(theUserInput);
+			trimInput(theUserInput);
 			if (!theUserInput.empty()) {
 				std::istringstream theInputStream(theUserInput);
 				Tokenizer theTokenizer(theInputStream);
@@ -65,32 +65,6 @@ int main(int argc, char* argv[])
 		}
 
 	}
-	/*char theChar;
-
-	while (theResult.getCode() != Error::user_terminated) {
-		defaultOutput << thePrevMark;
-		std::string theUserInput;
-		while (std::cin.get(theChar) && theChar != ';') {
-			theUserInput += theChar;
-			if (theChar == '\n') {
-				defaultOutput << thePrevMark;
-			}
-		}
-		std::cin.ignore();
-
-		trim(theUserInput);
-		if (!theUserInput.empty()) {
-			std::istringstream theInputStream(theUserInput);
-			Tokenizer theTokenizer(theInputStream);
-			theResult = theTokenizer.tokenize();
-			if (theResult) {
-				theResult = theBasicProcessor.process_input(theTokenizer);
-			}
-			if (!theResult && theResult.getCode() != Error::user_terminated) {
-				theResult.showError();
-			}
-		}
-	}*/
 
 	return 0;
 }
