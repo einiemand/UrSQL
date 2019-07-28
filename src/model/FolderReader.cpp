@@ -1,7 +1,22 @@
 #include "FolderReader.hpp"
-#include <filesystem>
+#ifdef _WIN32
+#include "Storage.hpp"
+#include <Windows.h>
+#elif defined(__LINUX__) || defined(__APPLE__)
+
+#endif
 
 namespace UrSQL {
+
+bool directoryExists(const std::string& aDirPath) {
+	DWORD theFileAttributes = GetFileAttributesA(aDirPath.c_str());
+	return theFileAttributes != INVALID_FILE_ATTRIBUTES && (theFileAttributes & FILE_ATTRIBUTE_DIRECTORY);
+}
+
+bool isNotDir(const WIN32_FIND_DATAA& aFindData) {
+	return aFindData.dwFileAttributes != INVALID_FILE_ATTRIBUTES
+		&& !(aFindData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY);
+}
 
 FolderReader::FolderReader(std::string aPath) :
 	m_path(std::move(aPath))
@@ -9,20 +24,30 @@ FolderReader::FolderReader(std::string aPath) :
 }
 
 StatusResult FolderReader::eachFile(FileVisitor aVisitor) const {
-	if (std::filesystem::exists(m_path)) {
-		for (const auto& theEntry : std::filesystem::directory_iterator(m_path)) {
-			std::string theFileName = theEntry.path().generic_string();
-			size_type thePos = theFileName.rfind('/');
-			if (std::string::npos != thePos) {
-				theFileName.erase(0, thePos + 1);
-			}
-			if (!aVisitor(theFileName)) {
+#ifdef _WIN32
+	StatusResult theResult(Error::no_error);
+	if (!directoryExists(m_path)) {
+		if (!CreateDirectoryA(m_path.c_str(), nullptr)) {
+			theResult.setError(Error::folder_notExist, '\'' + m_path + '\'');
+		}
+	}
+	WIN32_FIND_DATAA theFindData;
+	std::string theFileWildcard = m_path + "/*" + Storage::defaultFileExtension;
+	HANDLE theFileHandle = FindFirstFileA(theFileWildcard.c_str(), &theFindData);
+	if (theFileHandle != INVALID_HANDLE_VALUE) {
+		do {
+			if (isNotDir(theFindData)
+				&& !aVisitor(theFindData.cFileName))
+			{
 				break;
 			}
-		}
-		return StatusResult(Error::no_error);
+		} while (FindNextFileA(theFileHandle, &theFindData));
+		FindClose(theFileHandle);
 	}
-	return StatusResult(Error::folder_notExist, '\'' + m_path + '\'');
+	return theResult;
+#elif defined(__LINUX__) || defined(__APPLE__)
+
+#endif
 }
 
 
