@@ -382,4 +382,5 @@ healthchecksdb
 MigrationBackup/
 
 # Self-defined
-tmp/
+build/
+**/tmp/
