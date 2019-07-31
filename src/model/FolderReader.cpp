@@ -2,16 +2,17 @@
 #ifdef _WIN32
 #include "Storage.hpp"
 #include <Windows.h>
-#elif defined(__LINUX__) || defined(__APPLE__)
-
+#elif defined(__linux__) || defined(__APPLE__)
+#include <sys/stat.h>
+#include <dirent.h>
 #endif
 
 namespace UrSQL {
 
 #ifdef _WIN32
-class DirEntIterator {
+class WindowsDirEntIterator {
 public:
-	explicit DirEntIterator(const std::string& aDirPath) :
+	explicit WindowsDirEntIterator(const std::string& aDirPath) :
 		m_fileHandle(INVALID_HANDLE_VALUE),
 		m_fileData()
 	{
@@ -19,12 +20,12 @@ public:
 		m_fileHandle = FindFirstFileA(theFileWildCard.c_str(), &m_fileData);
 	}
 
-	~DirEntIterator() {
+	~WindowsDirEntIterator() {
 		FindClose(m_fileHandle);
 	}
 
-	DirEntIterator(const DirEntIterator&) = delete;
-	DirEntIterator& operator=(const DirEntIterator&) = delete;
+	WindowsDirEntIterator(const WindowsDirEntIterator&) = delete;
+	WindowsDirEntIterator& operator=(const WindowsDirEntIterator&) = delete;
 
 	bool next() {
 		return FindNextFileA(m_fileHandle, &m_fileData);
@@ -35,7 +36,7 @@ public:
 	}
 
 	explicit operator bool() const {
-		return m_fileHandle != INVALID_HANDLE_VALUE && m_fileData.dwFileAttributes != INVALID_FILE_ATTRIBUTES;
+		return m_fileHandle != INVALID_HANDLE_VALUE;
 	}
 
 	std::string currentFileName() const {
@@ -54,8 +55,57 @@ private:
 	HANDLE m_fileHandle;
 	WIN32_FIND_DATAA m_fileData;
 };
+#define DirEntIterator WindowsDirEntIterator
 #elif defined(__linux__) || defined(__APPLE__)
+class UnixDirEntIterator {
+public:
+    explicit UnixDirEntIterator(const std::string& aDirPath) :
+        m_dir(opendir(aDirPath.c_str())),
+        m_ent(nullptr)
+    {
+        if (m_dir) {
+            m_ent = readdir(m_dir);
+        }
+    }
 
+    ~UnixDirEntIterator() {
+        closedir(m_dir);
+    }
+
+    UnixDirEntIterator(const UnixDirEntIterator&) = delete;
+    UnixDirEntIterator& operator=(const UnixDirEntIterator&) = delete;
+
+    bool next() {
+        m_ent = readdir(m_dir);
+        return bool(*this);
+    }
+
+    bool isNotDir() const {
+        return m_ent->d_type != DT_DIR;
+    }
+
+    explicit operator bool() const {
+        return m_dir && m_ent;
+    }
+
+    std::string currentFileName() const {
+        return std::string(m_ent->d_name);
+    }
+
+    static bool directoryExists(const std::string& aDirPath) {
+        struct stat theFileStat;
+        stat(aDirPath.c_str(), &theFileStat);
+        return S_ISDIR(theFileStat.st_mode);
+    }
+
+    static bool createDirectory(const std::string& aDirPath) {
+        return mkdir(aDirPath.c_str(), ACCESSPERMS) == 0;
+    }
+private:
+    DIR* m_dir;
+    struct dirent* m_ent;
+};
+#define DirEntIterator UnixDirEntIterator
 #endif
 
 FolderReader::FolderReader(std::string aPath) :
