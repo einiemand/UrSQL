@@ -383,5 +383,5 @@ MigrationBackup/
 
 # Self-defined
 build
-**/tmp/
+tmp
 .idea
