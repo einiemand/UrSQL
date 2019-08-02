@@ -2,9 +2,10 @@ cmake_minimum_required(VERSION 3.0)
 project(UrSQL)
 
 set(SRC_HEADER
-        Error.hpp
-        Keyword.hpp
-        Util.hpp
+        common/Macros.hpp
+        common/Util.hpp
+        common/Error.hpp
+        model/Keyword.hpp
         model/Attribute.hpp
         model/Block.hpp
         model/BufferStream.hpp
@@ -31,8 +32,8 @@ set(SRC_HEADER
         )
 
 set(SRC_SOURCE
-        Error.cpp
-        Keyword.cpp
+        common/Error.cpp
+        model/Keyword.cpp
         model/Attribute.cpp
         model/Block.cpp
         model/BufferStream.cpp
@@ -59,12 +60,7 @@ set(SRC_SOURCE
 
 set(MAIN main.cpp)
 
-include_directories(
-        .
-        model
-        view
-        controller
-)
+include_directories(.)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ../bin)
 set(CMAKE_CXX_STANDARD 17)
