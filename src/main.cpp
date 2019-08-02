@@ -1,4 +1,4 @@
-#include "Error.hpp"
+#include "common/Error.hpp"
 #include "model/Tokenizer.hpp"
 #include "controller/BasicProcessor.hpp"
 #include "controller/DBManager.hpp"

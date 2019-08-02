@@ -1,5 +1,5 @@
 #include "Tokenizer.hpp"
-#include "../Keyword.hpp"
+#include "Keyword.hpp"
 #include "Token.hpp"
 #include <algorithm>
 #include <cstring>

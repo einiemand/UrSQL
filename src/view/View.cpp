@@ -1,8 +1,8 @@
 #include "View.hpp"
-#include "../model/FolderReader.hpp"
-#include "../model/Block.hpp"
-#include "../model/Entity.hpp"
-#include "../model/Row.hpp"
+#include "model/FolderReader.hpp"
+#include "model/Block.hpp"
+#include "model/Entity.hpp"
+#include "model/Row.hpp"
 #include <algorithm>
 #include <iomanip>
 

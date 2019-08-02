@@ -2,7 +2,7 @@
 #ifndef TOKENIZER_HPP
 #define TOKENIZER_HPP
 #include "Token.hpp"
-#include "../Error.hpp"
+#include "common/Error.hpp"
 #include <istream>
 #include <vector>
 #include <functional>

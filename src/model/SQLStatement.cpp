@@ -2,7 +2,7 @@
 #include "Tokenizer.hpp"
 #include "Attribute.hpp"
 #include "Database.hpp"
-#include "../controller/SQLInterpreter.hpp"
+#include "controller/SQLInterpreter.hpp"
 #include "Filter.hpp"
 #include "Order.hpp"
 #include "Row.hpp"

@@ -1,7 +1,7 @@
 #pragma once
 #ifndef VIEW_HPP
 #define VIEW_HPP
-#include "../Error.hpp"
+#include "common/Error.hpp"
 
 namespace UrSQL {
 
