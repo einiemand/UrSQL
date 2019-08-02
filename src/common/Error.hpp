@@ -1,6 +1,6 @@
 #ifndef ERROR_HPP
 #define ERROR_HPP
-#include "Util.hpp"
+#include "common/Util.hpp"
 #include <iostream>
 
 namespace UrSQL {

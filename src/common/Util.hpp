@@ -1,9 +1,11 @@
 #pragma once
 #ifndef UTIL_HPP
 #define UTIL_HPP
+
 #include <stdint.h>
 #include <vector>
 #include <string>
+#include "Macros.hpp"
 
 namespace UrSQL {
 
