@@ -19,12 +19,13 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\common\Error.hpp" />
+    <ClInclude Include="src\common\Macros.hpp" />
+    <ClInclude Include="src\common\Util.hpp" />
     <ClInclude Include="src\controller\BasicProcessor.hpp" />
     <ClInclude Include="src\controller\DBManager.hpp" />
     <ClInclude Include="src\controller\Interpreter.hpp" />
     <ClInclude Include="src\controller\SQLInterpreter.hpp" />
-    <ClInclude Include="src\Error.hpp" />
-    <ClInclude Include="src\Keyword.hpp" />
     <ClInclude Include="src\model\Attribute.hpp" />
     <ClInclude Include="src\model\Block.hpp" />
     <ClInclude Include="src\model\BufferStream.hpp" />
@@ -33,6 +34,7 @@
     <ClInclude Include="src\model\Entity.hpp" />
     <ClInclude Include="src\model\Filter.hpp" />
     <ClInclude Include="src\model\FolderReader.hpp" />
+    <ClInclude Include="src\model\Keyword.hpp" />
     <ClInclude Include="src\model\Order.hpp" />
     <ClInclude Include="src\model\Row.hpp" />
     <ClInclude Include="src\model\SQLStatement.hpp" />
@@ -43,15 +45,13 @@
     <ClInclude Include="src\model\Token.hpp" />
     <ClInclude Include="src\model\Tokenizer.hpp" />
     <ClInclude Include="src\model\Value.hpp" />
-    <ClInclude Include="src\Util.hpp" />
     <ClInclude Include="src\view\View.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\common\Error.cpp" />
     <ClCompile Include="src\controller\BasicProcessor.cpp" />
     <ClCompile Include="src\controller\DBManager.cpp" />
     <ClCompile Include="src\controller\SQLInterpreter.cpp" />
-    <ClCompile Include="src\Error.cpp" />
-    <ClCompile Include="src\Keyword.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\model\Attribute.cpp" />
     <ClCompile Include="src\model\Block.cpp" />
@@ -61,6 +61,7 @@
     <ClCompile Include="src\model\Entity.cpp" />
     <ClCompile Include="src\model\Filter.cpp" />
     <ClCompile Include="src\model\FolderReader.cpp" />
+    <ClCompile Include="src\model\Keyword.cpp" />
     <ClCompile Include="src\model\Order.cpp" />
     <ClCompile Include="src\model\Row.cpp" />
     <ClCompile Include="src\model\SQLStatement.cpp" />
@@ -147,6 +148,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
+      <AdditionalIncludeDirectories>$(ProjectDir)src\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -163,6 +165,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
+      <AdditionalIncludeDirectories>$(ProjectDir)src\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -181,6 +184,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
+      <AdditionalIncludeDirectories>$(ProjectDir)src\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -201,6 +205,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
+      <AdditionalIncludeDirectories>$(ProjectDir)src\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
