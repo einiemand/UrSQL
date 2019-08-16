@@ -23,12 +23,12 @@ public:
 	virtual std::unique_ptr<Statement> getStatement(Tokenizer& aTokenizer) = 0;
 	virtual ~Interpreter() = default;
 
-	StatusResult process_input(Tokenizer& aTokenizer) {
+	StatusResult processInput(Tokenizer& aTokenizer) {
 		if (auto theStatement = getStatement(aTokenizer)) {
 			return theStatement->run();
 		}
 
-		return m_next ? m_next->process_input(aTokenizer) :
+		return m_next ? m_next->processInput(aTokenizer) :
 			StatusResult(Error::unknown_command, "Enter 'help' to get familiar with this clumsy DB engine");
 	}
 

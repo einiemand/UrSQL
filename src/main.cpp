@@ -41,6 +41,7 @@ void trimInput(std::string& aString) {
 int main(int argc, char* argv[])
 {
 	using namespace UrSQL;
+
 	static const char* const thePrevMark = "\nursql> ";
 	DBManager theDBManager;
 	SQLInterpreter theSQLInterpreter(&theDBManager);
@@ -58,7 +59,7 @@ int main(int argc, char* argv[])
 				Tokenizer theTokenizer(theInputStream);
 				theResult = theTokenizer.tokenize();
 				if (theResult) {
-					theResult = theBasicProcessor.process_input(theTokenizer);
+					theResult = theBasicProcessor.processInput(theTokenizer);
 				}
 				theResult.showError();
 			}
