@@ -22,7 +22,7 @@
     <ClInclude Include="include\common\Error.hpp" />
     <ClInclude Include="include\common\Macros.hpp" />
     <ClInclude Include="include\common\Util.hpp" />
-    <ClInclude Include="include\controller\BasicProcessor.hpp" />
+    <ClInclude Include="include\controller\BasicInterpreter.hpp" />
     <ClInclude Include="include\controller\DBManager.hpp" />
     <ClInclude Include="include\controller\Interpreter.hpp" />
     <ClInclude Include="include\controller\SQLInterpreter.hpp" />
@@ -49,7 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\common\Error.cpp" />
-    <ClCompile Include="src\controller\BasicProcessor.cpp" />
+    <ClCompile Include="src\controller\BasicInterpreter.cpp" />
     <ClCompile Include="src\controller\DBManager.cpp" />
     <ClCompile Include="src\controller\SQLInterpreter.cpp" />
     <ClCompile Include="src\main.cpp" />

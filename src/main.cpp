@@ -1,6 +1,6 @@
 #include "common/Error.hpp"
 #include "model/Tokenizer.hpp"
-#include "controller/BasicProcessor.hpp"
+#include "controller/BasicInterpreter.hpp"
 #include "controller/DBManager.hpp"
 #include "controller/SQLInterpreter.hpp"
 #include "model/Database.hpp"
@@ -45,7 +45,7 @@ int main(int argc, char* argv[])
 	static const char* const thePrevMark = "\nursql> ";
 	DBManager theDBManager;
 	SQLInterpreter theSQLInterpreter(&theDBManager);
-	BasicProcessor theBasicProcessor(&theSQLInterpreter);
+	BasicInterpreter theBasicProcessor(&theSQLInterpreter);
 
 	StatusResult theResult(Error::no_error);
 	while (theResult.getCode() != Error::user_terminated) {

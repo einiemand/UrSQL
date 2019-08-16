@@ -24,9 +24,6 @@
     <ClInclude Include="include\common\Util.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\controller\BasicProcessor.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\controller\DBManager.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -96,6 +93,9 @@
     <ClInclude Include="include\view\View.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\controller\BasicInterpreter.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -158,9 +158,6 @@
     <ClCompile Include="src\model\Block.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\controller\BasicProcessor.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\model\Attribute.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -171,6 +168,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\common\Error.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\controller\BasicInterpreter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

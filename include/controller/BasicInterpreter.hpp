@@ -1,6 +1,6 @@
 #pragma once
-#ifndef BASICPROCESSOR_HPP
-#define BASICPROCESSOR_HPP
+#ifndef BASICINTERPRETER_HPP
+#define BASICINTERPRETER_HPP
 #include "Interpreter.hpp"
 
 namespace UrSQL {
