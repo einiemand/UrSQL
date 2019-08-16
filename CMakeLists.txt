@@ -8,6 +8,7 @@ set(URSQL_HEADER
         include/controller/BasicInterpreter.hpp
         include/controller/DBManager.hpp
         include/controller/Interpreter.hpp
+		include/controller/Processor.hpp
         include/controller/SQLInterpreter.hpp
         include/model/Attribute.hpp
         include/model/Block.hpp
@@ -35,6 +36,7 @@ set(URSQL_SOURCE
         src/common/Error.cpp
         src/controller/BasicInterpreter.cpp
         src/controller/DBManager.cpp
+		src/controller/Processor.cpp
         src/controller/SQLInterpreter.cpp
         src/model/Attribute.cpp
         src/model/Block.cpp

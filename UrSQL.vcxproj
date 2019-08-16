@@ -25,6 +25,7 @@
     <ClInclude Include="include\controller\BasicInterpreter.hpp" />
     <ClInclude Include="include\controller\DBManager.hpp" />
     <ClInclude Include="include\controller\Interpreter.hpp" />
+    <ClInclude Include="include\controller\Processor.hpp" />
     <ClInclude Include="include\controller\SQLInterpreter.hpp" />
     <ClInclude Include="include\model\Attribute.hpp" />
     <ClInclude Include="include\model\Block.hpp" />
@@ -51,6 +52,7 @@
     <ClCompile Include="src\common\Error.cpp" />
     <ClCompile Include="src\controller\BasicInterpreter.cpp" />
     <ClCompile Include="src\controller\DBManager.cpp" />
+    <ClCompile Include="src\controller\Processor.cpp" />
     <ClCompile Include="src\controller\SQLInterpreter.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\model\Attribute.cpp" />
