@@ -193,11 +193,11 @@ public:
 		return anOutput << "NULL";
 	}
 
-	bool less(const ValueBase& rhs) const override {
+	bool less(const ValueBase&) const override {
 		return false;
 	}
 
-	bool equal(const ValueBase& rhs) const override {
+	bool equal(const ValueBase&) const override {
 		return false;
 	}
 };
