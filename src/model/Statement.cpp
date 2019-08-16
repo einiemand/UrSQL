@@ -1,5 +1,5 @@
-#include "Statement.hpp"
-#include "Tokenizer.hpp"
+#include "model/Statement.hpp"
+#include "model/Tokenizer.hpp"
 
 namespace UrSQL {
 

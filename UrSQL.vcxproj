@@ -19,33 +19,33 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\common\Error.hpp" />
-    <ClInclude Include="src\common\Macros.hpp" />
-    <ClInclude Include="src\common\Util.hpp" />
-    <ClInclude Include="src\controller\BasicProcessor.hpp" />
-    <ClInclude Include="src\controller\DBManager.hpp" />
-    <ClInclude Include="src\controller\Interpreter.hpp" />
-    <ClInclude Include="src\controller\SQLInterpreter.hpp" />
-    <ClInclude Include="src\model\Attribute.hpp" />
-    <ClInclude Include="src\model\Block.hpp" />
-    <ClInclude Include="src\model\BufferStream.hpp" />
-    <ClInclude Include="src\model\Database.hpp" />
-    <ClInclude Include="src\model\DBStatement.hpp" />
-    <ClInclude Include="src\model\Entity.hpp" />
-    <ClInclude Include="src\model\Filter.hpp" />
-    <ClInclude Include="src\model\FolderReader.hpp" />
-    <ClInclude Include="src\model\Keyword.hpp" />
-    <ClInclude Include="src\model\Order.hpp" />
-    <ClInclude Include="src\model\Row.hpp" />
-    <ClInclude Include="src\model\SQLStatement.hpp" />
-    <ClInclude Include="src\model\Statement.hpp" />
-    <ClInclude Include="src\model\Storable.hpp" />
-    <ClInclude Include="src\model\Storage.hpp" />
-    <ClInclude Include="src\model\TOC.hpp" />
-    <ClInclude Include="src\model\Token.hpp" />
-    <ClInclude Include="src\model\Tokenizer.hpp" />
-    <ClInclude Include="src\model\Value.hpp" />
-    <ClInclude Include="src\view\View.hpp" />
+    <ClInclude Include="include\common\Error.hpp" />
+    <ClInclude Include="include\common\Macros.hpp" />
+    <ClInclude Include="include\common\Util.hpp" />
+    <ClInclude Include="include\controller\BasicProcessor.hpp" />
+    <ClInclude Include="include\controller\DBManager.hpp" />
+    <ClInclude Include="include\controller\Interpreter.hpp" />
+    <ClInclude Include="include\controller\SQLInterpreter.hpp" />
+    <ClInclude Include="include\model\Attribute.hpp" />
+    <ClInclude Include="include\model\Block.hpp" />
+    <ClInclude Include="include\model\BufferStream.hpp" />
+    <ClInclude Include="include\model\Database.hpp" />
+    <ClInclude Include="include\model\DBStatement.hpp" />
+    <ClInclude Include="include\model\Entity.hpp" />
+    <ClInclude Include="include\model\Filter.hpp" />
+    <ClInclude Include="include\model\FolderReader.hpp" />
+    <ClInclude Include="include\model\Keyword.hpp" />
+    <ClInclude Include="include\model\Order.hpp" />
+    <ClInclude Include="include\model\Row.hpp" />
+    <ClInclude Include="include\model\SQLStatement.hpp" />
+    <ClInclude Include="include\model\Statement.hpp" />
+    <ClInclude Include="include\model\Storable.hpp" />
+    <ClInclude Include="include\model\Storage.hpp" />
+    <ClInclude Include="include\model\TOC.hpp" />
+    <ClInclude Include="include\model\Token.hpp" />
+    <ClInclude Include="include\model\Tokenizer.hpp" />
+    <ClInclude Include="include\model\Value.hpp" />
+    <ClInclude Include="include\view\View.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\common\Error.cpp" />
@@ -148,7 +148,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)src\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -165,7 +165,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)src\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -184,7 +184,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)src\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -205,7 +205,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)src\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

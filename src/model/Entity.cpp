@@ -1,6 +1,6 @@
-#include "Entity.hpp"
-#include "BufferStream.hpp"
-#include "Row.hpp"
+#include "model/Entity.hpp"
+#include "model/BufferStream.hpp"
+#include "model/Row.hpp"
 
 namespace UrSQL {
 

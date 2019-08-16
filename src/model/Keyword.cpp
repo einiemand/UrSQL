@@ -1,4 +1,4 @@
-#include "Keyword.hpp"
+#include "model/Keyword.hpp"
 
 namespace UrSQL {
 

@@ -1,6 +1,6 @@
-#include "DBStatement.hpp"
+#include "model/DBStatement.hpp"
 #include "controller/DBManager.hpp"
-#include "Tokenizer.hpp"
+#include "model/Tokenizer.hpp"
 
 namespace UrSQL {
 

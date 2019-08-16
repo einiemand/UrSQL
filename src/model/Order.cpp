@@ -1,5 +1,5 @@
-#include "Order.hpp"
-#include "Entity.hpp"
+#include "model/Order.hpp"
+#include "model/Entity.hpp"
 
 namespace UrSQL {
 

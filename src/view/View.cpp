@@ -1,4 +1,4 @@
-#include "View.hpp"
+#include "view/View.hpp"
 #include "model/FolderReader.hpp"
 #include "model/Block.hpp"
 #include "model/Entity.hpp"

@@ -1,5 +1,5 @@
-#include "BufferStream.hpp"
-#include "Storable.hpp"
+#include "model/BufferStream.hpp"
+#include "model/Storable.hpp"
 
 namespace UrSQL {
 

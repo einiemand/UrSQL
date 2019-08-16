@@ -15,85 +15,85 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\controller\BasicProcessor.hpp">
+    <ClInclude Include="include\common\Error.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\controller\DBManager.hpp">
+    <ClInclude Include="include\common\Macros.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\controller\Interpreter.hpp">
+    <ClInclude Include="include\common\Util.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\controller\SQLInterpreter.hpp">
+    <ClInclude Include="include\controller\BasicProcessor.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\model\Value.hpp">
+    <ClInclude Include="include\controller\DBManager.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\model\Tokenizer.hpp">
+    <ClInclude Include="include\controller\Interpreter.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\model\Token.hpp">
+    <ClInclude Include="include\controller\SQLInterpreter.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\model\TOC.hpp">
+    <ClInclude Include="include\model\Attribute.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\model\Storage.hpp">
+    <ClInclude Include="include\model\Block.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\model\Storable.hpp">
+    <ClInclude Include="include\model\BufferStream.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\model\Statement.hpp">
+    <ClInclude Include="include\model\Database.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\model\SQLStatement.hpp">
+    <ClInclude Include="include\model\DBStatement.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\model\Row.hpp">
+    <ClInclude Include="include\model\Entity.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\model\Order.hpp">
+    <ClInclude Include="include\model\Filter.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\model\Filter.hpp">
+    <ClInclude Include="include\model\FolderReader.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\model\Entity.hpp">
+    <ClInclude Include="include\model\Keyword.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\model\Database.hpp">
+    <ClInclude Include="include\model\Order.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\model\DBStatement.hpp">
+    <ClInclude Include="include\model\Row.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\model\BufferStream.hpp">
+    <ClInclude Include="include\model\SQLStatement.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\model\Block.hpp">
+    <ClInclude Include="include\model\Statement.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\model\Attribute.hpp">
+    <ClInclude Include="include\model\Storable.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\model\FolderReader.hpp">
+    <ClInclude Include="include\model\Storage.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\view\View.hpp">
+    <ClInclude Include="include\model\TOC.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\model\Keyword.hpp">
+    <ClInclude Include="include\model\Token.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\common\Error.hpp">
+    <ClInclude Include="include\model\Tokenizer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\common\Macros.hpp">
+    <ClInclude Include="include\model\Value.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\common\Util.hpp">
+    <ClInclude Include="include\view\View.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

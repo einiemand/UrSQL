@@ -1,7 +1,7 @@
-#include "Filter.hpp"
-#include "Tokenizer.hpp"
-#include "Row.hpp"
-#include "Entity.hpp"
+#include "model/Filter.hpp"
+#include "model/Tokenizer.hpp"
+#include "model/Row.hpp"
+#include "model/Entity.hpp"
 #include <unordered_map>
 
 namespace UrSQL {

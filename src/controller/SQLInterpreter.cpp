@@ -1,4 +1,4 @@
-#include "SQLInterpreter.hpp"
+#include "controller/SQLInterpreter.hpp"
 #include "model/Tokenizer.hpp"
 #include "model/SQLStatement.hpp"
 #include "model/Database.hpp"

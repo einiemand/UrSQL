@@ -1,6 +1,6 @@
-#include "Tokenizer.hpp"
-#include "Keyword.hpp"
-#include "Token.hpp"
+#include "model/Tokenizer.hpp"
+#include "model/Keyword.hpp"
+#include "model/Token.hpp"
 #include <algorithm>
 #include <cstring>
 

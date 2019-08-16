@@ -1,4 +1,4 @@
-#include "Token.hpp"
+#include "model/Token.hpp"
 
 namespace UrSQL {
 

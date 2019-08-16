@@ -1,6 +1,6 @@
-#include "Block.hpp"
-#include "Storable.hpp"
-#include "BufferStream.hpp"
+#include "model/Block.hpp"
+#include "model/Storable.hpp"
+#include "model/BufferStream.hpp"
 
 namespace UrSQL {
 

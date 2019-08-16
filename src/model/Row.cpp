@@ -1,6 +1,6 @@
-#include "Row.hpp"
-#include "BufferStream.hpp"
-#include "Order.hpp"
+#include "model/Row.hpp"
+#include "model/BufferStream.hpp"
+#include "model/Order.hpp"
 #include <algorithm>
 
 namespace UrSQL {

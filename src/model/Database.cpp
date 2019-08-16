@@ -1,6 +1,6 @@
-#include "Database.hpp"
-#include "Filter.hpp"
-#include "Order.hpp"
+#include "model/Database.hpp"
+#include "model/Filter.hpp"
+#include "model/Order.hpp"
 
 namespace UrSQL {
 

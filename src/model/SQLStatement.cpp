@@ -1,11 +1,11 @@
-#include "SQLStatement.hpp"
-#include "Tokenizer.hpp"
-#include "Attribute.hpp"
-#include "Database.hpp"
+#include "model/SQLStatement.hpp"
+#include "model/Tokenizer.hpp"
+#include "model/Attribute.hpp"
+#include "model/Database.hpp"
 #include "controller/SQLInterpreter.hpp"
-#include "Filter.hpp"
-#include "Order.hpp"
-#include "Row.hpp"
+#include "model/Filter.hpp"
+#include "model/Order.hpp"
+#include "model/Row.hpp"
 #include <unordered_set>
 
 namespace UrSQL {

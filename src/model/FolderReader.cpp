@@ -1,6 +1,6 @@
-#include "FolderReader.hpp"
+#include "model/FolderReader.hpp"
 #ifdef _WIN32
-#include "Storage.hpp"
+#include "model/Storage.hpp"
 #include <Windows.h>
 #elif defined(__linux__) || defined(__APPLE__)
 #include <sys/stat.h>
