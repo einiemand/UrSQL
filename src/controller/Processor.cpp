@@ -30,17 +30,13 @@ private:
 
 void Processor::consume(std::istream& anInput, CommandConsumer aConsumer) {
 	static const char* const thePrevMark = "\nursql> ";
-	StatusResult theResult(Error::no_error);
-	while (theResult.getCode() != Error::user_terminated && !anInput.eof()) {
+	std::string theUserInput;
+	do {
 		defaultOutput << thePrevMark;
-		std::string theUserInput;
-		if (std::getline(anInput, theUserInput, ';')) {
-			theResult = aConsumer(theUserInput);
-		}
-	}
+	} while (std::getline(anInput, theUserInput, ';') && !aConsumer(theUserInput));
 }
 
-StatusResult Processor::consumeOne(const std::string& aCommandString) {
+bool Processor::consumeOne(const std::string& aCommandString) {
 	TimeCounter aCounter;
 	StatusResult theResult(Error::no_error);
 	if (std::any_of(aCommandString.cbegin(), aCommandString.cend(),
@@ -55,7 +51,7 @@ StatusResult Processor::consumeOne(const std::string& aCommandString) {
 		}
 	}
 	theResult.showError();
-	return theResult;
+	return theResult.getCode() == Error::user_terminated;
 }
 
 }

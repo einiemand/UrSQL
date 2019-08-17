@@ -13,7 +13,7 @@ namespace UrSQL {
 class Processor {
 public:
 	using InterpreterList = std::list<std::unique_ptr<Interpreter>>;
-	using CommandConsumer = std::function<StatusResult(const std::string& aCommandString)>;
+	using CommandConsumer = std::function<bool(const std::string& aCommandString)>;
 
 	Processor() = default;
 	~Processor() = default;
@@ -22,7 +22,7 @@ public:
 	Processor& operator=(const Processor&) noexcept = delete;
 
 	void consume(std::istream& anInput, CommandConsumer aConsumer);
-	StatusResult consumeOne(const std::string& aCommandString);
+	bool consumeOne(const std::string& aCommandString);
 
 	template<typename T, typename = std::enable_if_t< std::is_base_of_v<Interpreter, T> >>
 	void addInterpreter() {
