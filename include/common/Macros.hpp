@@ -27,30 +27,49 @@
 #endif
 
 // Helper macros
-#define DISABLE_COPY_CTOR(Class) Class(const Class&) = delete
-#define DISABLE_COPY_ASSIGN(Class) Class& operator=(const Class&) = delete
-#define DISABLE_COPY(Class) \
-    DISABLE_COPY_CTOR(Class); \
-    DISABLE_COPY_ASSIGN(Class)
+#define URSQL_DISABLE_COPY_CTOR(Class) Class(const Class&) = delete
+#define URSQL_DISABLE_COPY_ASSIGN(Class) Class& operator=(const Class&) = delete
+#define URSQL_DISABLE_COPY(Class) \
+    URSQL_DISABLE_COPY_CTOR(Class); \
+    URSQL_DISABLE_COPY_ASSIGN(Class)
+
+#define URSQL_DEFAULT_COPY_CTOR(Class) Class(const Class&) = default
+#define URSQL_DEFAULT_COPY_ASSIGN(Class) Class& operator=(const Class&) = default
+#define URSQL_DEFAULT_COPY(Class) \
+	URSQL_DEFAULT_COPY_CTOR(Class); \
+	URSQL_DEFAULT_COPY_ASSIGN(Class)
+
+#define URSQL_DISABLE_MOVE_CTOR(Class) Class(Class&&) noexcept = delete
+#define URSQL_DISABLE_MOVE_ASSIGN(Class) Class& operator=(const Class&) noexcept = delete
+#define URSQL_DISABLE_MOVE(Class) \
+    URSQL_DISABLE_MOVE_CTOR(Class); \
+    URSQL_DISABLE_MOVE_ASSIGN(Class)
+
+#define URSQL_DEFAULT_MOVE_CTOR(Class) Class(Class&&) noexcept = default
+#define URSQL_DEFAULT_MOVE_ASSIGN(Class) Class& operator=(Class&&) noexcept = default
+#define URSQL_DEFAULT_MOVE(Class) \
+	URSQL_DEFAULT_MOVE_CTOR(Class); \
+	URSQL_DEFAULT_MOVE_ASSIGN(Class)
+
+// Debug macros
+#ifndef NDEBUG
+#define URSQL_DEBUG
+#endif
 
 #ifdef URSQL_DEBUG
 
-#define URSQL_TRUTH(truth) \
+#define URSQL_TRUTH(TRUTH, MESSAGE) \
     do { \
-        if (!(truth)) std::abort(); \
+        if (!(TRUTH)) { \
+			std::cerr << "At line " << __LINE__ << ", in file '" << __FILE__ << "'\n"; \
+			std::cerr << "Truth is a lie! " << MESSAGE << '\n'; \
+			std::terminate(); \
+		} \
     } while(false)
-
-#define URSQL_MUST_INLINE inline
 
 #else
 
-#define URSQL_TRUTH()
-
-#if defined(COMPILER_GNUC) || defined(COMPILER_MINGW64)
-#define URSQL_MUST_INLINE __attribute__((always_inline))
-#elif defined(COMPILER_MSVC)
-#define URSQL_MUST_INLINE __forceinline
-#endif
+#define URSQL_TRUTH(TRUTH, MESSAGE) ((void)0)
 
 #endif
 
