@@ -23,14 +23,14 @@ $ git clone https://github.com/einiemand/UrSQL.git
     * If you have `Visual Studio` installed, simply opening the `.sln` file should be enough. Or you can create project files with cmake.
     * If you are building with `MinGW`, make sure to specify the compiler with
 ```
-$ cmake -G "MinGW Makefiles" path/to/src
+$ cmake -G "MinGW Makefiles" path/to/root
 ```
 * Linux
 ```
 $ mkdir build && cd build
 $ cmake ..
 $ make
-$ cd ../bin && ./UrSQL
+$ cd ../bin && ./ursql
 ```
 
 Note: The build type is Release and `-O3` is used by default. To switch to Debug and help me find bugs, you might want to do
