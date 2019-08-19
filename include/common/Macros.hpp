@@ -62,7 +62,8 @@
     do { \
         if (!(TRUTH)) { \
 			std::cerr << "At line " << __LINE__ << ", in file '" << __FILE__ << "'\n"; \
-			std::cerr << "Truth is a lie! " << MESSAGE << '\n'; \
+			std::cerr << "Truth is a lie! " << (MESSAGE) << '\n'; \
+			std::cerr << "Aborting...\n"; \
 			std::terminate(); \
 		} \
     } while(false)

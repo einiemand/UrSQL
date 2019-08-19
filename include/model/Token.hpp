@@ -3,6 +3,7 @@
 #define TOKEN_HPP
 #include <string>
 #include "Keyword.hpp"
+#include "common/Macros.hpp"
 
 namespace UrSQL {
 
@@ -19,11 +20,8 @@ public:
 	Token(TokenType type, std::string data, Keyword keyword = Keyword::unknown_kw);
 	~Token() = default;
 
-	Token(const Token&) = default;
-	Token(Token&&) noexcept = default;
-
-	Token& operator=(const Token&) = default;
-	Token& operator=(Token&&) noexcept = default;
+	URSQL_DEFAULT_COPY(Token);
+	URSQL_DEFAULT_MOVE(Token);
 
 	inline const std::string& getData() const {
 		return m_Data;

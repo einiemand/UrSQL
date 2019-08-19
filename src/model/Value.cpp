@@ -51,10 +51,8 @@ public:
 
 	~ValueImpl() override = default;
 
-	ValueImpl(const ValueImpl&) = default;
-	ValueImpl(ValueImpl&&) noexcept = default;
-	ValueImpl& operator=(const ValueImpl&) = default;
-	ValueImpl& operator=(ValueImpl&&) noexcept = default;
+	URSQL_DEFAULT_COPY(ValueImpl);
+	URSQL_DEFAULT_MOVE(ValueImpl);
 
 	ValueType type() const override {
 		return val_type;
@@ -79,17 +77,13 @@ public:
 	}
 
 	bool less(const ValueBase& rhs) const override {
-		if (type() == rhs.type()) {
-			return m_val < dynamic_cast<const ValueImpl<T>&>(rhs).m_val;
-		}
-		throw std::runtime_error("Values of different types are not comparable");
+		URSQL_TRUTH(type() == rhs.type(), "Values of different types are not comparable");
+		return m_val < dynamic_cast<const ValueImpl<T>&>(rhs).m_val;
 	}
 
 	bool equal(const ValueBase& rhs) const override {
-		if (type() == rhs.type()) {
-			return m_val == dynamic_cast<const ValueImpl<T>&>(rhs).m_val;
-		}
-		throw std::runtime_error("Values of different types are not comparable");
+		URSQL_TRUTH(type() == rhs.type(), "Values of different types are not comparable");
+		return m_val == dynamic_cast<const ValueImpl<T>&>(rhs).m_val;
 	}
 private:
 	T m_val;
@@ -107,10 +101,8 @@ public:
 
 	~ValueImpl() override = default;
 
-	ValueImpl(const ValueImpl&) = default;
-	ValueImpl(ValueImpl&&) noexcept = default;
-	ValueImpl& operator=(const ValueImpl&) = default;
-	ValueImpl& operator=(ValueImpl&&) noexcept = default;
+	URSQL_DEFAULT_COPY(ValueImpl);
+	URSQL_DEFAULT_MOVE(ValueImpl);
 
 	ValueType type() const override {
 		return val_type;
@@ -135,23 +127,15 @@ public:
 	}
 
 	bool less(const ValueBase& rhs) const override {
-		if (type() == rhs.type()) {
-			return m_val < dynamic_cast<const ValueImpl<varchar_t>&>(rhs).m_val;
-		}
-		if (rhs.type() == ValueType::null_type) {
-			return false;
-		}
-		throw std::runtime_error("Values of different types are not comparable");
+		URSQL_TRUTH(rhs.type() == ValueType::varchar_type || rhs.type() == ValueType::null_type,
+			"Values of different types are not comparable");
+		return rhs.type() == ValueType::varchar_type && m_val < dynamic_cast<const ValueImpl<varchar_t>&>(rhs).m_val;
 	}
 
 	bool equal(const ValueBase& rhs) const override {
-		if (rhs.type() == ValueType::varchar_type) {
-			return m_val == dynamic_cast<const ValueImpl<varchar_t>&>(rhs).m_val;
-		}
-		if (rhs.type() == ValueType::null_type) {
-			return false;
-		}
-		throw std::runtime_error("Values of different types are not comparable");
+		URSQL_TRUTH(rhs.type() == ValueType::varchar_type || rhs.type() == ValueType::null_type,
+			"Values of different types are not comparable");
+		return rhs.type() == ValueType::varchar_type && m_val == dynamic_cast<const ValueImpl<varchar_t>&>(rhs).m_val;
 	}
 
 private:
@@ -168,8 +152,7 @@ public:
 
 	~ValueImpl() override = default;
 
-	ValueImpl(const ValueImpl&) = default;
-	ValueImpl& operator=(const ValueImpl&) = default;
+	URSQL_DEFAULT_COPY(ValueImpl);
 
 	ValueType type() const override {
 		return val_type;
@@ -341,12 +324,8 @@ void Value::deserialize(BufferReader& aReader) {
 	std::string theString;
 	aReader >> theString;
 	Value theValue(std::move(theString));
-	if (theValue.become(static_cast<ValueType>(theChar))) {
-		swap(theValue);
-	}
-	else {
-		throw std::runtime_error("Value parse error");
-	}
+	URSQL_TRUTH(theValue.become(static_cast<ValueType>(theChar)), "Value parse error");
+	swap(theValue);
 }
 
 ValueType Value::getType() const {

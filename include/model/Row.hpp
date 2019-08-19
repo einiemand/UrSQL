@@ -14,8 +14,8 @@ public:
 	Row(blocknum_t aBlocknum);
 	~Row() override = default;
 
-	Row(Row&&) noexcept = default;
-	Row& operator=(const Row&) = delete;
+	URSQL_DEFAULT_MOVE_CTOR(Row);
+	URSQL_DISABLE_COPY_ASSIGN(Row);
 
 	void serialize(BufferWriter& aWriter) const override;
 	void deserialize(BufferReader& aReader) override;

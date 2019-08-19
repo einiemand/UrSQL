@@ -61,14 +61,12 @@ bool Entity::attributeExistsByName(const std::string& aName) const {
 }
 
 const Attribute& Entity::getAttributeByName(const std::string& aName) const {
-	if (attributeExistsByName(aName)) {
-		return *std::find_if(m_attributes.cbegin(), m_attributes.cend(),
-			[&aName](const auto& anAttribute)->bool {
-				return anAttribute.getName() == aName;
-			}
-		);
-	}
-	throw std::runtime_error("Check if attribute exists before getting it!");
+	URSQL_TRUTH(attributeExistsByName(aName), "Check if attribute exists before getting it!");
+	return *std::find_if(m_attributes.cbegin(), m_attributes.cend(),
+		[&aName](const auto& anAttribute)->bool {
+			return anAttribute.getName() == aName;
+		}
+	);
 }
 
 Entity::int_t Entity::getNextAutoincr() {
@@ -77,17 +75,13 @@ Entity::int_t Entity::getNextAutoincr() {
 }
 
 void Entity::addRowPosition(blocknum_t aBlocknum) {
-	if (_blocknumExists(aBlocknum)) {
-		throw std::runtime_error("Impossible: attempting to add a new row position that's ALREADY recorded");
-	}
+	URSQL_TRUTH(!_blocknumExists(aBlocknum), "Attempting to add a new row position that's ALREADY recorded");
 	m_rowPos.push_back(aBlocknum);
 	makeDirty(true);
 }
 
 void Entity::dropRowPosition(blocknum_t aBlocknum) {
-	if (!_blocknumExists(aBlocknum)) {
-		throw std::runtime_error("Impossible: attempting to drop a row position that's NOT recorded");
-	}
+	URSQL_TRUTH(_blocknumExists(aBlocknum), "Attempting to drop a row position that's NOT recorded");
 	m_rowPos.erase(m_rowPos.cbegin() + _indexOfBlocknum(aBlocknum));
 	makeDirty(true);
 }
@@ -104,7 +98,7 @@ StatusResult Entity::generateNewRow(Row& aRow, const StringList& aFieldNames, co
 				aRow.addField(theFieldName, std::move(theValue));
 			}
 		}
-		else{
+		else {
 			theResult.setError(Error::unknown_attribute, '\'' + theFieldName + '\'');
 		}
 	}
@@ -124,14 +118,12 @@ StatusResult Entity::generateNewRow(Row& aRow, const StringList& aFieldNames, co
 		const auto& theAttribute = *iter;
 		const std::string& theAttributeName = iter->getName();
 		if (!aRow.fieldExists(theAttributeName)) {
+			URSQL_TRUTH(theAttribute.isAutoIncr() || theAttribute.isNullable(), "The attribute must be auto_increment or nullable!");
 			if (theAttribute.isAutoIncr()) {
 				aRow.addField(theAttributeName, Value(getNextAutoincr()));
 			}
 			else if (theAttribute.isNullable()) {
 				aRow.addField(theAttributeName, theAttribute.getDefaultValue());
-			}
-			else {
-				throw std::runtime_error("Impossible: the attribute must be auto_increment or nullable!");
 			}
 		}
 	}
@@ -143,10 +135,8 @@ bool Entity::_blocknumExists(blocknum_t aBlocknum) const {
 }
 
 size_type Entity::_indexOfBlocknum(blocknum_t aBlocknum) const {
-	if (_blocknumExists(aBlocknum)) {
-		return std::distance(m_rowPos.cbegin(), std::find(m_rowPos.cbegin(), m_rowPos.cend(), aBlocknum));
-	}
-	throw std::runtime_error("Cannot find block number in Entity's row numbers");
+	URSQL_TRUTH(_blocknumExists(aBlocknum), "Cannot find block number in Entity's row numbers");
+	return std::distance(m_rowPos.cbegin(), std::find(m_rowPos.cbegin(), m_rowPos.cend(), aBlocknum));
 }
 
 }

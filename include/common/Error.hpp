@@ -96,8 +96,6 @@ private:
 	std::string m_msg;
 };
 
-void showMessage(const char* what);
-
 }
 
 #endif /* Error.hpp */

@@ -12,8 +12,7 @@ public:
 	View() = default;
 	virtual ~View() = default;
 
-	View(const View&) = delete;
-	View& operator=(const View&) = delete;
+	URSQL_DISABLE_COPY(View);
 
 	virtual void show() const = 0;
 protected:

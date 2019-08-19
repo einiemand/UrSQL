@@ -17,8 +17,7 @@ public:
 	explicit Tokenizer(std::istream& anInput);
 	~Tokenizer() = default;
 
-	Tokenizer(const Tokenizer&) = delete;
-	Tokenizer& operator=(const Tokenizer&) = delete;
+	URSQL_DISABLE_COPY(Tokenizer);
 
 	inline bool more() const {
 		return m_index < m_tokens.size();

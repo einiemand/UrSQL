@@ -28,9 +28,7 @@ void BlockCache::put(blocknum_t aBlocknum, const Block& aBlock) {
 }
 
 const Block& BlockCache::get(blocknum_t aBlocknum) {
-	if (!contains(aBlocknum)) {
-		throw std::runtime_error("Impossible: getting a block that's not in cache");
-	}
+	URSQL_TRUTH(contains(aBlocknum), "Getting a block that's not in cache");
 	return *(_touch(aBlocknum)->second);
 }
 

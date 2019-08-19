@@ -16,9 +16,7 @@ void MonoStorable::encode(Block& aBlock) const {
 }
 
 void MonoStorable::decode(const Block& aBlock) {
-	if (expectedBlockType() != aBlock.getType()) {
-		throw std::runtime_error("Block type is NOT correct!");
-	}
+	URSQL_TRUTH(expectedBlockType() != aBlock.getType(), "Block type is NOT correct!");
 	BufferReader theReader(aBlock.getData(), defaultBlockSize);
 	deserialize(theReader);
 }

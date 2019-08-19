@@ -14,18 +14,15 @@ public:
 	BufferWriter(char* aBuf, size_type aSize);
 	~BufferWriter() = default;
 
-	BufferWriter(const BufferWriter&) = delete;
-	BufferWriter& operator=(const BufferWriter&) = delete;
+	URSQL_DISABLE_COPY(BufferWriter);
 
 	template<typename T, typename = std::enable_if_t< std::is_arithmetic_v<T> > >
 	BufferWriter& operator<<(const T aNum) {
 		static constexpr size_type theTypeSize = sizeof(T);
-		if (m_pos + theTypeSize < m_size) {
-			memcpy(m_buf + m_pos, &aNum, theTypeSize);
-			m_pos += theTypeSize;
-			return *this;
-		}
-		throw std::out_of_range("BufferWriter out of range");
+		URSQL_TRUTH(m_pos + theTypeSize < m_size, "BufferWriter out of range");
+		memcpy(m_buf + m_pos, &aNum, theTypeSize);
+		m_pos += theTypeSize;
+		return *this;
 	}
 
 	BufferWriter& operator<<(const std::string& aString);
@@ -42,18 +39,15 @@ public:
 	BufferReader(const char* aBuf, size_type aSize);
 	~BufferReader() = default;
 
-	BufferReader(const BufferReader&) = delete;
-	BufferReader& operator=(const BufferReader&) = delete;
+	URSQL_DISABLE_COPY(BufferReader);
 
 	template<typename T, typename = std::enable_if_t< std::is_arithmetic_v<T> >>
 	BufferReader& operator>>(T& aNum) {
 		static constexpr size_type theTypeSize = sizeof(T);
-		if (m_pos + theTypeSize < m_size) {
-			memcpy(&aNum, m_buf + m_pos, theTypeSize);
-			m_pos += theTypeSize;
-			return *this;
-		}
-		throw std::out_of_range("BufferReader out of range");
+		URSQL_TRUTH(m_pos + theTypeSize < m_size, "BufferReader out of range");
+		memcpy(&aNum, m_buf + m_pos, theTypeSize);
+		m_pos += theTypeSize;
+		return *this;
 	}
 
 	BufferReader& operator>>(std::string& aString);

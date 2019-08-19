@@ -12,8 +12,7 @@ class Statement {
 public:
 	Statement(Tokenizer& aTokenizer);
 
-	Statement(const Statement&) = delete;
-	Statement& operator=(const Statement&) = delete;
+	URSQL_DISABLE_COPY(Statement);
 
 	StatusResult run();
 

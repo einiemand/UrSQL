@@ -55,7 +55,7 @@ StatusResult BasicStatement::execute() const {
 		break;
 	}
 	default:
-		throw std::runtime_error("Impossible: A BasicStatement shouldn't have been run");
+		URSQL_TRUTH(false, "A BasicStatement shouldn't have been run");
 	}
 	return theResult;
 }

@@ -21,10 +21,8 @@ bool isValidComparator(const std::string& aString) {
 }
 
 Comparator string2Comparator(const std::string& aString) {
-	if (isValidComparator(aString)) {
-		return compMap.at(aString);
-	}
-	throw std::runtime_error("Check if a string is a comparator first!");
+	URSQL_TRUTH(isValidComparator(aString), "Check if a string is a comparator first!");
+	return compMap.at(aString);
 }
 
 void reverseComparator(Comparator& aComparator) {
@@ -84,27 +82,23 @@ StatusResult Expression::validate(const Entity& anEntity) const {
 }
 
 bool Expression::match(const Row& aRow) const {
-	if (aRow.fieldExists(m_fieldName)) {
-		const Value& theValue = aRow.getField(m_fieldName);
-		switch (m_comparator) {
-		case Comparator::e_op:
-			return (theValue == m_value);
-		case Comparator::ne_op:
-			return (theValue != m_value);
-		case Comparator::lt_op:
-			return (theValue < m_value);
-		case Comparator::le_op:
-			return (theValue <= m_value);
-		case Comparator::gt_op:
-			return (theValue > m_value);
-		case Comparator::ge_op:
-			return (theValue >= m_value);
-		default:
-			throw std::runtime_error("Impossible: unknown comparator");
-		}
-	}
-	else {
-		throw std::runtime_error("Impossible: m_fieldName doesn't exist in entity");
+	URSQL_TRUTH(aRow.fieldExists(m_fieldName), '\'' + m_fieldName + "' doesn't exist in entity");
+	const Value& theValue = aRow.getField(m_fieldName);
+	switch (m_comparator) {
+	case Comparator::e_op:
+		return (theValue == m_value);
+	case Comparator::ne_op:
+		return (theValue != m_value);
+	case Comparator::lt_op:
+		return (theValue < m_value);
+	case Comparator::le_op:
+		return (theValue <= m_value);
+	case Comparator::gt_op:
+		return (theValue > m_value);
+	case Comparator::ge_op:
+		return (theValue >= m_value);
+	default:
+		URSQL_TRUTH(false, "Unknown comparator");
 	}
 }
 
@@ -159,9 +153,7 @@ StatusResult Filter::validate(const Entity& anEntity) const {
 }
 
 bool Filter::match(const Row& aRow) const {
-	if (m_expressions.empty()) {
-		throw std::runtime_error("Impossible: calling Filter::match() but no filter is parsed!");
-	}
+	URSQL_TRUTH(!m_expressions.empty(), "Calling Filter::match() but no filter is parsed!");
 	bool matched = m_expressions.front().match(aRow);
 	for (size_type i = 0; i < m_relations.size(); ++i) {
 		if (m_relations[i] == ExpRelation::AND) {

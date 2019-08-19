@@ -13,8 +13,7 @@ public:
 	Order();
 	~Order() = default;
 
-	Order(const Order&) = delete;
-	Order& operator=(const Order&) = delete;
+	URSQL_DISABLE_COPY(Order);
 
 	StatusResult validate(const Entity& anEntity) const;
 

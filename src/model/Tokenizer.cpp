@@ -64,10 +64,8 @@ inline bool isSeparator(char aChar) {
 }
 
 const Token& Tokenizer::peek(size_type anOffset) {
-	if (remaining() > anOffset) {
-		return m_tokens[m_index + anOffset];
-	}
-	throw std::out_of_range("Check if there are more tokens before peeking!");
+	URSQL_TRUTH(remaining() > anOffset, "Check if there are more tokens before peeking!");
+	return m_tokens[m_index + anOffset];
 }
 
 const Token& Tokenizer::get() {

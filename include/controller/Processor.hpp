@@ -18,8 +18,7 @@ public:
 	Processor() = default;
 	~Processor() = default;
 
-	Processor(const Processor&) = delete;
-	Processor& operator=(const Processor&) noexcept = delete;
+	URSQL_DISABLE_COPY(Processor);
 
 	void consume(std::istream& anInput, CommandConsumer aConsumer);
 	bool consumeOne(const std::string& aCommandString);

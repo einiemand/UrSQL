@@ -35,23 +35,17 @@ BlockType Row::expectedBlockType() const {
 }
 
 const Value& Row::getField(const std::string& aFieldName) const {
-	if (fieldExists(aFieldName)) {
-		return m_data.at(aFieldName);
-	}
-	throw std::runtime_error("Impossible: " + aFieldName + " doesn't exist in a row!");
+	URSQL_TRUTH(fieldExists(aFieldName), '\'' + aFieldName + "' doesn't exist in a row!");
+	return m_data.at(aFieldName);
 }
 
 void Row::addField(std::string aFieldName, Value aValue) {
-	if (m_data.count(aFieldName)) {
-		throw std::runtime_error("Impossible: a row has fields of the same name");
-	}
+	URSQL_TRUTH(!m_data.count(aFieldName), "A row has fields of the same name");
 	m_data.insert({ std::move(aFieldName),std::move(aValue) });
 }
 
 void Row::updateField(std::string aFieldName, Value aValue) {
-	if (!m_data.count(aFieldName)) {
-		throw std::runtime_error("Impossible: trying to update a field that doesn't exist");
-	}
+	URSQL_TRUTH(m_data.count(aFieldName), "Trying to update a field that doesn't exist");
 	m_data[std::move(aFieldName)] = std::move(aValue);
 }
 

@@ -17,8 +17,7 @@ public:
 	{
 	}
 
-	Interpreter(const Interpreter&) = delete;
-	Interpreter& operator=(const Interpreter&) = delete;
+	URSQL_DISABLE_COPY(Interpreter);
 
 	virtual std::unique_ptr<Statement> getStatement(Tokenizer& aTokenizer) = 0;
 	virtual ~Interpreter() = default;

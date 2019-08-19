@@ -14,8 +14,7 @@ public:
 	TimeCounter() : m_start(Clock::now()) {}
 	~TimeCounter() { _show_time_elapsed(); }
 
-	TimeCounter(const TimeCounter&) = delete;
-	TimeCounter& operator=(const TimeCounter&) = delete;
+	URSQL_DISABLE_COPY(TimeCounter);
 private:
 	std::chrono::time_point<Clock> m_start;
 

@@ -186,9 +186,7 @@ void View::printHorizontalLine(const std::vector<size_type>& aWidths) {
 }
 
 void View::printLine(const StringList& aStrings, const std::vector<size_type>& aWidths) {
-	if (aStrings.size() != aWidths.size()) {
-		throw std::runtime_error("StringList size should be equal to aWidths size!");
-	}
+	URSQL_TRUTH(aStrings.size() == aWidths.size(), "StringList size should be equal to aWidths size!");
 	defaultOutput << View::verticalEdge;
 	for (size_type i = 0; i < aStrings.size(); ++i) {
 		defaultOutput << ' ' << std::setw(aWidths[i])  << std::left << aStrings[i] << ' ' << View::verticalEdge;

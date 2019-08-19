@@ -13,8 +13,7 @@ public:
 	FolderReader(std::string aPath);
 	~FolderReader() = default;
 
-	FolderReader(const FolderReader&) = delete;
-	FolderReader& operator=(const FolderReader&) = delete;
+	URSQL_DISABLE_COPY(FolderReader);
 
 	StatusResult eachFile(FileVisitor aVisitor) const;
 private:

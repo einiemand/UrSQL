@@ -52,8 +52,4 @@ void StatusResult::showError() const {
 	defaultOutput << m_msg;
 }
 
-void showMessage(const char* what) {
-	defaultOutput << what << '\n';
-}
-
 }

@@ -25,8 +25,7 @@ public:
 	BlockCache(size_type aCapacity = BlockCache::capacity);
 	~BlockCache() = default;
 
-	BlockCache(const BlockCache&) = delete;
-	BlockCache& operator=(const BlockCache&) = delete;
+	URSQL_DISABLE_COPY(BlockCache);
 
 	bool contains(blocknum_t aBlocknum);
 	void put(blocknum_t aBlocknum, const Block& aBlock);

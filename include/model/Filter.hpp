@@ -28,8 +28,8 @@ public:
 	Expression();
 	~Expression() = default;
 
-	Expression(Expression&&) noexcept = default;
-	Expression& operator=(const Expression&) = delete;
+	URSQL_DEFAULT_MOVE_CTOR(Expression);
+	URSQL_DISABLE_COPY_ASSIGN(Expression);
 
 	StatusResult parse(Tokenizer& aTokenizer);
 	StatusResult validate(const Entity& anEntity) const;

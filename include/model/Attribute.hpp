@@ -11,8 +11,8 @@ public:
 	Attribute();
 	~Attribute() = default;
 
-	Attribute(const Attribute&) = default;
-	Attribute& operator=(const Attribute&) = delete;
+	URSQL_DEFAULT_COPY_CTOR(Attribute);
+	URSQL_DISABLE_COPY_ASSIGN(Attribute);
 
 	void serialize(BufferWriter& aWriter) const override;
 	void deserialize(BufferReader& aReader) override;

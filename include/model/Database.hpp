@@ -23,8 +23,7 @@ public:
 	Database(const std::string& aFileName, OpenExistingFile, StatusResult& aResult);
 	~Database();
 
-	Database(const Database&) = delete;
-	Database& operator=(const Database&) = delete;
+	URSQL_DISABLE_COPY(Database);
 
 	StatusResult createTable(const AttributeList& anAttributeList, const std::string& anEntityName);
 	StatusResult dropTable(const std::string& anEntityName, size_type& aRowCount);

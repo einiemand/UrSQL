@@ -246,9 +246,7 @@ Entity* Database::getEntityByName(const std::string& anEntityName, StatusResult&
 }
 
 void Database::_addEntityToCache(const std::string& anEntityName, std::unique_ptr<Entity>&& anEntity) {
-	if (_entityCached(anEntityName)) {
-		throw std::runtime_error(anEntityName + " already cached");
-	}
+	URSQL_TRUTH(!_entityCached(anEntityName), '\'' + anEntityName + "' already cached");
 	m_entityCache.insert({ anEntityName,std::move(anEntity) });
 }
 
@@ -268,18 +266,16 @@ void Database::_saveEntites() {
 }
 
 StatusResult Database::_dropEntity(const std::string& anEntityName) {
-	if (_entityExists(anEntityName)) {
-		blocknum_t theBlocknum = m_toc.getEntityPosByName(anEntityName);
-		StatusResult theResult = m_storage.releaseBlock(theBlocknum);
-		if (theResult) {
-			if (_entityCached(anEntityName)) {
-				m_entityCache.erase(anEntityName);
-			}
-			m_toc.drop(anEntityName);
+	URSQL_TRUTH(_entityExists(anEntityName), "Trying to drop an entity that doesn't exist!");
+	blocknum_t theBlocknum = m_toc.getEntityPosByName(anEntityName);
+	StatusResult theResult = m_storage.releaseBlock(theBlocknum);
+	if (theResult) {
+		if (_entityCached(anEntityName)) {
+			m_entityCache.erase(anEntityName);
 		}
-		return theResult;
+		m_toc.drop(anEntityName);
 	}
-	throw std::runtime_error("Impossible: Trying to drop an entity that doesn't exist!");
+	return theResult;
 }
 
 } /* UrSQL */

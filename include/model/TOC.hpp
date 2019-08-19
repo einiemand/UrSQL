@@ -12,8 +12,7 @@ public:
 	TOC();
 	~TOC() = default;
 
-	TOC(const TOC&) = delete;
-	TOC& operator=(const TOC&) = delete;
+	URSQL_DISABLE_COPY(TOC);
 
 	BlockType expectedBlockType() const override;
 	void serialize(BufferWriter& aWriter) const override;

@@ -16,8 +16,7 @@ public:
 	Entity(blocknum_t aBlocknum);
 	~Entity() override = default;
 
-	Entity(const Entity&) = delete;
-	Entity& operator=(const Entity&) = delete;
+	URSQL_DISABLE_COPY(Entity);
 
 	BlockType expectedBlockType() const override;
 	void serialize(BufferWriter& aWriter) const override;

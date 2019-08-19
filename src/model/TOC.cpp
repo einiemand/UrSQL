@@ -40,24 +40,18 @@ void TOC::deserialize(BufferReader& aReader) {
 }
 
 blocknum_t TOC::getEntityPosByName(const std::string& anEntityName) const {
-	if (entityExists(anEntityName)) {
-		return m_entityMap.at(anEntityName);
-	}
-	throw std::runtime_error("Check if entity exists before getting its block number!");
+	URSQL_TRUTH(entityExists(anEntityName), "Check if entity exists before getting its block number!");
+	return m_entityMap.at(anEntityName);
 }
 
 void TOC::add(const std::string& anEntityName, blocknum_t aBlocknum) {
-	if (entityExists(anEntityName)) {
-		throw std::runtime_error("Check if entity exists before adding it to TOC!");
-	}
+	URSQL_TRUTH(!entityExists(anEntityName), "Check if entity exists before adding it to TOC!");
 	m_entityMap.insert({ anEntityName,aBlocknum });
 	makeDirty(true);
 }
 
 void TOC::drop(const std::string& anEntityName) {
-	if (!entityExists(anEntityName)) {
-		throw std::runtime_error("Check if entity exists before dropping it from TOC!");
-	}
+	URSQL_TRUTH(entityExists(anEntityName), "Check if entity exists before dropping it from TOC!");
 	m_entityMap.erase(anEntityName);
 	makeDirty(true);
 }

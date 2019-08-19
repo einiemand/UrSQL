@@ -13,12 +13,10 @@ BufferWriter::BufferWriter(char* aBuf, size_type aSize) :
 BufferWriter& BufferWriter::operator<<(const std::string& aString) {
 	size_type theLength = aString.length();
 	(*this) << theLength;
-	if (m_pos + theLength < m_size) {
-		memcpy(m_buf + m_pos, aString.data(), theLength);
-		m_pos += theLength;
-		return *this;
-	}
-	throw std::out_of_range("BufferWriter out of range");
+	URSQL_TRUTH(m_pos + theLength < m_size, "BufferWriter out of range");
+	memcpy(m_buf + m_pos, aString.data(), theLength);
+	m_pos += theLength;
+	return *this;
 }
 
 BufferWriter& BufferWriter::operator<<(const Storable& aStorable) {
@@ -36,12 +34,10 @@ BufferReader::BufferReader(const char* aBuf, size_type aSize) :
 BufferReader& BufferReader::operator>>(std::string& aString) {
 	size_type theLength;
 	(*this) >> theLength;
-	if (m_pos + theLength < m_size) {
-		aString.assign(m_buf + m_pos, theLength);
-		m_pos += theLength;
-		return *this;
-	}
-	throw std::out_of_range("BufferReader out of range");
+	URSQL_TRUTH(m_pos + theLength < m_size, "BufferReader out of range");
+	aString.assign(m_buf + m_pos, theLength);
+	m_pos += theLength;
+	return *this;
 }
 
 BufferReader& BufferReader::operator>>(Storable& aStorable) {
