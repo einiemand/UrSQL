@@ -58,7 +58,7 @@ public:
 		return val_type;
 	}
 
-	size_type size() const override {
+	constexpr size_type size() const override {
 		return sizeof(T);
 	}
 
@@ -324,7 +324,8 @@ void Value::deserialize(BufferReader& aReader) {
 	std::string theString;
 	aReader >> theString;
 	Value theValue(std::move(theString));
-	URSQL_TRUTH(theValue.become(static_cast<ValueType>(theChar)), "Value parse error");
+	StatusResult theResult = theValue.become(static_cast<ValueType>(theChar));
+	URSQL_TRUTH(theResult, "Value parse error");
 	swap(theValue);
 }
 
