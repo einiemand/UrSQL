@@ -128,3 +128,115 @@ An example file is located in `example` folder. Run it by
 $ cd bin
 $ ./ursql ../example/ursql_example.sql
 ```
+On my machine (gcc 7.4.0, Ubuntu 18.04 LTS amd64), the results are
+```
+einiemand@einiemand-hs:~/Repos/UrSQL/bin$ ./ursql ../example/ursql_example.sql
+
+ursql> create database ursqldb;
+Query OK, database 'ursqldb' created (0.00 sec)
+
+ursql> use ursqldb;
+Database changed (0.00 sec)
+
+ursql> create table userinfo (id integer primary key auto_increment, name varchar not null, age int not null, address varchar);
+Query ok, table 'userinfo' created (0.00 sec)
+
+ursql> show tables;
++-------------------+
+| Tables_in_ursqldb |
++-------------------+
+| userinfo          |
++-------------------+
+1 row(s) in set (0.00 sec)
+
+ursql> desc table userinfo;
++---------+---------+------+-----+---------+-------+
+| Field   | Type    | Null | Key | Default | Extra |
++---------+---------+------+-----+---------+-------+
+| id      | int     | NO   | PRI | NULL    |       |
+| name    | varchar | NO   |     | NULL    |       |
+| age     | int     | NO   |     | NULL    |       |
+| address | varchar | YES  |     | NULL    |       |
++---------+---------+------+-----+---------+-------+
+4 row(s) in set (0.00 sec)
+
+ursql> insert into userinfo (name, age, address) values ('user1', 24, "mirage"), ("another_user", 18, 'inferno');
+Query ok, 2 row(s) inserted (0.00 sec)
+
+ursql> select * from userinfo order by id;
++----+--------------+-----+---------+
+| id | name         | age | address |
++----+--------------+-----+---------+
+| 0  | user1        | 24  | mirage  |
+| 1  | another_user | 18  | inferno |
++----+--------------+-----+---------+
+Query ok, 2 row(s) affected (0.00 sec)
+
+ursql> select name, address, age from userinfo where age = 18 and address == 'inferno';
++--------------+---------+-----+
+| name         | address | age |
++--------------+---------+-----+
+| another_user | inferno | 18  |
++--------------+---------+-----+
+Query ok, 1 row(s) affected (0.00 sec)
+
+ursql> delete from userinfo where id = 1;
+Query ok, 1 row(s) affected (0.00 sec)
+
+ursql> select * from userinfo;
++----+-------+-----+---------+
+| id | name  | age | address |
++----+-------+-----+---------+
+| 0  | user1 | 24  | mirage  |
++----+-------+-----+---------+
+Query ok, 1 row(s) affected (0.00 sec)
+
+ursql> insert into userinfo (name, age) values ('Lanaya', 55), ("Mirana", 66), ("Kunkka", 22), ("Kalashnikov", 100);
+Query ok, 4 row(s) inserted (0.00 sec)
+
+ursql> select * from userinfo;
++----+-------------+-----+---------+
+| id | name        | age | address |
++----+-------------+-----+---------+
+| 0  | user1       | 24  | mirage  |
+| 2  | Lanaya      | 55  | NULL    |
+| 3  | Mirana      | 66  | NULL    |
+| 4  | Kunkka      | 22  | NULL    |
+| 5  | Kalashnikov | 100 | NULL    |
++----+-------------+-----+---------+
+Query ok, 5 row(s) affected (0.00 sec)
+
+ursql> select name from userinfo where 30 < age order by name;
++-------------+
+| name        |
++-------------+
+| Kalashnikov |
+| Lanaya      |
+| Mirana      |
++-------------+
+Query ok, 3 row(s) affected (0.00 sec)
+
+ursql> update userinfo set age = 80 where age > 80;
+Query ok, 1 row(s) affected (0.00 sec)
+
+ursql> select * from userinfo;
++----+-------------+-----+---------+
+| id | name        | age | address |
++----+-------------+-----+---------+
+| 0  | user1       | 24  | mirage  |
+| 2  | Lanaya      | 55  | NULL    |
+| 3  | Mirana      | 66  | NULL    |
+| 4  | Kunkka      | 22  | NULL    |
+| 5  | Kalashnikov | 80  | NULL    |
++----+-------------+-----+---------+
+Query ok, 5 row(s) affected (0.00 sec)
+
+ursql> drop table userinfo;
+Query ok, 5 row(s) affected (0.00 sec)
+
+ursql> drop database ursqldb;
+Query OK, database 'ursqldb' dropped (0.00 sec)
+
+ursql> quit;
+Bye (0.00 sec)
+```

@@ -62,11 +62,19 @@ set(URSQL_SOURCE
 
 set(URSQL_MAIN ${CMAKE_SOURCE_DIR}/src/main.cpp)
 include_directories(${CMAKE_SOURCE_DIR}/include)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
+
+if(NOT CMAKE_BUILD_TYPE)
+	set(CMAKE_BUILD_TYPE Release)
+endif()
+
+set(CMAKE_CXX_FLAGS "-g -Wall -Wextra -pedantic")
+if(CMAKE_BUILD_TYPE STREQUAL "Release")
+	string(APPEND CMAKE_CXX_FLAGS " -O3")
+endif()
+message(STATUS "Flags: ${CMAKE_CXX_FLAGS}")
 
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_BUILD_TYPE Release)
-set(CMAKE_CXX_FLAGS "-Wall -Wextra -pedantic -O3")
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 
 add_library(ursqlmvc ${URSQL_HEADER} ${URSQL_SOURCE})
 
