@@ -99,6 +99,7 @@ bool Expression::match(const Row& aRow) const {
 		return (theValue >= m_value);
 	default:
 		URSQL_TRUTH(false, "Unknown comparator");
+		return false;
 	}
 }
 
