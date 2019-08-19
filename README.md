@@ -7,10 +7,10 @@ UrSQL is a Relational DataBase Management System(RDBMS) written in C++ and suppo
         * cmake
         * MinGW 64-bit
     * Option 2
-        * Visual Studio 2017 15.7 (MSVC 19.14) or higher
-* Ubuntu Linux 16.04 LTS or higher
+        * Visual Studio 2017 15.7 (MSVC 19.14) or later
+* Ubuntu Linux 16.04 LTS or later
     * cmake
-    * gcc 7 or higher
+    * gcc 7.0 or later
 
 Note: not tested on other platforms
 ### Build
