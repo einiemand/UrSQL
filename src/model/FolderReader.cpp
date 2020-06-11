@@ -55,7 +55,7 @@ private:
 	HANDLE m_fileHandle;
 	WIN32_FIND_DATAA m_fileData;
 };
-#define DirEntIterator WindowsDirEntIterator
+using DirEntIterator = WindowsDirEntIterator;
 #elif defined(__linux__) || defined(__APPLE__)
 class UnixDirEntIterator {
 public:
@@ -105,7 +105,7 @@ private:
     DIR* m_dir;
     struct dirent* m_ent;
 };
-#define DirEntIterator UnixDirEntIterator
+using DirEntIterator = UnixDirEntIterator;
 #endif
 
 FolderReader::FolderReader(std::string aPath) :
