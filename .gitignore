@@ -385,3 +385,4 @@ MigrationBackup/
 build
 tmp
 .idea
+cmake-build-debug
