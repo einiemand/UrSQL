@@ -58,7 +58,7 @@ public:
 		return val_type;
 	}
 
-	constexpr size_type size() const override {
+	size_type size() const override {
 		return sizeof(T);
 	}
 
