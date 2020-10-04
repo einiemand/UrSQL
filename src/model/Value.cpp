@@ -37,6 +37,21 @@ struct val_type_traits<null_t> {
 	static constexpr ValueType val_type = ValueType::null_type;
 };
 
+class ValueBase {
+public:
+    virtual ValueType type() const = 0;
+    virtual size_type size() const = 0;
+    virtual std::unique_ptr<ValueBase> copyAndConvert(ValueType aType) const = 0;
+    virtual size_type hash() const = 0;
+    virtual std::string stringify() const = 0;
+    virtual std::ostream& dump(std::ostream& anOutput) const = 0;
+
+    virtual bool less(const ValueBase& rhs) const = 0;
+    virtual bool equal(const ValueBase& rhs) const = 0;
+
+    virtual ~ValueBase() = default;
+};
+
 template<typename T>
 class ValueImpl : public ValueBase {
 public:
@@ -304,6 +319,8 @@ Value::Value(Value&& rhs) noexcept :
 {
 }
 
+Value::~Value() noexcept = default;
+
 Value& Value::operator=(const Value& rhs) {
 	Value(rhs).swap(*this);
 	return *this;
@@ -344,6 +361,10 @@ StatusResult Value::become(ValueType aType) {
 
 size_type Value::hash() const {
 	return m_base->hash();
+}
+
+std::string Value::stringify() const {
+    return m_base->stringify();
 }
 
 bool operator<(const Value& lhs, const Value& rhs) {

@@ -15,20 +15,7 @@ enum class ValueType : char {
 	null_type
 };
 
-class ValueBase {
-public:
-	virtual ValueType type() const = 0;
-	virtual size_type size() const = 0;
-	virtual std::unique_ptr<ValueBase> copyAndConvert(ValueType aType) const = 0;
-	virtual size_type hash() const = 0;
-	virtual std::string stringify() const = 0;
-	virtual std::ostream& dump(std::ostream& anOutput) const = 0;
-
-	virtual bool less(const ValueBase& rhs) const = 0;
-	virtual bool equal(const ValueBase& rhs) const = 0;
-
-	virtual ~ValueBase() = default;
-};
+class ValueBase;
 
 class Value : public Storable {
 public:
@@ -43,7 +30,7 @@ public:
 	Value(float_t aFloat);
 	Value(bool_t aBool);
 	Value(varchar_t aString);
-	~Value() override = default;
+	~Value() override;
 
 	Value(const Value& rhs);
 	Value(Value&& rhs) noexcept;
@@ -66,9 +53,7 @@ public:
 		return getType() == ValueType::null_type;
 	}
 
-	inline std::string stringify() const {
-		return m_base->stringify();
-	}
+	std::string stringify() const;
 
 	friend bool operator<(const Value& lhs, const Value& rhs);
 	friend bool operator==(const Value& lhs, const Value& rhs);
