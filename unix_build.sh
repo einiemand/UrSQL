@@ -7,5 +7,5 @@ fi
 echo "Creating build folder"
 mkdir build
 cd build || { echo "Unable to create build folder, aborting..."; exit 1; }
-cmake ..
+cmake -DCMAKE_BUILD_TYPE=Debug ..
 make -j8
