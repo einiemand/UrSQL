@@ -12,7 +12,7 @@ class Order;
 
 class SQLInterpreter : public Interpreter {
 public:
-	SQLInterpreter(Interpreter* next);
+	explicit SQLInterpreter(Interpreter* next);
 	~SQLInterpreter() override = default;
 
 	std::unique_ptr<Statement> getStatement(Tokenizer& aTokenizer) override;
@@ -26,9 +26,6 @@ public:
 	StatusResult selectFromTable(const std::string& anEntityName, StringList& aFieldNames, const Filter* aFilter, const Order* anOrder) const;
 	StatusResult deleteFromTable(const std::string& anEntityName, const Filter* aFilter) const;
 	StatusResult updateTable(const std::string& anEntityName, const Row::DataMap& aFieldValues, const Filter* aFilter) const;
-
-private:
-
 };
 
 }

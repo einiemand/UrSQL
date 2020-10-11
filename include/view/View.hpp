@@ -28,7 +28,7 @@ protected:
 /* -------------------------------ShowDatabasesView------------------------------- */
 class ShowDatabasesView : public View {
 public:
-	ShowDatabasesView(const StringList& aDBNames);
+	explicit ShowDatabasesView(const StringList& aDBNames);
 	~ShowDatabasesView() override = default;
 
 	void show() const override;
@@ -41,7 +41,7 @@ enum class BlockType : char;
 
 class DescDatabaseView : public View {
 public:
-	DescDatabaseView(const std::vector<BlockType>& theTypes);
+    explicit DescDatabaseView(const std::vector<BlockType>& theTypes);
 	~DescDatabaseView() override = default;
 
 	void show() const override;
@@ -54,7 +54,7 @@ class Entity;
 
 class DescTableView : public View {
 public:
-	DescTableView(const Entity& anEntity);
+    explicit DescTableView(const Entity& anEntity);
 	~DescTableView() override = default;
 
 	void show() const override;

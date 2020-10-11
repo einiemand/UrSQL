@@ -10,7 +10,7 @@ public:
 	using EntityMap = std::unordered_map<std::string, blocknum_t>;
 
 	TOC();
-	~TOC() = default;
+	~TOC() override = default;
 
 	URSQL_DISABLE_COPY(TOC);
 

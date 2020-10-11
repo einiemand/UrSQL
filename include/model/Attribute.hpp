@@ -9,7 +9,7 @@ namespace UrSQL {
 class Attribute : public Storable {
 public:
 	Attribute();
-	~Attribute() = default;
+	~Attribute() override = default;
 
 	URSQL_DEFAULT_COPY_CTOR(Attribute);
 	URSQL_DISABLE_COPY_ASSIGN(Attribute);

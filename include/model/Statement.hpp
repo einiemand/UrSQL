@@ -10,7 +10,8 @@ class Tokenizer;
 
 class Statement {
 public:
-	Statement(Tokenizer& aTokenizer);
+	explicit Statement(Tokenizer& aTokenizer);
+	virtual ~Statement() = default;
 
 	URSQL_DISABLE_COPY(Statement);
 
@@ -19,7 +20,6 @@ public:
 	virtual StatusResult parse() = 0;
 	virtual StatusResult validate() const = 0;
 	virtual StatusResult execute() const = 0;
-	virtual ~Statement() = default;
 protected:
 	Tokenizer& m_tokenizer;
 };
@@ -27,7 +27,7 @@ protected:
 class BasicStatement : public Statement {
 public:
 	BasicStatement(Tokenizer& aTokenizer, Keyword aKeyword);
-	~BasicStatement() = default;
+	~BasicStatement() override = default;
 
 	StatusResult parse() override;
 	StatusResult validate() const override;

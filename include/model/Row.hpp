@@ -11,7 +11,7 @@ class Row : public MonoStorable {
 public:
 	using DataMap = std::unordered_map<std::string, Value>;
 
-	Row(blocknum_t aBlocknum);
+	explicit Row(blocknum_t aBlocknum);
 	~Row() override = default;
 
 	URSQL_DEFAULT_MOVE_CTOR(Row);

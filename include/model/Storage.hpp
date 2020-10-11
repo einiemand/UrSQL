@@ -22,7 +22,7 @@ public:
 	using UseSequence = std::list< std::pair<blocknum_t, std::unique_ptr<Block>> >;
  	using CacheMap = std::unordered_map<blocknum_t, UseSequence::iterator>;
 
-	BlockCache(size_type aCapacity = BlockCache::capacity);
+	explicit BlockCache(size_type aCapacity = BlockCache::capacity);
 	~BlockCache() = default;
 
 	URSQL_DISABLE_COPY(BlockCache);

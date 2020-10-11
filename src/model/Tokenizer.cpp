@@ -142,7 +142,7 @@ StatusResult Tokenizer::tokenize() {
 std::string Tokenizer::_readWhile(TokenizeCondition aCondition) {
 	std::string theData;
 	for (char theChar = m_input.peek(); theChar != -1 && aCondition(theChar); theChar = m_input.peek()) {
-		theData += m_input.get();
+		theData += static_cast<char>(m_input.get());
 	}
 	return theData;
 }
@@ -150,7 +150,7 @@ std::string Tokenizer::_readWhile(TokenizeCondition aCondition) {
 std::string Tokenizer::_readUntil(TokenizeCondition aCondition) {
 	std::string theData;
 	for (char theChar = m_input.peek(); theChar != -1 && !aCondition(theChar); theChar = m_input.peek()) {
-		theData += m_input.get();
+		theData += static_cast<char>(m_input.get());
 	}
 	return theData;
 }

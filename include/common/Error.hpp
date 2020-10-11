@@ -69,7 +69,7 @@ extern std::ostream& defaultOutput;
 class StatusResult {
 public:
 
-	StatusResult(Error aCode, std::string aMsg = "");
+	explicit StatusResult(Error aCode, std::string aMsg = "");
 	~StatusResult() = default;
 
 	StatusResult(StatusResult&& rhs) noexcept;

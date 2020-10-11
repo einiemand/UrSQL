@@ -12,7 +12,7 @@ class Database;
 
 class Interpreter {
 public:
-	Interpreter(Interpreter* anInterpreter) :
+	explicit Interpreter(Interpreter* anInterpreter) :
 		m_next(anInterpreter)
 	{
 	}

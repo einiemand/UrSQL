@@ -319,7 +319,7 @@ Value::Value(Value&& rhs) noexcept :
 {
 }
 
-Value::~Value() noexcept = default;
+Value::~Value() = default;
 
 Value& Value::operator=(const Value& rhs) {
 	Value(rhs).swap(*this);

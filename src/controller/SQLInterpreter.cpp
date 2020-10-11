@@ -17,13 +17,9 @@ std::unique_ptr<Statement> SQLInterpreter::getStatement(Tokenizer& aTokenizer) {
 	Keyword theKeyword = aTokenizer.peek().getKeyword();
 
 	switch (theKeyword) {
-	case Keyword::create_kw: {
-		if (aTokenizer.remaining() > 1 && aTokenizer.peek(1).getKeyword() == Keyword::table_kw) {
-			return SQLStatement::factory(aTokenizer, *this);
-		}
-		break;
-	}
+	case Keyword::create_kw:
 	case Keyword::describe_kw:
+    case Keyword::drop_kw:
 	case Keyword::desc_kw: {
 		if (aTokenizer.remaining() > 1 && aTokenizer.peek(1).getKeyword() == Keyword::table_kw) {
 			return SQLStatement::factory(aTokenizer, *this);
@@ -31,15 +27,8 @@ std::unique_ptr<Statement> SQLInterpreter::getStatement(Tokenizer& aTokenizer) {
 		break;
 	}
 	case Keyword::insert_kw:
-		return SQLStatement::factory(aTokenizer, *this);
 	case Keyword::select_kw:
 		return SQLStatement::factory(aTokenizer, *this);
-	case Keyword::drop_kw: {
-		if (aTokenizer.remaining() > 1 && aTokenizer.peek(1).getKeyword() == Keyword::table_kw) {
-			return SQLStatement::factory(aTokenizer, *this);
-		}
-		break;
-	}
 	case Keyword::show_kw: {
 		if (aTokenizer.remaining() > 1 && aTokenizer.peek(1).getKeyword() == Keyword::tables_kw) {
 			return SQLStatement::factory(aTokenizer, *this);
@@ -47,7 +36,6 @@ std::unique_ptr<Statement> SQLInterpreter::getStatement(Tokenizer& aTokenizer) {
 		break;
 	}
 	case Keyword::delete_kw:
-		return SQLStatement::factory(aTokenizer, *this);
 	case Keyword::update_kw:
 		return SQLStatement::factory(aTokenizer, *this);
 	default:

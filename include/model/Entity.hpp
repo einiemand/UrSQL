@@ -13,7 +13,7 @@ public:
 	using BlocknumList = std::vector<blocknum_t>;
 	using int_t = Value::int_t;
 
-	Entity(blocknum_t aBlocknum);
+	explicit Entity(blocknum_t aBlocknum);
 	~Entity() override = default;
 
 	URSQL_DISABLE_COPY(Entity);

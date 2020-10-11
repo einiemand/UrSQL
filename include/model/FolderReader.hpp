@@ -10,7 +10,7 @@ class FolderReader {
 public:
 	using FileVisitor = std::function<bool(const std::string&)>;
 
-	FolderReader(std::string aPath);
+	explicit FolderReader(std::string aPath);
 	~FolderReader() = default;
 
 	URSQL_DISABLE_COPY(FolderReader);

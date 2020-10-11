@@ -12,16 +12,16 @@ class BufferReader;
 class Storable {
 public:
 	Storable() = default;
+	virtual ~Storable() = default;
 
 	virtual void serialize(BufferWriter& aWriter) const = 0;
 	virtual void deserialize(BufferReader& aReader) = 0;
-	virtual ~Storable() = default;
 };
 
 
 class MonoStorable : public Storable {
 public:
-	MonoStorable(blocknum_t aBlocknum);
+	explicit MonoStorable(blocknum_t aBlocknum);
 	~MonoStorable() override = default;
 
 	virtual BlockType expectedBlockType() const = 0;

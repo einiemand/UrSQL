@@ -385,7 +385,7 @@ private:
 	StatusResult _parseOneRow() {
 		StatusResult theResult(Error::no_error);
 		if (m_tokenizer.skipIf(TokenType::lparen)) {
-			m_valueStrs.push_back({});
+			m_valueStrs.emplace_back();
 			if (theResult = parseSequence(m_tokenizer, m_valueStrs.back(),
 				[](const Token& aToken) { return aToken.isValue(); })) {
 				if (m_tokenizer.skipIf(TokenType::rparen)) {

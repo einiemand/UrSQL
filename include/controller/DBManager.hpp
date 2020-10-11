@@ -10,15 +10,15 @@ class Database;
 
 class DBManager : public Interpreter {
 public:
-	DBManager(Interpreter* anInterpreter = nullptr);
-	~DBManager() = default;
+	explicit DBManager(Interpreter* anInterpreter = nullptr);
+	~DBManager() override = default;
 
 	std::unique_ptr<Statement> getStatement(Tokenizer& aTokenizer) override;
 
 	StatusResult createDatabase(const std::string& aName);
 	StatusResult dropDatabase(const std::string& aName);
 	StatusResult useDatabase(const std::string& aName);
-	StatusResult showDatabases();
+	static StatusResult showDatabases();
 	StatusResult describeDatabase(const std::string& aName);
 
 	Database* getActiveDatabase() const override;

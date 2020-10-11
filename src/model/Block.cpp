@@ -24,8 +24,10 @@ Block::Block(const Block& rhs) noexcept :
 }
 
 Block& Block::operator=(const Block& rhs) noexcept {
-	m_type = rhs.m_type;
-	memcpy(m_Data, rhs.m_Data, defaultPayloadSize);
+    if (this != &rhs) {
+        m_type = rhs.m_type;
+        memcpy(m_Data, rhs.m_Data, defaultPayloadSize);
+    }
 	return *this;
 }
 

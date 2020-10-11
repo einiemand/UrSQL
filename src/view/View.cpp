@@ -93,7 +93,7 @@ void DescTableView::show() const {
 		std::string theNullString = (theAttribute.isNullable() ? "YES" : "NO");
 		std::string theKeyString = (theAttribute.isPrimary() ? "PRI" : "");
 		std::string theDefaultValueString = theAttribute.getDefaultValue().stringify();
-		std::string theExtraString = "";
+		std::string theExtraString;
 		theEntityDisplay.emplace_back(StringList{ theAttribute.getName(),theTypeString,theNullString,theKeyString,theDefaultValueString,theExtraString });
 	}
 	std::vector<size_type> theWidths;
