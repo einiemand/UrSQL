@@ -1,6 +1,5 @@
 #pragma once
-#ifndef ORDER_HPP
-#define ORDER_HPP
+
 #include "common/Error.hpp"
 #include <string>
 
@@ -33,5 +32,3 @@ private:
 };
 
 } /* UrSQL */
-
-#endif /* Order.hpp */

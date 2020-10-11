@@ -1,5 +1,5 @@
-#ifndef ERROR_HPP
-#define ERROR_HPP
+#pragma once
+
 #include "common/Util.hpp"
 #include <iostream>
 
@@ -97,5 +97,3 @@ private:
 };
 
 }
-
-#endif /* Error.hpp */

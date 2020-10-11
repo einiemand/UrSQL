@@ -1,6 +1,5 @@
 #pragma once
-#ifndef VALUE_HPP
-#define VALUE_HPP
+
 #include "Storable.hpp"
 #include "Keyword.hpp"
 #include <memory>
@@ -83,5 +82,3 @@ inline bool operator>=(const Value& lhs, const Value& rhs) {
 }
 
 }
-
-#endif /* VALUE_HPP */

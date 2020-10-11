@@ -1,6 +1,5 @@
 #pragma once
-#ifndef STORABLE_HPP
-#define STORABLE_HPP
+
 #include "common/Error.hpp"
 #include "Block.hpp"
 
@@ -42,4 +41,3 @@ protected:
 };
 
 }
-#endif /* Storable.hpp */

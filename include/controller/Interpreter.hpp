@@ -1,6 +1,5 @@
 #pragma once
-#ifndef INTERPRETER_HPP
-#define INTERPRETER_HPP
+
 #include "common/Error.hpp"
 #include "model/Statement.hpp"
 #include <memory>
@@ -39,5 +38,3 @@ protected:
 };
 
 }
-
-#endif

@@ -1,6 +1,5 @@
 #pragma once
-#ifndef STORAGE_HPP
-#define STORAGE_HPP
+
 #include "common/Error.hpp"
 #include <fstream>
 #include <functional>
@@ -127,5 +126,3 @@ private:
 };
 
 }
-
-#endif /* Storage.hpp */

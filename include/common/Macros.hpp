@@ -1,6 +1,4 @@
 #pragma once
-#ifndef MACROS_HPP
-#define MACROS_HPP
 
 #include <cstdlib>
 
@@ -73,5 +71,3 @@
 #define URSQL_TRUTH(TRUTH, MESSAGE) ((void)0)
 
 #endif
-
-#endif /* Macros.hpp */

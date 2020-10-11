@@ -1,6 +1,4 @@
 #pragma once
-#ifndef PROCESSOR_HPP
-#define PROCESSOR_HPP
 
 #include <istream>
 #include <list>
@@ -36,5 +34,3 @@ private:
 };
 
 } /* namespace UrSQL */
-
-#endif /* Processor.hpp */

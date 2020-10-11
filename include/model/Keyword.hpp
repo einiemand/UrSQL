@@ -1,6 +1,5 @@
 #pragma once
-#ifndef KEYWORD_HPP
-#define KEYWORD_HPP
+
 #include <unordered_map>
 
 namespace UrSQL {
@@ -22,4 +21,3 @@ bool isKeyword(const std::string& aWord);
 Keyword toKeyword(const std::string& aWord);
 
 }
-#endif /* Keyword.hpp */

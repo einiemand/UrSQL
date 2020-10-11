@@ -1,6 +1,5 @@
 #pragma once
-#ifndef FILTER_HPP
-#define FILTER_HPP
+
 #include "Value.hpp"
 
 namespace UrSQL {
@@ -69,5 +68,3 @@ private:
 };
 
 } /* UrSQL */
-
-#endif /* Filter.hpp */

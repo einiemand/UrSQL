@@ -1,6 +1,5 @@
 #pragma once
-#ifndef ROW_HPP
-#define ROW_HPP
+
 #include "Value.hpp"
 #include <unordered_map>
 #include <functional>
@@ -65,5 +64,3 @@ private:
 };
 
 } /* UrSQL */
-
-#endif /* Row.hpp */

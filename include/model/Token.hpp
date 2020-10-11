@@ -1,6 +1,5 @@
 #pragma once
-#ifndef TOKEN_HPP
-#define TOKEN_HPP
+
 #include <string>
 #include "Keyword.hpp"
 #include "common/Macros.hpp"
@@ -45,5 +44,3 @@ private:
 };
 
 } /* UrSQL */
-
-#endif /* Token.hpp */

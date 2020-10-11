@@ -1,6 +1,5 @@
 #pragma once
-#ifndef BLOCK_HPP
-#define BLOCK_HPP
+
 #include "common/Util.hpp"
 #include <unordered_map>
 
@@ -51,5 +50,3 @@ private:
 static_assert(sizeof(Block) == defaultBlockSize, "Block size is not equal to defaultBlockSize. Fix it!");
 
 }
-
-#endif

@@ -1,6 +1,5 @@
 #pragma once
-#ifndef STATEMENT_HPP
-#define STATEMENT_HPP
+
 #include "common/Error.hpp"
 #include "Keyword.hpp"
 
@@ -37,5 +36,3 @@ private:
 };
 
 }
-
-#endif /* Statement.hpp */

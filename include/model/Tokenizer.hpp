@@ -1,6 +1,5 @@
 #pragma once
-#ifndef TOKENIZER_HPP
-#define TOKENIZER_HPP
+
 #include "Token.hpp"
 #include "common/Error.hpp"
 #include <istream>
@@ -56,5 +55,3 @@ private:
 };
 
 } /* UrSQL */
-
-#endif /* Tokenizer.hpp */

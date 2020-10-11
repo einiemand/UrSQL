@@ -1,6 +1,5 @@
 #pragma once
-#ifndef BUFFERSTREAM_HPP
-#define BUFFERSTREAM_HPP
+
 #include "common/Error.hpp"
 #include <type_traits>
 #include <cstring>
@@ -60,4 +59,3 @@ private:
 };
 
 }
-#endif

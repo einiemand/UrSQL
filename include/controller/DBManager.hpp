@@ -1,6 +1,5 @@
 #pragma once
-#ifndef DBMANAGER_HPP
-#define DBMANAGER_HPP
+
 #include "Interpreter.hpp"
 
 namespace UrSQL {
@@ -36,5 +35,3 @@ private:
 };
 
 }
-
-#endif /* DBManager.hpp */

@@ -1,6 +1,5 @@
 #pragma once
-#ifndef FOLDERREADER_HPP
-#define FOLDERREADER_HPP
+
 #include "common/Error.hpp"
 #include <functional>
 
@@ -21,6 +20,3 @@ private:
 };
 
 }
-
-
-#endif /* FOLDERREADER_HPP */

@@ -1,6 +1,4 @@
 #pragma once
-#ifndef UTIL_HPP
-#define UTIL_HPP
 
 #include <cstdint>
 #include <vector>
@@ -29,5 +27,3 @@ using blocknum_t = size_trait<sizeof(void*)>::int_t;
 using StringList = std::vector<std::string>;
 
 }
-
-#endif

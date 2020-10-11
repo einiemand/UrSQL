@@ -1,6 +1,5 @@
 #pragma once
-#ifndef TABLE_HPP
-#define TABLE_HPP
+
 #include "Attribute.hpp"
 #include <algorithm>
 
@@ -59,5 +58,3 @@ private:
 };
 
 }
-
-#endif

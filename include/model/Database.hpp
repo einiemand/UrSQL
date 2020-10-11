@@ -1,6 +1,5 @@
 #pragma once
-#ifndef DATABASE_HPP
-#define DATABASE_HPP
+
 #include "Storage.hpp"
 #include "TOC.hpp"
 #include "Entity.hpp"
@@ -70,5 +69,3 @@ private:
 };
 
 }
-
-#endif /* Database.hpp */

@@ -1,6 +1,5 @@
 #pragma once
-#ifndef ATTRIBUTE_HPP
-#define ATTRIBUTE_HPP
+
 #include "Storable.hpp"
 #include "Value.hpp"
 
@@ -77,5 +76,3 @@ private:
 using AttributeList = std::vector<Attribute>;
 
 } /* UrSQL */
-
-#endif

@@ -1,6 +1,5 @@
 #pragma once
-#ifndef TOC_HPP
-#define TOC_HPP
+
 #include "Storable.hpp"
 
 namespace UrSQL {
@@ -43,5 +42,3 @@ private:
 };
 
 }
-
-#endif

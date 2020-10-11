@@ -1,6 +1,5 @@
 #pragma once
-#ifndef SQLINTERPRETER_HPP
-#define SQLINTERPRETER_HPP
+
 #include "Interpreter.hpp"
 #include "model/Attribute.hpp"
 #include "model/Row.hpp"
@@ -29,5 +28,3 @@ public:
 };
 
 }
-
-#endif

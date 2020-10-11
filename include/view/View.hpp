@@ -1,6 +1,5 @@
 #pragma once
-#ifndef VIEW_HPP
-#define VIEW_HPP
+
 #include "common/Error.hpp"
 
 namespace UrSQL {
@@ -89,5 +88,3 @@ private:
 };
 
 }
-
-#endif
