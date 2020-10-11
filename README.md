@@ -18,26 +18,21 @@ Clone this repo
 ```
 $ git clone https://github.com/einiemand/UrSQL.git
 ```
-* Windows
-
-    * If you have `Visual Studio` installed, simply opening the `.sln` file should be enough. Or you can create project files with cmake.
-    * If you are building with `MinGW`, make sure to specify the compiler with
+#### Windows
+* If you have `Visual Studio` installed, simply opening the `.sln` file should be enough. Or you can create project files with cmake.
+* If you are building with `MinGW`, make sure to specify the compiler with
 ```
 $ cmake -G "MinGW Makefiles" path/to/root
 ```
-* Linux
+#### Linux
+* Simply run the shell script
 ```
-$ mkdir build && cd build
-$ cmake ..
-$ make
-$ cd ../bin && ./ursql
+$ ./unix_build.sh
 ```
+* It will run `cmake` and `make`. The executable will be put in `<UrSQL>/bin`.  
+* Note: The build type is Release and `-O3` is used by default in `CMakeLists.txt`. If you use the script to build, the build type will be Debug. It will show error messages in terminal if something wrong happens before UrSQL crashes.
 
-Note: The build type is Release and `-O3` is used by default. To switch to Debug and help me find bugs, you might want to do
-```
-$ cmake -DCMAKE_BUILD_TYPE=Debug ..
-```
-It will show error messages in terminal before crashing.
+
 ## Use
 UrSQL can be run in 2 ways
 * If no additional command-line argument is given, you will enter interactive mode and commands must be typed in command prompt.
