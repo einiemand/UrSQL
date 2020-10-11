@@ -593,7 +593,7 @@ public:
         : SQLStatement(aTokenizer, anInterpreter),
           m_filter(nullptr) {}
 
-    ~DeleteStatement() = default;
+    ~DeleteStatement() override = default;
 
     StatusResult parse() override {
         StatusResult theResult(Error::no_error);
@@ -639,7 +639,7 @@ public:
 
     ~UpdateStatement() override = default;
 
-    StatusResult parse() {
+    StatusResult parse() override {
         m_tokenizer.next();
         StatusResult theResult = _parseTableName();
         if (m_tokenizer.skipIf(Keyword::set_kw)) {
@@ -654,13 +654,13 @@ public:
         return theResult;
     }
 
-    StatusResult validate() const {
+    StatusResult validate() const override {
         return !m_tokenizer.more() ?
                  StatusResult(Error::no_error) :
                  StatusResult(Error::syntax_error, "Redundant input");
     }
 
-    StatusResult execute() const {
+    StatusResult execute() const override {
         return m_interpreter.updateTable(m_entityName, m_fieldMap,
                                          m_filter.get());
     }
