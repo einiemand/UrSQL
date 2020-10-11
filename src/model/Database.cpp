@@ -20,7 +20,7 @@ Database::Database(const std::string& aFileName, OpenExistingFile, StatusResult&
 
 Database::~Database() {
 	_saveTOC();
-	_saveEntites();
+	_saveEntities();
 }
 
 StatusResult Database::createTable(const AttributeList& anAttributeList, const std::string& anEntityName) {
@@ -256,7 +256,7 @@ void Database::_saveTOC() {
 	}
 }
 
-void Database::_saveEntites() {
+void Database::_saveEntities() {
 	for (const auto& theNameAndEntity : m_entityCache) {
 		Entity* theEntity = theNameAndEntity.second.get();
 		if (theEntity->isDirty()) {

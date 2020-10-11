@@ -63,7 +63,7 @@ private:
 	void _addEntityToCache(const std::string& anEntityName, std::unique_ptr<Entity>&& anEntity);
 
 	void _saveTOC();
-	void _saveEntites();
+	void _saveEntities();
 
 	StatusResult _dropEntity(const std::string& anEntityName);
 
