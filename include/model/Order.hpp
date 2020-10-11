@@ -1,7 +1,8 @@
 #pragma once
 
-#include "common/Error.hpp"
 #include <string>
+
+#include "common/Error.hpp"
 
 namespace UrSQL {
 
@@ -9,26 +10,27 @@ class Entity;
 
 class Order {
 public:
-	Order();
-	~Order() = default;
+    Order();
+    ~Order() = default;
 
-	URSQL_DISABLE_COPY(Order);
+    URSQL_DISABLE_COPY(Order);
 
-	StatusResult validate(const Entity& anEntity) const;
+    StatusResult validate(const Entity& anEntity) const;
 
-	void setFieldName(std::string aFieldName);
-	void setDesc(bool aDesc);
+    void setFieldName(std::string aFieldName);
+    void setDesc(bool aDesc);
 
-	inline const std::string& getFieldName() const {
-		return m_fieldName;
-	}
+    inline const std::string& getFieldName() const {
+        return m_fieldName;
+    }
 
-	inline bool isDesc() const {
-		return m_desc;
-	}
+    inline bool isDesc() const {
+        return m_desc;
+    }
+
 private:
-	std::string m_fieldName;
-	bool m_desc;
+    std::string m_fieldName;
+    bool m_desc;
 };
 
-} /* UrSQL */
+}  // namespace UrSQL

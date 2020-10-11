@@ -1,7 +1,8 @@
 #pragma once
 
-#include "Statement.hpp"
 #include <memory>
+
+#include "Statement.hpp"
 
 namespace UrSQL {
 
@@ -9,15 +10,17 @@ class SQLInterpreter;
 
 class SQLStatement : public Statement {
 public:
-	SQLStatement(Tokenizer& aTokenizer, SQLInterpreter& anInterpreter);
-	~SQLStatement() override = default;
+    SQLStatement(Tokenizer& aTokenizer, SQLInterpreter& anInterpreter);
+    ~SQLStatement() override = default;
 
-	static std::unique_ptr<SQLStatement> factory(Tokenizer& aTokenizer, SQLInterpreter& anInterpreter);
+    static std::unique_ptr<SQLStatement> factory(Tokenizer& aTokenizer,
+                                                 SQLInterpreter& anInterpreter);
+
 protected:
-	SQLInterpreter& m_interpreter;
-	std::string m_entityName;
+    SQLInterpreter& m_interpreter;
+    std::string m_entityName;
 
-	StatusResult _parseTableName();
+    StatusResult _parseTableName();
 };
 
-}
+}  // namespace UrSQL

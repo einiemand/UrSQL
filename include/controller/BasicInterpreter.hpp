@@ -6,10 +6,10 @@ namespace UrSQL {
 
 class BasicInterpreter : public Interpreter {
 public:
-	explicit BasicInterpreter(Interpreter* anInterpreter = nullptr);
-	~BasicInterpreter() override = default;
+    explicit BasicInterpreter(Interpreter* anInterpreter = nullptr);
+    ~BasicInterpreter() override = default;
 
-	std::unique_ptr<Statement> getStatement(Tokenizer& aTokenizer) override;
+    std::unique_ptr<Statement> getStatement(Tokenizer& aTokenizer) override;
 };
 
-}
+}  // namespace UrSQL
