@@ -14,8 +14,8 @@ enum class BlockType : char {
     free_type = 'F'
 };
 
-constexpr size_type defaultBlockSize = 1024;
-constexpr size_type defaultPayloadSize = defaultBlockSize - sizeof(BlockType);
+inline constexpr size_type defaultBlockSize = 1024;
+inline constexpr size_type defaultPayloadSize = defaultBlockSize - sizeof(BlockType);
 
 class MonoStorable;
 
