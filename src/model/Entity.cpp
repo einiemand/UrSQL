@@ -98,7 +98,8 @@ StatusResult Entity::generateNewRow(Row& aRow, const StringList& aFieldNames,
             if (theResult = theValue.become(theAttribute.getType())) {
                 aRow.addField(theFieldName, std::move(theValue));
             }
-        } else {
+        }
+        else {
             theResult.setError(Error::unknown_attribute,
                                '\'' + theFieldName + '\'');
         }
@@ -131,7 +132,8 @@ StatusResult Entity::generateNewRow(Row& aRow, const StringList& aFieldNames,
                         "The attribute must be auto_increment or nullable!");
             if (theAttribute.isAutoIncr()) {
                 aRow.addField(theAttributeName, Value(getNextAutoincr()));
-            } else if (theAttribute.isNullable()) {
+            }
+            else if (theAttribute.isNullable()) {
                 aRow.addField(theAttributeName, theAttribute.getDefaultValue());
             }
         }

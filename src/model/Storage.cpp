@@ -21,7 +21,8 @@ bool BlockCache::contains(blocknum_t aBlocknum) {
 void BlockCache::put(blocknum_t aBlocknum, const Block& aBlock) {
     if (contains(aBlocknum)) {
         _touch(aBlocknum)->second = std::make_unique<Block>(aBlock);
-    } else {
+    }
+    else {
         _add(aBlocknum, aBlock);
     }
 }
@@ -147,12 +148,12 @@ StatusResult Storage::readBlock(Block& aBlock, blocknum_t aBlocknum) {
                                  Storage::getDBFilePath(m_fileName) + '\'');
         }
 #ifdef ENABLE_BLOCKCACHE
-        else
-        {
+        else {
             m_blockCache.put(aBlocknum, aBlock);
         }
 #endif
-    } else {
+    }
+    else {
         theResult.setError(Error::seek_error, "fstream offset error: " +
                                                 std::to_string(aBlocknum));
     }
@@ -169,12 +170,12 @@ StatusResult Storage::writeBlock(const Block& aBlock, blocknum_t aBlocknum) {
                                  Storage::getDBFilePath(m_fileName) + '\'');
         }
 #ifdef ENABLE_BLOCKCACHE
-        else
-        {
+        else {
             m_blockCache.put(aBlocknum, aBlock);
         }
 #endif
-    } else {
+    }
+    else {
         theResult.setError(Error::seek_error, "fstream offset error: " +
                                                 std::to_string(aBlocknum));
     }

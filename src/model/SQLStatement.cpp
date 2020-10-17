@@ -23,11 +23,13 @@ StatusResult SQLStatement::_parseTableName() {
         const Token& theNameToken = m_tokenizer.get();
         if (theNameToken.getType() == TokenType::identifier) {
             m_entityName = theNameToken.getData();
-        } else {
+        }
+        else {
             theResult.setError(Error::identifier_expected,
                                "Table name is not an identifier");
         }
-    } else {
+    }
+    else {
         theResult.setError(Error::identifier_expected, "Table name missing");
     }
     return theResult;
@@ -45,13 +47,15 @@ StatusResult parseSequence(Tokenizer& aTokenizer, StringList& aContainer,
             const Token& theToken = aTokenizer.get();
             if (aFilter(theToken)) {
                 aContainer.emplace_back(theToken.getData());
-            } else {
+            }
+            else {
                 theResult.setError(
                   Error::syntax_error,
                   "Invalid input '" + theToken.getData() + '\'');
             }
         } while (theResult && aTokenizer.skipIf(TokenType::comma));
-    } else {
+    }
+    else {
         theResult.setError(Error::syntax_error, "Input not enough");
     }
     return theResult;
@@ -85,19 +89,22 @@ public:
                     if (theResult = _parseAttributeList()) {
                         if (m_tokenizer.skipIf(TokenType::rparen)) {
                             // success
-                        } else {
+                        }
+                        else {
                             theResult.setError(
                               Error::syntax_error,
                               "Use ')' to terminate attribute list");
                         }
                     }
-                } else {
+                }
+                else {
                     theResult.setError(
                       Error::syntax_error,
                       "'(' missing after table name '" + m_entityName + '\'');
                 }
             }
-        } else {
+        }
+        else {
             theResult.setError(Error::identifier_expected,
                                "Table name unspecified");
         }
@@ -108,7 +115,8 @@ public:
         StatusResult theResult(Error::no_error);
         if (!m_tokenizer.more()) {
             theResult = _validateAttributes();
-        } else {
+        }
+        else {
             theResult.setError(Error::invalid_command,
                                "Redundant input after ')'");
         }
@@ -130,11 +138,13 @@ private:
             const Token& theNameToken = m_tokenizer.get();
             if (theNameToken.getType() == TokenType::identifier) {
                 anAttribute.setName(theNameToken.getData());
-            } else {
+            }
+            else {
                 theResult.setError(Error::identifier_expected,
                                    "Attribute name is not an identifier");
             }
-        } else {
+        }
+        else {
             theResult.setError(Error::identifier_expected,
                                "Attribute name missing");
         }
@@ -148,12 +158,14 @@ private:
             Keyword theKeyword = theTypeToken.getKeyword();
             if (Value::keywordIsValueType(theKeyword)) {
                 anAttribute.setType(Value::keyword2ValueType(theKeyword));
-            } else {
+            }
+            else {
                 theResult.setError(
                   Error::syntax_error,
                   "Unknown value type '" + theTypeToken.getData() + '\'');
             }
-        } else {
+        }
+        else {
             theResult.setError(Error::syntax_error, "Attribute type missing");
         }
         return theResult;
@@ -175,7 +187,8 @@ private:
                 if (m_tokenizer.skipIf(Keyword::key_kw)) {
                     anAttribute.setPrimary(true);
                     anAttribute.setNullable(false);
-                } else {
+                }
+                else {
                     theResult.setError(Error::syntax_error,
                                        "Expect 'key' after 'primary'");
                 }
@@ -184,7 +197,8 @@ private:
             case Keyword::not_kw: {
                 if (m_tokenizer.skipIf(Keyword::null_kw)) {
                     anAttribute.setNullable(false);
-                } else {
+                }
+                else {
                     theResult.setError(Error::syntax_error,
                                        "Expect 'null' after 'not'");
                 }
@@ -240,16 +254,19 @@ private:
                 if (theResult) {
                     anAttribute.setDefaultValue(std::move(theValue));
                 }
-            } else if (theType == TokenType::keyword &&
-                       theValueToken.getKeyword() == Keyword::null_kw)
+            }
+            else if (theType == TokenType::keyword &&
+                     theValueToken.getKeyword() == Keyword::null_kw)
             {
                 anAttribute.setDefaultValue(Value{});
-            } else {
+            }
+            else {
                 theResult.setError(
                   Error::syntax_error,
                   "Invalid default value '" + theValueToken.getData() + '\'');
             }
-        } else {
+        }
+        else {
             theResult.setError(Error::syntax_error,
                                "Default value unspecified");
         }
@@ -288,12 +305,14 @@ public:
             const Token& theNameToken = m_tokenizer.get();
             if (theNameToken.getType() == TokenType::identifier) {
                 m_entityName = theNameToken.getData();
-            } else {
+            }
+            else {
                 theResult.setError(
                   Error::unexpected_identifier,
                   "'" + theNameToken.getData() + "' is not a valid table name");
             }
-        } else {
+        }
+        else {
             theResult.setError(Error::identifier_expected,
                                "Table name unspecified");
         }
@@ -328,13 +347,15 @@ public:
                 if (theResult = _parseFieldNames()) {
                     if (m_tokenizer.skipIf(Keyword::values_kw)) {
                         theResult = _parseMultipleRows();
-                    } else {
+                    }
+                    else {
                         theResult.setError(Error::syntax_error,
                                            "'values' missing");
                     }
                 }
             }
-        } else {
+        }
+        else {
             theResult.setError(Error::keyword_expected, "'into'");
         }
         return theResult;
@@ -350,12 +371,14 @@ public:
                             }))
             {
                 theResult = _validateFieldNames();
-            } else {
+            }
+            else {
                 theResult.setError(
                   Error::keyValue_mismatch,
                   "The number of fields is not equal to the number of values");
             }
-        } else {
+        }
+        else {
             theResult.setError(Error::syntax_error,
                                "Redundant input after ')'");
         }
@@ -381,11 +404,13 @@ private:
             if (theResult) {
                 if (m_tokenizer.skipIf(TokenType::rparen)) {
                     // success
-                } else {
+                }
+                else {
                     theResult.setError(Error::syntax_error, "')' missing");
                 }
             }
-        } else {
+        }
+        else {
             theResult.setError(
               Error::syntax_error,
               "'(' missing after table name '" + m_entityName + "'");
@@ -412,11 +437,13 @@ private:
             {
                 if (m_tokenizer.skipIf(TokenType::rparen)) {
                     //  success
-                } else {
+                }
+                else {
                     theResult.setError(Error::syntax_error, "')' missing");
                 }
             }
-        } else {
+        }
+        else {
             theResult.setError(Error::syntax_error,
                                "'(' missing after 'values' or ','");
         }
@@ -465,11 +492,13 @@ public:
                     if (theResult && m_tokenizer.skipIf(Keyword::order_kw)) {
                         theResult = _parseOrderBy();
                     }
-                } else {
+                }
+                else {
                     theResult.setError(Error::keyword_expected, "'from'");
                 }
             }
-        } else {
+        }
+        else {
             theResult.setError(Error::identifier_expected,
                                "Specify from which fields");
         }
@@ -508,19 +537,23 @@ private:
                     m_order->setFieldName(theToken.getData());
                     if (m_tokenizer.skipIf(Keyword::desc_kw)) {
                         m_order->setDesc(true);
-                    } else if (m_tokenizer.skipIf(Keyword::asc_kw)) {
+                    }
+                    else if (m_tokenizer.skipIf(Keyword::asc_kw)) {
                         // do nothing
                     }
-                } else {
+                }
+                else {
                     theResult.setError(
                       Error::identifier_expected,
                       '\'' + theToken.getData() + "' is not an identifier");
                 }
-            } else {
+            }
+            else {
                 theResult.setError(Error::identifier_expected,
                                    "Specify the field name to be ordered by");
             }
-        } else {
+        }
+        else {
             theResult.setError(Error::keyword_expected, "'by'");
         }
         return theResult;
@@ -540,7 +573,8 @@ public:
         StatusResult theResult(Error::no_error);
         if (m_tokenizer.next(2)) {
             theResult = _parseTableName();
-        } else {
+        }
+        else {
             theResult.setError(Error::identifier_expected,
                                "Table name unspecified");
         }
@@ -603,11 +637,13 @@ public:
                 if (m_tokenizer.skipIf(Keyword::where_kw)) {
                     m_filter = std::make_unique<Filter>();
                     theResult = m_filter->parse(m_tokenizer);
-                } else {
+                }
+                else {
                     theResult.setError(Error::keyword_expected, "'where'");
                 }
             }
-        } else {
+        }
+        else {
             theResult.setError(Error::keyword_expected, "'from'");
         }
         return theResult;
@@ -648,7 +684,8 @@ public:
                 m_filter = std::make_unique<Filter>();
                 theResult = m_filter->parse(m_tokenizer);
             }
-        } else {
+        }
+        else {
             theResult.setError(Error::keyword_expected, "'set'");
         }
         return theResult;
@@ -691,7 +728,8 @@ private:
                     m_fieldMap.insert(
                       { std::move(theFieldName), std::move(theValue) });
                 }
-            } else {
+            }
+            else {
                 theResult.setError(Error::syntax_error,
                                    "Missing '=' after field name");
             }
@@ -707,15 +745,18 @@ private:
                 const std::string& theFieldName = theFieldToken.getData();
                 if (!m_fieldMap.count(theFieldName)) {
                     aFieldName = theFieldName;
-                } else {
+                }
+                else {
                     theResult.setError(Error::keyValue_mismatch,
                                        '\'' + aFieldName + "' are repeating");
                 }
-            } else {
+            }
+            else {
                 theResult.setError(Error::identifier_expected,
                                    "Which fields are you trying to modify?");
             }
-        } else {
+        }
+        else {
             theResult.setError(Error::syntax_error,
                                "Fields and values missing");
         }
@@ -736,16 +777,19 @@ private:
                                     }))
                     {
                         theResult = aValue.become(ValueType::float_type);
-                    } else {
+                    }
+                    else {
                         theResult = aValue.become(ValueType::int_type);
                     }
                 }
-            } else {
+            }
+            else {
                 theResult.setError(Error::syntax_error,
                                    '\'' + theValueToken.getData() +
                                      "' is neither a string nor a number");
             }
-        } else {
+        }
+        else {
             theResult.setError(Error::value_expected, "What value to assign??");
         }
         return theResult;

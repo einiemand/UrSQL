@@ -55,7 +55,8 @@ StatusResult SQLInterpreter::createTable(
             theResult.setMessage("Query ok, table '" + anEntityName +
                                  "' created");
         }
-    } else {
+    }
+    else {
         theResult.setError(Error::noDatabase_specified,
                            "Specify the database first by 'use <DBName>'");
     }
@@ -74,12 +75,14 @@ StatusResult SQLInterpreter::describeTable(
                 theResult.setMessage(
                   std::to_string(theEntity->getAttributes().size()) +
                   " row(s) in set");
-            } else {
+            }
+            else {
                 theResult.setError(Error::unknown_entity,
                                    "\'" + anEntityName + '\'');
             }
         }
-    } else {
+    }
+    else {
         theResult.setError(Error::noDatabase_specified,
                            "Specify the database first by 'use <DBName>'");
     }
@@ -95,7 +98,8 @@ StatusResult SQLInterpreter::dropTable(const std::string& anEntityName) const {
             theResult.setMessage("Query ok, " + std::to_string(theRowCount) +
                                  " row(s) affected");
         }
-    } else {
+    }
+    else {
         theResult.setError(Error::noDatabase_specified,
                            "Specify the database first by 'use <DBName>'");
     }
@@ -108,12 +112,14 @@ StatusResult SQLInterpreter::showTables() const {
         StringList theEntityNames = theActiveDB->collectEntityNames();
         if (theEntityNames.empty()) {
             theResult.setMessage("empty set");
-        } else {
+        }
+        else {
             ShowTablesView(theActiveDB->getName(), theEntityNames).show();
             theResult.setMessage(std::to_string(theEntityNames.size()) +
                                  " row(s) in set");
         }
-    } else {
+    }
+    else {
         theResult.setError(Error::noDatabase_specified,
                            "Specify the database first by 'use <DBName>'");
     }
@@ -132,7 +138,8 @@ StatusResult SQLInterpreter::insertIntoTable(
                                  std::to_string(aValueStrsOfRows.size()) +
                                  " row(s) inserted");
         }
-    } else {
+    }
+    else {
         theResult.setError(Error::noDatabase_specified,
                            "Specify the database first by 'use <DBName>'");
     }
@@ -151,7 +158,8 @@ StatusResult SQLInterpreter::selectFromTable(const std::string& anEntityName,
         if (theResult) {
             if (theRowCollection.empty()) {
                 theResult.setMessage("empty set");
-            } else {
+            }
+            else {
                 if (anOrder) {
                     theRowCollection.reorder(*anOrder);
                 }
@@ -161,7 +169,8 @@ StatusResult SQLInterpreter::selectFromTable(const std::string& anEntityName,
                                      " row(s) affected");
             }
         }
-    } else {
+    }
+    else {
         theResult.setError(Error::noDatabase_specified,
                            "Specify the database first by 'use <DBName>'");
     }
@@ -173,7 +182,8 @@ StatusResult SQLInterpreter::deleteFromTable(const std::string& anEntityName,
     StatusResult theResult(Error::no_error);
     if (Database* theActiveDB = getActiveDatabase()) {
         theResult = theActiveDB->deleteFromTable(anEntityName, aFilter);
-    } else {
+    }
+    else {
         theResult.setError(Error::noDatabase_specified,
                            "Specify the database first by 'use <DBName>'");
     }
@@ -187,7 +197,8 @@ StatusResult SQLInterpreter::updateTable(const std::string& anEntityName,
     if (Database* theActiveDB = getActiveDatabase()) {
         theResult =
           theActiveDB->updateTable(anEntityName, aFieldValues, aFilter);
-    } else {
+    }
+    else {
         theResult.setError(Error::noDatabase_specified,
                            "Specify the database first by 'use <DBName>'");
     }

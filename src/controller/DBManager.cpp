@@ -87,7 +87,8 @@ StatusResult DBManager::showDatabases() {
         if (!theDBNames.empty()) {
             ShowDatabasesView(theDBNames).show();
             theResult.setMessage("Showing databases");
-        } else {
+        }
+        else {
             theResult.setMessage("empty set");
         }
     }
@@ -100,7 +101,8 @@ StatusResult DBManager::describeDatabase(const std::string& aName) {
     std::unique_ptr<Database> theDBHolder(nullptr);
     if (m_activeDB && m_activeDB->getName() == aName) {
         theDB = m_activeDB.get();
-    } else {
+    }
+    else {
         theDBHolder =
           std::make_unique<Database>(aName, OpenExistingFile{}, theResult);
         theDB = theDBHolder.get();
