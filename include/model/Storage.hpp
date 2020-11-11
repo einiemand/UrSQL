@@ -95,26 +95,8 @@ public:
 
     StatusResult eachBlock(BlockVisitor aVisitor);
 
-    template<typename IterableT>
     StatusResult visitBlocks(BlockVisitor aVisitor,
-                             const IterableT& anIterable) {
-        StatusResult theResult(Error::no_error);
-
-        Block theBlock;
-        for (auto iter = anIterable.cbegin();
-             iter != anIterable.cend() && theResult; ++iter)
-        {
-            blocknum_t theBlocknum = *iter;
-            theResult = readBlock(theBlock, theBlocknum);
-            if (theResult) {
-                theResult = aVisitor(theBlock, theBlocknum);
-                if (theResult.getCode() == Error::block_found) {
-                    return theResult;
-                }
-            }
-        }
-        return theResult;
-    }
+                             const std::vector<blocknum_t>& aBlocknumList);
 
     StatusResult findFreeBlocknumber(blocknum_t& aFreeBlocknum);
 

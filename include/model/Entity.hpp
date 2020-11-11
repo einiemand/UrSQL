@@ -10,7 +10,6 @@ class Row;
 
 class Entity : public MonoStorable {
 public:
-    using BlocknumList = std::vector<blocknum_t>;
     using int_t = Value::int_t;
 
     explicit Entity(blocknum_t aBlocknum);
@@ -43,7 +42,7 @@ public:
 
     void addRowPosition(blocknum_t aBlocknum);
     void dropRowPosition(blocknum_t aBlocknum);
-    inline const BlocknumList& getRowPos() const {
+    inline const std::vector<blocknum_t>& getRowPos() const {
         return m_rowPos;
     }
 
@@ -54,7 +53,7 @@ private:
     bool m_dirty;
     AttributeList m_attributes;
     size_type m_autoincr;
-    BlocknumList m_rowPos;
+    std::vector<blocknum_t> m_rowPos;
 
     bool _blocknumExists(blocknum_t aBlocknum) const;
     size_type _indexOfBlocknum(blocknum_t aBlocknum) const;

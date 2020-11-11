@@ -220,6 +220,23 @@ StatusResult Storage::eachBlock(BlockVisitor aVisitor) {
     return theResult;
 }
 
+StatusResult Storage::visitBlocks(
+  BlockVisitor aVisitor, const std::vector<blocknum_t>& aBlocknumList) {
+    StatusResult theResult(Error::no_error);
+
+    Block theBlock;
+    for (blocknum_t theBlocknum : aBlocknumList) {
+        theResult = readBlock(theBlock, theBlocknum);
+        if (theResult) {
+            theResult = aVisitor(theBlock, theBlocknum);
+            if (theResult.getCode() == Error::block_found) {
+                return theResult;
+            }
+        }
+    }
+    return theResult;
+}
+
 StatusResult Storage::findFreeBlocknumber(blocknum_t& aFreeBlocknum) {
     StatusResult theResult = eachBlock(
       [&aFreeBlocknum](Block& aBlock, blocknum_t aBlocknum) -> StatusResult {

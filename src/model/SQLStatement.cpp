@@ -84,9 +84,11 @@ public:
     StatusResult parse() override {
         StatusResult theResult(Error::no_error);
         if (m_tokenizer.next(2)) {
-            if (theResult = _parseTableName()) {
+            theResult = _parseTableName();
+            if (theResult) {
                 if (m_tokenizer.skipIf(TokenType::lparen)) {
-                    if (theResult = _parseAttributeList()) {
+                    theResult = _parseAttributeList();
+                    if (theResult) {
                         if (m_tokenizer.skipIf(TokenType::rparen)) {
                             // success
                         }
@@ -235,7 +237,8 @@ private:
         StatusResult theResult(Error::no_error);
         do {
             Attribute theAttribute;
-            if (theResult = _parseAttribute(theAttribute)) {
+            theResult = _parseAttribute(theAttribute);
+            if (theResult) {
                 m_attributes.emplace_back(std::move(theAttribute));
             }
         } while (theResult && m_tokenizer.skipIf(TokenType::comma));
@@ -343,8 +346,10 @@ public:
     StatusResult parse() override {
         StatusResult theResult(Error::no_error);
         if (m_tokenizer.next() && m_tokenizer.skipIf(Keyword::into_kw)) {
-            if (theResult = _parseTableName()) {
-                if (theResult = _parseFieldNames()) {
+            theResult = _parseTableName();
+            if (theResult) {
+                theResult = _parseFieldNames();
+                if (theResult) {
                     if (m_tokenizer.skipIf(Keyword::values_kw)) {
                         theResult = _parseMultipleRows();
                     }
@@ -430,11 +435,11 @@ private:
         StatusResult theResult(Error::no_error);
         if (m_tokenizer.skipIf(TokenType::lparen)) {
             m_valueStrs.emplace_back();
-            if (theResult = parseSequence(m_tokenizer, m_valueStrs.back(),
-                                          [](const Token& aToken) {
-                                              return aToken.isValue();
-                                          }))
-            {
+            theResult = parseSequence(m_tokenizer, m_valueStrs.back(),
+                                      [](const Token& aToken) {
+                                          return aToken.isValue();
+                                      });
+            if (theResult) {
                 if (m_tokenizer.skipIf(TokenType::rparen)) {
                     //  success
                 }

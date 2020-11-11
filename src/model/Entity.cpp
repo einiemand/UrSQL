@@ -95,7 +95,8 @@ StatusResult Entity::generateNewRow(Row& aRow, const StringList& aFieldNames,
             const Attribute& theAttribute = getAttributeByName(theFieldName);
             const std::string& theValueStr = aValueStrs[i];
             Value theValue(theValueStr);
-            if (theResult = theValue.become(theAttribute.getType())) {
+            theResult = theValue.become(theAttribute.getType());
+            if (theResult) {
                 aRow.addField(theFieldName, std::move(theValue));
             }
         }

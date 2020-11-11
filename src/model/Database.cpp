@@ -27,7 +27,8 @@ StatusResult Database::createTable(const AttributeList& anAttributeList,
     StatusResult theResult(Error::no_error);
     if (!_entityExists(anEntityName)) {
         blocknum_t theBlocknum;
-        if (theResult = m_storage.findFreeBlocknumber(theBlocknum)) {
+        theResult = m_storage.findFreeBlocknumber(theBlocknum);
+        if (theResult) {
             auto theEntity = std::make_unique<Entity>(theBlocknum);
             for (const auto& theAttribute : anAttributeList) {
                 theEntity->addAttribute(theAttribute);
@@ -78,11 +79,12 @@ StatusResult Database::insertIntoTable(
         {
             const StringList& theRowValueStrs = *iter;
             blocknum_t theBlocknum;
-            if (theResult = m_storage.findFreeBlocknumber(theBlocknum)) {
+            theResult = m_storage.findFreeBlocknumber(theBlocknum);
+            if (theResult) {
                 Row theNewRow(theBlocknum);
-                if (theResult = theEntity->generateNewRow(
-                      theNewRow, aFieldNames, theRowValueStrs))
-                {
+                theResult = theEntity->generateNewRow(theNewRow, aFieldNames,
+                                                      theRowValueStrs);
+                if (theResult) {
                     theResult = m_storage.saveMonoStorable(theNewRow);
                     if (theResult) {
                         theEntity->addRowPosition(theBlocknum);

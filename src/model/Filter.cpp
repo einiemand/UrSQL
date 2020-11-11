@@ -45,7 +45,8 @@ StatusResult Expression::parse(Tokenizer& aTokenizer) {
     StatusResult theResult(Error::no_error);
     if (aTokenizer.remaining() >= 3) {
         const Token& theLHS = aTokenizer.get();
-        if (theResult = _parseComparator(aTokenizer)) {
+        theResult = _parseComparator(aTokenizer);
+        if (theResult) {
             const Token& theRHS = aTokenizer.get();
             if (theLHS.getType() == TokenType::identifier &&
                 (theRHS.getType() == TokenType::number ||
