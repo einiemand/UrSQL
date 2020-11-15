@@ -9,7 +9,7 @@ build_for_compiler () {
   echo "Creating $dir_name directory"
   mkdir $dir_name
   cd $dir_name || { echo "Unable to create $dir_name folder, aborting..."; exit 1; }
-  cmake -DCMAKE_C_COMPILER=$1 -DCMAKE_CXX_COMPILER=$2 -DCMAKE_BUILD_TYPE=Debug ..
+  cmake -DCMAKE_C_COMPILER=$1 -DCMAKE_CXX_COMPILER=$2 -DCMAKE_BUILD_TYPE=Debug -DCMAKE_RUNTIME_OUTPUT_DIRECTORY=$(pwd)/../bin_$1 ..
   make -j8
   cd ..
 }

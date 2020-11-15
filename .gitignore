@@ -382,7 +382,8 @@ healthchecksdb
 MigrationBackup/
 
 # Self-defined
-build*
-tmp
-.idea
-cmake-build-debug
+/build*/
+/bin*/
+tmp/
+.idea/
+cmake-build*/
