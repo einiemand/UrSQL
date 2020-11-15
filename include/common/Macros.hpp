@@ -3,10 +3,8 @@
 #include <cstdlib>
 
 // Platform macros
-#ifdef __linux__
-#define OSPLATFORM_LINUX
-#elif defined(__APPLE__)
-#define OSPLATFORM_MACOS
+#if defined(__unix__)
+#define OSPLATFORM_UNIX
 #elif defined(_WIN32)
 #define OSPLATFORM_WINDOWS
 #else
@@ -14,7 +12,7 @@
 #endif
 
 // Compiler macros
-#ifdef __GNUC__
+#if defined(__GNUC__)
 #define COMPILER_GNUC
 #elif defined(__MINGW64__)
 #define COMPILER_MINGW64
@@ -59,12 +57,33 @@
 
 #ifdef URSQL_DEBUG
 
+#ifdef OSPLATFORM_UNIX
+#include <execinfo.h>
+#define BACKTRACE_MAX_DEPTH (1 << 10)
+#define URSQL_PRINT_BACKTRACE                               \
+    do {                                                    \
+        std::cerr << "Printing backtrace...\n"              \
+                     "=====================\n";             \
+        void* btAddr[BACKTRACE_MAX_DEPTH];                  \
+        int depth = backtrace(btAddr, BACKTRACE_MAX_DEPTH); \
+        char** btNames = backtrace_symbols(btAddr, depth);  \
+        for (int i = 0; i < depth; ++i) {                   \
+            std::cerr << btNames[i] << '\n';                \
+        }                                                   \
+        free(btNames);                                      \
+        std::cerr << "=====================\n";             \
+    } while (false)
+#else
+#define URSQL_PRINT_BACKTRACE ((void)0)
+#endif
+
 #define URSQL_TRUTH(TRUTH, MESSAGE)                                          \
     do {                                                                     \
         if (!(TRUTH)) {                                                      \
             std::cerr << "At line " << __LINE__ << ", in file '" << __FILE__ \
                       << "'\n";                                              \
             std::cerr << "Truth is a lie! " << (MESSAGE) << '\n';            \
+            URSQL_PRINT_BACKTRACE;                                           \
             std::cerr << "Aborting...\n";                                    \
             std::terminate();                                                \
         }                                                                    \
