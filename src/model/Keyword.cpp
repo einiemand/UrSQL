@@ -1,5 +1,7 @@
 #include "model/Keyword.hpp"
 
+#include <unordered_map>
+
 namespace UrSQL {
 
 const std::unordered_map<std::string, Keyword> str2keyword{

@@ -41,8 +41,7 @@ StatusResult Database::createTable(const AttributeList& anAttributeList,
                 }
             }
         }
-    }
-    else {
+    } else {
         theResult.setError(Error::entity_exists, '\'' + anEntityName + '\'');
     }
     return theResult;
@@ -61,8 +60,7 @@ StatusResult Database::dropTable(const std::string& anEntityName,
                 theResult = _dropEntity(anEntityName);
             }
         }
-    }
-    else {
+    } else {
         theResult.setError(Error::unknown_entity, '\'' + anEntityName + '\'');
     }
     return theResult;
@@ -92,8 +90,7 @@ StatusResult Database::insertIntoTable(
                 }
             }
         }
-    }
-    else {
+    } else {
         theResult.setError(Error::unknown_entity, '\'' + anEntityName + '\'');
     }
     return theResult;
@@ -141,8 +138,7 @@ StatusResult Database::selectFromTable(RowCollection& aRowCollection,
                 }
             }
         }
-    }
-    else {
+    } else {
         theResult.setError(Error::unknown_entity, '\'' + anEntityName + '\'');
     }
     return theResult;
@@ -183,8 +179,7 @@ StatusResult Database::deleteFromTable(const std::string& anEntityName,
                 }
             }
         }
-    }
-    else {
+    } else {
         theResult.setError(Error::unknown_entity, '\'' + anEntityName + '\'');
     }
     return theResult;
@@ -207,8 +202,7 @@ StatusResult Database::updateTable(const std::string& anEntityName,
                     theResult.setError(Error::keyValue_mismatch,
                                        '\'' + theAttributeName + '\'');
                 }
-            }
-            else {
+            } else {
                 theResult.setError(Error::unknown_attribute,
                                    '\'' + theAttributeName + '\'');
             }
@@ -246,8 +240,7 @@ StatusResult Database::updateTable(const std::string& anEntityName,
             }
         }
         return theResult;
-    }
-    else {
+    } else {
         theResult.setError(Error::unknown_entity, '\'' + anEntityName + '\'');
     }
     return theResult;

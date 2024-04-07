@@ -25,8 +25,7 @@ int main(int argc, char* argv[]) {
                   defaultOutput << aCommandString << ";\n";
                   return theProcessor.consumeOne(aCommandString);
               });
-        }
-        else {
+        } else {
             defaultOutput << "Cannot open '" << argv[1] << "'\n";
         }
         return 0;

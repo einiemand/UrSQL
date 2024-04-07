@@ -125,7 +125,8 @@ StatusResult FolderReader::eachFile(FileVisitor aVisitor) const {
         if (theDirEntIter) {
             do {
                 if (theDirEntIter.isNotDir() &&
-                    !aVisitor(theDirEntIter.currentFileName())) {
+                    !aVisitor(theDirEntIter.currentFileName()))
+                {
                     break;
                 }
             } while (theDirEntIter.next());

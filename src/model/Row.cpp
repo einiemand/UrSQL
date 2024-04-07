@@ -75,8 +75,7 @@ void RowCollection::reorder(const Order& anOrder) {
                       return lhs->getField(theFieldName) >
                              rhs->getField(theFieldName);
                   });
-    }
-    else {
+    } else {
         std::sort(m_rows.begin(), m_rows.end(),
                   [&theFieldName](const std::unique_ptr<Row>& lhs,
                                   const std::unique_ptr<Row>& rhs) -> bool {

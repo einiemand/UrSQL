@@ -54,23 +54,20 @@ StatusResult Expression::parse(Tokenizer& aTokenizer) {
             {
                 m_fieldName = theLHS.getData();
                 m_value = theRHS.getData();
-            }
-            else if (theRHS.getType() == TokenType::identifier &&
-                     (theLHS.getType() == TokenType::number ||
-                      theLHS.getType() == TokenType::string))
+            } else if (theRHS.getType() == TokenType::identifier &&
+                       (theLHS.getType() == TokenType::number ||
+                        theLHS.getType() == TokenType::string))
             {
                 m_fieldName = theRHS.getData();
                 m_value = theLHS.getData();
                 reverseComparator(m_comparator);
-            }
-            else {
+            } else {
                 theResult.setError(
                   Error::syntax_error,
                   "Operands should be one identifier and one string/number");
             }
         }
-    }
-    else {
+    } else {
         theResult.setError(Error::syntax_error,
                            "Not enough input to parse Expression");
     }
@@ -82,8 +79,7 @@ StatusResult Expression::validate(const Entity& anEntity) const {
     if (anEntity.attributeExistsByName(m_fieldName)) {
         theResult =
           m_value.become(anEntity.getAttributeByName(m_fieldName).getType());
-    }
-    else {
+    } else {
         theResult.setError(Error::unknown_attribute, '\'' + m_fieldName + '\'');
     }
     return theResult;
@@ -117,8 +113,7 @@ StatusResult Expression::_parseComparator(Tokenizer& aTokenizer) {
     const std::string& theCompString = aTokenizer.get().getData();
     if (isValidComparator(theCompString)) {
         m_comparator = string2Comparator(theCompString);
-    }
-    else {
+    } else {
         theResult.setError(Error::invalid_comparator,
                            '\'' + theCompString + '\'');
     }
@@ -147,8 +142,7 @@ StatusResult Filter::parse(Tokenizer& aTokenizer) {
                          return false;
                      }
                  }));
-    }
-    else {
+    } else {
         theResult.setError(Error::syntax_error,
                            "Not enough input to parse Filter");
     }
@@ -175,8 +169,7 @@ bool Filter::match(const Row& aRow) const {
                 continue;
             }
             matched = m_expressions[i + 1].match(aRow);
-        }
-        else {
+        } else {
             if (matched) {
                 return true;
             }

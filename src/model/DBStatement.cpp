@@ -35,8 +35,7 @@ public:
                   Error::unexpected_identifier,
                   "Illegal database name '" + theToken.getData() + '\'');
             }
-        }
-        else {
+        } else {
             theResult.setError(Error::identifier_expected,
                                "Database name expected");
         }
@@ -52,8 +51,7 @@ public:
                 theResult.setError(Error::database_exists,
                                    '\'' + m_dbName + '\'');
             }
-        }
-        else {
+        } else {
             theResult.setError(Error::invalid_command,
                                "Redundant input after '" + m_dbName + '\'');
         }
@@ -94,8 +92,7 @@ public:
                   Error::unexpected_identifier,
                   "Illegal database name '" + theToken.getData() + '\'');
             }
-        }
-        else {
+        } else {
             theResult.setError(Error::identifier_expected,
                                "Database name expected");
         }
@@ -111,8 +108,7 @@ public:
                 theResult.setError(Error::unknown_database,
                                    '\'' + m_dbName + '\'');
             }
-        }
-        else {
+        } else {
             theResult.setError(Error::invalid_command,
                                "Redundant input after '" + m_dbName + '\'');
         }
@@ -153,8 +149,7 @@ public:
                   Error::unexpected_identifier,
                   "Illegal database name '" + theToken.getData() + '\'');
             }
-        }
-        else {
+        } else {
             theResult.setError(Error::identifier_expected,
                                "Database name expected");
         }
@@ -170,8 +165,7 @@ public:
                 theResult.setError(Error::unknown_database,
                                    '\'' + m_dbName + '\'');
             }
-        }
-        else {
+        } else {
             theResult.setError(Error::invalid_command,
                                "Redundant input after '" + m_dbName + '\'');
         }
@@ -238,8 +232,7 @@ public:
                   Error::unexpected_identifier,
                   "Illegal database name '" + theToken.getData() + '\'');
             }
-        }
-        else {
+        } else {
             theResult.setError(Error::identifier_expected,
                                "Database name expected");
         }
@@ -255,8 +248,7 @@ public:
                 theResult.setError(Error::unknown_database,
                                    '\'' + m_dbName + '\'');
             }
-        }
-        else {
+        } else {
             theResult.setError(Error::invalid_command,
                                "Redundant input after '" + m_dbName + '\'');
         }

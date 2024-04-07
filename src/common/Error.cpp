@@ -46,7 +46,7 @@ void StatusResult::showError() const {
     };
     if (m_code != Error::no_error && m_code != Error::user_terminated) {
         auto iter = err2msg.find(m_code);
-        defaultOutput << (iter == err2msg.end() ? iter->second :
+        defaultOutput << (iter != err2msg.end() ? iter->second :
                                                   "Unsupported error type")
                       << ": ";
     }
