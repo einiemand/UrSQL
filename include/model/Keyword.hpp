@@ -1,6 +1,6 @@
 #pragma once
 
-#include <string>
+#include <string_view>
 
 namespace UrSQL {
 
@@ -51,8 +51,8 @@ enum class Keyword {
     where_kw
 };
 
-bool isKeyword(const std::string& aWord);
+bool isKeyword(std::string_view aWord);
 
-Keyword toKeyword(const std::string& aWord);
+Keyword toKeyword(std::string_view aWord);
 
 }  // namespace UrSQL

@@ -4,7 +4,7 @@
 
 namespace UrSQL {
 
-const std::unordered_map<std::string, Keyword> str2keyword{
+const std::unordered_map<std::string_view, Keyword> str2keyword{
     { "add", Keyword::add_kw },
     { "and", Keyword::and_kw },
     { "asc", Keyword::asc_kw },
@@ -50,12 +50,13 @@ const std::unordered_map<std::string, Keyword> str2keyword{
     { "where", Keyword::where_kw }
 };
 
-bool isKeyword(const std::string& aWord) {
-    return str2keyword.count(aWord) == 1;
+bool isKeyword(std::string_view aWord) {
+    return str2keyword.find(aWord) != std::end(str2keyword);
 }
 
-Keyword toKeyword(const std::string& aWord) {
-    return isKeyword(aWord) ? str2keyword.at(aWord) : Keyword::unknown_kw;
+Keyword toKeyword(std::string_view aWord) {
+    auto it = str2keyword.find(aWord);
+    return it != std::end(str2keyword) ? it->second : Keyword::unknown_kw;
 }
 
 }  // namespace UrSQL
