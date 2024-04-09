@@ -38,24 +38,25 @@ struct val_type_traits<null_t> {
     static constexpr ValueType val_type = ValueType::null_type;
 };
 
-class ValueBase {
+namespace detail {
+
+class Impl {
 public:
     virtual ValueType type() const = 0;
     virtual size_type size() const = 0;
-    virtual std::unique_ptr<ValueBase> copyAndConvert(
-      ValueType aType) const = 0;
+    virtual std::unique_ptr<Impl> copyAndConvert(ValueType aType) const = 0;
     virtual size_type hash() const = 0;
-    virtual std::string stringify() const = 0;
+    virtual std::string toString() const = 0;
     virtual std::ostream& dump(std::ostream& anOutput) const = 0;
 
-    virtual bool less(const ValueBase& rhs) const = 0;
-    virtual bool equal(const ValueBase& rhs) const = 0;
+    virtual bool lt(const Impl& rhs) const = 0;
+    virtual bool eq(const Impl& rhs) const = 0;
 
-    virtual ~ValueBase() = default;
+    virtual ~Impl() = default;
 };
 
 template<typename T>
-class ValueImpl : public ValueBase {
+class ValueImpl : public Impl {
 public:
     static constexpr ValueType val_type = val_type_traits<T>::val_type;
 
@@ -76,13 +77,13 @@ public:
         return sizeof(T);
     }
 
-    std::unique_ptr<ValueBase> copyAndConvert(ValueType aType) const override;
+    std::unique_ptr<Impl> copyAndConvert(ValueType aType) const override;
 
     size_type hash() const override {
         return std::hash<T>()(m_val);
     }
 
-    std::string stringify() const override {
+    std::string toString() const override {
         return std::to_string(m_val);
     }
 
@@ -90,13 +91,13 @@ public:
         return anOutput << m_val;
     }
 
-    bool less(const ValueBase& rhs) const override {
+    bool lt(const Impl& rhs) const override {
         URSQL_TRUTH(type() == rhs.type(),
                     "Values of different types are not comparable");
         return m_val < dynamic_cast<const ValueImpl<T>&>(rhs).m_val;
     }
 
-    bool equal(const ValueBase& rhs) const override {
+    bool eq(const Impl& rhs) const override {
         URSQL_TRUTH(type() == rhs.type(),
                     "Values of different types are not comparable");
         return m_val == dynamic_cast<const ValueImpl<T>&>(rhs).m_val;
@@ -107,7 +108,7 @@ private:
 };
 
 template<>
-class ValueImpl<varchar_t> : public ValueBase {
+class ValueImpl<varchar_t> : public Impl {
 public:
     static constexpr ValueType val_type = val_type_traits<varchar_t>::val_type;
 
@@ -126,13 +127,13 @@ public:
         return m_val.size();
     }
 
-    std::unique_ptr<ValueBase> copyAndConvert(ValueType aType) const override;
+    std::unique_ptr<Impl> copyAndConvert(ValueType aType) const override;
 
     size_type hash() const override {
         return std::hash<varchar_t>()(m_val);
     }
 
-    std::string stringify() const override {
+    std::string toString() const override {
         return m_val;
     }
 
@@ -140,7 +141,7 @@ public:
         return anOutput << m_val;
     }
 
-    bool less(const ValueBase& rhs) const override {
+    bool lt(const Impl& rhs) const override {
         URSQL_TRUTH(rhs.type() == ValueType::varchar_type ||
                       rhs.type() == ValueType::null_type,
                     "Values of different types are not comparable");
@@ -148,7 +149,7 @@ public:
                m_val < dynamic_cast<const ValueImpl<varchar_t>&>(rhs).m_val;
     }
 
-    bool equal(const ValueBase& rhs) const override {
+    bool eq(const Impl& rhs) const override {
         URSQL_TRUTH(rhs.type() == ValueType::varchar_type ||
                       rhs.type() == ValueType::null_type,
                     "Values of different types are not comparable");
@@ -161,7 +162,7 @@ private:
 };
 
 template<>
-class ValueImpl<null_t> : public ValueBase {
+class ValueImpl<null_t> : public Impl {
 public:
     static constexpr ValueType val_type = val_type_traits<null_t>::val_type;
 
@@ -179,27 +180,30 @@ public:
         return 0;
     }
 
-    std::unique_ptr<ValueBase> copyAndConvert(ValueType aType) const override;
+    std::unique_ptr<Impl> copyAndConvert(ValueType aType) const override;
 
     size_type hash() const override {
         return 0;
     }
 
-    std::string stringify() const override {
-        return "NULL";
+    std::string toString() const override {
+        return strRep;
     }
 
     std::ostream& dump(std::ostream& anOutput) const override {
-        return anOutput << "NULL";
+        return anOutput.write(strRep, std::char_traits<char>::length(strRep));
     }
 
-    bool less(const ValueBase&) const override {
+    bool lt(const Impl&) const override {
         return false;
     }
 
-    bool equal(const ValueBase&) const override {
+    bool eq(const Impl&) const override {
         return false;
     }
+
+private:
+    static constexpr const char* const strRep = "NULL";
 };
 
 using IntValue = ValueImpl<int_t>;
@@ -209,8 +213,7 @@ using VCharValue = ValueImpl<varchar_t>;
 using NullValue = ValueImpl<null_t>;
 
 template<>
-std::unique_ptr<ValueBase> ValueImpl<int_t>::copyAndConvert(
-  ValueType aType) const {
+std::unique_ptr<Impl> ValueImpl<int_t>::copyAndConvert(ValueType aType) const {
     switch (aType) {
     case ValueType::int_type:
         return std::make_unique<IntValue>(m_val);
@@ -226,7 +229,7 @@ std::unique_ptr<ValueBase> ValueImpl<int_t>::copyAndConvert(
 }
 
 template<>
-std::unique_ptr<ValueBase> ValueImpl<float_t>::copyAndConvert(
+std::unique_ptr<Impl> ValueImpl<float_t>::copyAndConvert(
   ValueType aType) const {
     switch (aType) {
     case ValueType::int_type:
@@ -243,8 +246,7 @@ std::unique_ptr<ValueBase> ValueImpl<float_t>::copyAndConvert(
 }
 
 template<>
-std::unique_ptr<ValueBase> ValueImpl<bool_t>::copyAndConvert(
-  ValueType aType) const {
+std::unique_ptr<Impl> ValueImpl<bool_t>::copyAndConvert(ValueType aType) const {
     switch (aType) {
     case ValueType::int_type:
         return std::make_unique<IntValue>(static_cast<int_t>(m_val));
@@ -260,7 +262,7 @@ std::unique_ptr<ValueBase> ValueImpl<bool_t>::copyAndConvert(
     }
 }
 
-std::unique_ptr<ValueBase> ValueImpl<varchar_t>::copyAndConvert(
+std::unique_ptr<Impl> ValueImpl<varchar_t>::copyAndConvert(
   ValueType aType) const {
     switch (aType) {
     case ValueType::int_type:
@@ -277,8 +279,7 @@ std::unique_ptr<ValueBase> ValueImpl<varchar_t>::copyAndConvert(
     }
 }
 
-std::unique_ptr<ValueBase> ValueImpl<null_t>::copyAndConvert(
-  ValueType aType) const {
+std::unique_ptr<Impl> ValueImpl<null_t>::copyAndConvert(ValueType aType) const {
     switch (aType) {
     case ValueType::int_type:
         return std::make_unique<IntValue>();
@@ -293,21 +294,25 @@ std::unique_ptr<ValueBase> ValueImpl<null_t>::copyAndConvert(
     }
 }
 
-Value::Value() : m_base(std::make_unique<NullValue>()) {}
+}  // namespace detail
 
-Value::Value(int_t anInt) : m_base(std::make_unique<IntValue>(anInt)) {}
+Value::Value() : m_impl(std::make_unique<detail::NullValue>()) {}
 
-Value::Value(float_t aFloat) : m_base(std::make_unique<FloatValue>(aFloat)) {}
+Value::Value(int_t anInt) : m_impl(std::make_unique<detail::IntValue>(anInt)) {}
 
-Value::Value(bool_t aBool) : m_base(std::make_unique<BoolValue>(aBool)) {}
+Value::Value(float_t aFloat)
+    : m_impl(std::make_unique<detail::FloatValue>(aFloat)) {}
+
+Value::Value(bool_t aBool)
+    : m_impl(std::make_unique<detail::BoolValue>(aBool)) {}
 
 Value::Value(varchar_t aString)
-    : m_base(std::make_unique<VCharValue>(std::move(aString))) {}
+    : m_impl(std::make_unique<detail::VCharValue>(std::move(aString))) {}
 
 Value::Value(const Value& rhs)
-    : m_base(rhs.m_base->copyAndConvert(rhs.getType())) {}
+    : m_impl(rhs.m_impl->copyAndConvert(rhs.getType())) {}
 
-Value::Value(Value&& rhs) noexcept : m_base(std::move(rhs.m_base)) {}
+Value::Value(Value&& rhs) noexcept : m_impl(std::move(rhs.m_impl)) {}
 
 Value::~Value() = default;
 
@@ -322,7 +327,7 @@ Value& Value::operator=(Value&& rhs) noexcept {
 }
 
 void Value::serialize(BufferWriter& aWriter) const {
-    aWriter << static_cast<char>(getType()) << m_base->stringify();
+    aWriter << static_cast<char>(getType()) << m_impl->toString();
 }
 
 void Value::deserialize(BufferReader& aReader) {
@@ -337,53 +342,66 @@ void Value::deserialize(BufferReader& aReader) {
 }
 
 ValueType Value::getType() const {
-    return m_base->type();
+    return m_impl->type();
 }
 
 size_type Value::getSize() const {
-    return m_base->size();
+    return m_impl->size();
 }
 
 StatusResult Value::become(ValueType aType) {
-    m_base = m_base->copyAndConvert(aType);
+    m_impl = m_impl->copyAndConvert(aType);
     return getType() == aType ?
              StatusResult(Error::no_error) :
              StatusResult(Error::conversion_fail, "Invalid ValueType");
 }
 
 size_type Value::hash() const {
-    return m_base->hash();
+    return m_impl->hash();
 }
 
-std::string Value::stringify() const {
-    return m_base->stringify();
+std::string Value::toString() const {
+    return m_impl->toString();
 }
 
 bool operator<(const Value& lhs, const Value& rhs) {
-    return !lhs.isNull() && !rhs.isNull() && lhs.m_base->less(*rhs.m_base);
+    return !lhs.isNull() && !rhs.isNull() && lhs.m_impl->lt(*rhs.m_impl);
 }
 
 bool operator==(const Value& lhs, const Value& rhs) {
-    return !lhs.isNull() && !rhs.isNull() && lhs.m_base->equal(*rhs.m_base);
+    return !lhs.isNull() && !rhs.isNull() && lhs.m_impl->eq(*rhs.m_impl);
 }
 
 std::ostream& operator<<(std::ostream& anOutput, const Value& aValue) {
-    return aValue.m_base->dump(anOutput);
+    return aValue.m_impl->dump(anOutput);
 }
 
-static const std::unordered_map<Keyword, ValueType> str2type{
-    { Keyword::integer_kw, ValueType::int_type },
-    { Keyword::float_kw, ValueType::float_type },
-    { Keyword::boolean_kw, ValueType::bool_type },
-    { Keyword::varchar_kw, ValueType::varchar_type }
-};
-
 bool Value::keywordIsValueType(Keyword aKeyword) {
-    return str2type.count(aKeyword) == 1;
+    switch (aKeyword) {
+    case Keyword::integer_kw:
+    case Keyword::float_kw:
+    case Keyword::boolean_kw:
+    case Keyword::varchar_kw:
+        return true;
+    default:
+        return false;
+    }
 }
 
 ValueType Value::keyword2ValueType(Keyword aKeyword) {
-    return str2type.at(aKeyword);
+    switch (aKeyword) {
+    case Keyword::integer_kw:
+        return ValueType::int_type;
+    case Keyword::float_kw:
+        return ValueType::float_type;
+    case Keyword::boolean_kw:
+        return ValueType::bool_type;
+    case Keyword::varchar_kw:
+        return ValueType::varchar_type;
+    default:
+        // TODO: throw exception
+        return ValueType::null_type;
+    }
 }
 
 }  // namespace UrSQL

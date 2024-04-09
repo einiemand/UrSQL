@@ -47,6 +47,7 @@ private:
 #endif
 
 struct OpenExistingFile {};
+
 struct CreateNewFile {};
 
 class TOC;

@@ -283,6 +283,7 @@ class DescTableStatement : public SQLStatement {
 public:
     DescTableStatement(Tokenizer& aTokenizer, SQLInterpreter& anInterpreter)
         : SQLStatement(aTokenizer, anInterpreter) {}
+
     ~DescTableStatement() override = default;
 
     StatusResult parse() override {

@@ -14,6 +14,7 @@ public:
     using Clock = std::chrono::steady_clock;
 
     TimeCounter() : m_start(Clock::now()) {}
+
     ~TimeCounter() {
         _show_time_elapsed();
     }

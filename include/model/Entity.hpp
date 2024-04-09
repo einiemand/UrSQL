@@ -42,6 +42,7 @@ public:
 
     void addRowPosition(blocknum_t aBlocknum);
     void dropRowPosition(blocknum_t aBlocknum);
+
     inline const std::vector<blocknum_t>& getRowPos() const {
         return m_rowPos;
     }

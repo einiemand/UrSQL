@@ -15,7 +15,11 @@ enum class ValueType : char {
     null_type
 };
 
-class ValueBase;
+namespace detail {
+
+class Impl;
+
+}
 
 class Value : public Storable {
 public:
@@ -41,7 +45,7 @@ public:
     void deserialize(BufferReader& aReader) override;
 
     inline void swap(Value& rhs) noexcept {
-        m_base.swap(rhs.m_base);
+        std::swap(m_impl, rhs.m_impl);
     }
 
     ValueType getType() const;
@@ -53,7 +57,7 @@ public:
         return getType() == ValueType::null_type;
     }
 
-    std::string stringify() const;
+    std::string toString() const;
 
     friend bool operator<(const Value& lhs, const Value& rhs);
     friend bool operator==(const Value& lhs, const Value& rhs);
@@ -64,15 +68,15 @@ public:
     static ValueType keyword2ValueType(Keyword aKeyword);
 
 private:
-    std::unique_ptr<ValueBase> m_base;
+    std::unique_ptr<detail::Impl> m_impl;
 };
 
 inline bool operator!=(const Value& lhs, const Value& rhs) {
-    return !lhs.isNull() && !rhs.isNull() && !(lhs == rhs);
+    return !(lhs == rhs);
 }
 
 inline bool operator<=(const Value& lhs, const Value& rhs) {
-    return lhs == rhs || lhs < rhs;
+    return lhs < rhs || lhs == rhs;
 }
 
 inline bool operator>(const Value& lhs, const Value& rhs) {

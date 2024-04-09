@@ -54,6 +54,7 @@ private:
 
     std::string _readWhile(TokenizeCondition aCondition);
     std::string _readUntil(TokenizeCondition aCondition);
+
     inline std::string _readUntil(char aChar) {
         return _readUntil([aChar](char ch) -> bool {
             return ch == aChar;

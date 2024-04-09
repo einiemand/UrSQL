@@ -96,7 +96,7 @@ void DescTableView::show() const {
         std::string theNullString = (theAttribute.isNullable() ? "YES" : "NO");
         std::string theKeyString = (theAttribute.isPrimary() ? "PRI" : "");
         std::string theDefaultValueString =
-          theAttribute.getDefaultValue().stringify();
+          theAttribute.getDefaultValue().toString();
         std::string theExtraString;
         theEntityDisplay.emplace_back(
           StringList{ theAttribute.getName(), theTypeString, theNullString,
@@ -135,7 +135,7 @@ void SelectRowView::show() const {
     m_rowCollection.eachRow([&](const Row& aRow) {
         StringList theRowDisplay;
         for (const std::string& theFieldName : m_fieldNames) {
-            theRowDisplay.push_back(aRow.getField(theFieldName).stringify());
+            theRowDisplay.push_back(aRow.getField(theFieldName).toString());
         }
         theRowCollectionDisplay.push_back(std::move(theRowDisplay));
     });

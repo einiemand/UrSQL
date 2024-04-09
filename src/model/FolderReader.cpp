@@ -58,6 +58,7 @@ private:
     HANDLE m_fileHandle;
     WIN32_FIND_DATAA m_fileData;
 };
+
 using DirEntIterator = WindowsDirEntIterator;
 #elif defined(__linux__) || defined(__APPLE__)
 class UnixDirEntIterator {
@@ -108,6 +109,7 @@ private:
     DIR* m_dir;
     struct dirent* m_ent;
 };
+
 using DirEntIterator = UnixDirEntIterator;
 #endif
 

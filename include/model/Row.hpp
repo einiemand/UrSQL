@@ -25,6 +25,7 @@ public:
     inline bool fieldExists(const std::string& aFieldName) const {
         return m_data.count(aFieldName) == 1;
     }
+
     const Value& getField(const std::string& aFieldName) const;
     void addField(std::string aFieldName, Value aValue);
     void updateField(std::string aFieldName, Value aValue);
