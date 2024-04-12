@@ -10,12 +10,12 @@ class Token;
 class Entity;
 
 enum class Comparator : uint8_t {
-    e_op,          // =, ==
-    ne_op,         // !=
-    lt_op = 0xF0,  // <
-    le_op = 0xCC,  // <=
-    gt_op = 0x0F,  // >
-    ge_op = 0x33,  // >=
+    eq_op = 0x00,          // =, ==
+    ne_op,                 // !=
+    lt_op,                 // <
+    le_op,                 // <=
+    gt_op = 0xFF - lt_op,  // >
+    ge_op = 0xFF - le_op,  // >=
     unknown_op = 0xFF
 };
 

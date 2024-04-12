@@ -8,26 +8,27 @@
 
 namespace UrSQL {
 
-static const std::unordered_map<std::string, Comparator> compMap{
-    { "=", Comparator::e_op },   { "==", Comparator::e_op },
+static const std::unordered_map<std::string_view, Comparator> compMap{
+    { "=", Comparator::eq_op },  { "==", Comparator::eq_op },
     { "!=", Comparator::ne_op }, { "<", Comparator::lt_op },
     { "<=", Comparator::le_op }, { ">", Comparator::gt_op },
     { ">=", Comparator::ge_op }
 };
 
-bool isValidComparator(const std::string& aString) {
-    return compMap.count(aString) == 1;
+bool isValidComparator(std::string_view aString) {
+    return compMap.find(aString) != std::end(compMap);
 }
 
-Comparator string2Comparator(const std::string& aString) {
-    URSQL_TRUTH(isValidComparator(aString),
+Comparator string2Comparator(std::string_view aString) {
+    auto it = compMap.find(aString);
+    URSQL_TRUTH(it != std::end(compMap),
                 "Check if a string is a comparator first!");
-    return compMap.at(aString);
+    return it->second;
 }
 
 void reverseComparator(Comparator& aComparator) {
     switch (aComparator) {
-    case Comparator::e_op:
+    case Comparator::eq_op:
     case Comparator::ne_op:
         break;
     default:
@@ -90,7 +91,7 @@ bool Expression::match(const Row& aRow) const {
                 '\'' + m_fieldName + "' doesn't exist in entity");
     const Value& theValue = aRow.getField(m_fieldName);
     switch (m_comparator) {
-    case Comparator::e_op:
+    case Comparator::eq_op:
         return (theValue == m_value);
     case Comparator::ne_op:
         return (theValue != m_value);
