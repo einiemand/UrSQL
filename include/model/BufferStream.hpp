@@ -9,30 +9,29 @@ namespace UrSQL {
 
 class Storable;
 
-class BufferWriter {
+namespace detail {
+
+class BufferData {
 public:
-    BufferWriter(char* aBuf, size_type aSize);
-    ~BufferWriter() = default;
+    BufferData(const char* aBuf, size_type aSize);
+    BufferData(char* aBuf, size_type aSize);
 
-    URSQL_DISABLE_COPY(BufferWriter);
+    ~BufferData() = default;
 
-    template<typename T, typename = std::enable_if_t<std::is_arithmetic_v<T>>>
-    BufferWriter& operator<<(const T aNum) {
-        static constexpr size_type theTypeSize = sizeof(T);
-        URSQL_TRUTH(m_pos + theTypeSize < m_size, "BufferWriter out of range");
-        memcpy(m_buf + m_pos, &aNum, theTypeSize);
-        m_pos += theTypeSize;
-        return *this;
-    }
+    URSQL_DISABLE_COPY(BufferData);
 
-    BufferWriter& operator<<(const std::string& aString);
-    BufferWriter& operator<<(const Storable& aStorable);
+    char* getAndAdvance(size_type anOffset);
 
 private:
-    char* m_buf;
-    size_type m_pos;
-    size_type m_size;
+    union {
+        const char* m_get;
+        char* m_put;
+    } m_cur;
+
+    const char* const m_end;
 };
+
+}  // namespace detail
 
 class BufferReader {
 public:
@@ -43,10 +42,8 @@ public:
 
     template<typename T, typename = std::enable_if_t<std::is_arithmetic_v<T>>>
     BufferReader& operator>>(T& aNum) {
-        static constexpr size_type theTypeSize = sizeof(T);
-        URSQL_TRUTH(m_pos + theTypeSize < m_size, "BufferReader out of range");
-        memcpy(&aNum, m_buf + m_pos, theTypeSize);
-        m_pos += theTypeSize;
+        constexpr size_type theTypeSize = sizeof(T);
+        memcpy(&aNum, m_bufData.getAndAdvance(theTypeSize), theTypeSize);
         return *this;
     }
 
@@ -54,9 +51,28 @@ public:
     BufferReader& operator>>(Storable& aStorable);
 
 private:
-    const char* m_buf;
-    size_type m_pos;
-    size_type m_size;
+    detail::BufferData m_bufData;
+};
+
+class BufferWriter {
+public:
+    BufferWriter(char* aBuf, size_type aSize);
+    ~BufferWriter() = default;
+
+    URSQL_DISABLE_COPY(BufferWriter);
+
+    template<typename T, typename = std::enable_if_t<std::is_arithmetic_v<T>>>
+    BufferWriter& operator<<(const T aNum) {
+        constexpr size_type theTypeSize = sizeof(T);
+        memcpy(m_bufData.getAndAdvance(theTypeSize), &aNum, theTypeSize);
+        return *this;
+    }
+
+    BufferWriter& operator<<(const std::string& aString);
+    BufferWriter& operator<<(const Storable& aStorable);
+
+private:
+    detail::BufferData m_bufData;
 };
 
 }  // namespace UrSQL
