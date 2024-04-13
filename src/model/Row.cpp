@@ -40,28 +40,28 @@ const Value& Row::getField(const std::string& aFieldName) const {
 
 void Row::addField(std::string aFieldName, Value aValue) {
     URSQL_TRUTH(!m_data.count(aFieldName), "A row has fields of the same name");
-    m_data.insert({ std::move(aFieldName), std::move(aValue) });
+    m_data.emplace(std::move(aFieldName), std::move(aValue));
 }
 
-void Row::updateField(std::string aFieldName, Value aValue) {
-    URSQL_TRUTH(m_data.count(aFieldName),
-                "Trying to update a field that doesn't exist");
-    m_data[std::move(aFieldName)] = std::move(aValue);
+void Row::updateField(const std::string& aFieldName, Value aValue) {
+    auto it = m_data.find(aFieldName);
+    URSQL_TRUTH(it != std::end(m_data), "Trying to update a field that doesn't exist");
+    it->second = std::move(aValue);
 }
 
-void RowCollection::addRow(std::unique_ptr<Row>&& aRow) {
+void RowCollection::addRow(Row&& aRow) {
     m_rows.push_back(std::move(aRow));
 }
 
 void RowCollection::eachRow(RowVisitor aVisitor) {
-    for (auto iter = m_rows.begin(); iter != m_rows.end(); ++iter) {
-        aVisitor(*iter->get());
+    for (Row& theRow : m_rows) {
+        aVisitor(theRow);
     }
 }
 
 void RowCollection::eachRow(CleanRowVisitor aVisitor) const {
-    for (auto iter = m_rows.cbegin(); iter != m_rows.cend(); ++iter) {
-        aVisitor(*iter->get());
+    for (const Row& theRow : m_rows) {
+        aVisitor(theRow);
     }
 }
 
@@ -70,17 +70,17 @@ void RowCollection::reorder(const Order& anOrder) {
     bool isDesc = anOrder.isDesc();
     if (isDesc) {
         std::sort(m_rows.begin(), m_rows.end(),
-                  [&theFieldName](const std::unique_ptr<Row>& lhs,
-                                  const std::unique_ptr<Row>& rhs) -> bool {
-                      return lhs->getField(theFieldName) >
-                             rhs->getField(theFieldName);
+                  [&theFieldName](const Row& lhs,
+                                  const Row& rhs) -> bool {
+                      return lhs.getField(theFieldName) >
+                             rhs.getField(theFieldName);
                   });
     } else {
         std::sort(m_rows.begin(), m_rows.end(),
-                  [&theFieldName](const std::unique_ptr<Row>& lhs,
-                                  const std::unique_ptr<Row>& rhs) -> bool {
-                      return lhs->getField(theFieldName) <
-                             rhs->getField(theFieldName);
+                  [&theFieldName](const Row& lhs,
+                                  const Row& rhs) -> bool {
+                      return lhs.getField(theFieldName) <
+                             rhs.getField(theFieldName);
                   });
     }
 }

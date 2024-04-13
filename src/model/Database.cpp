@@ -123,9 +123,9 @@ StatusResult Database::selectFromTable(RowCollection& aRowCollection,
             theResult = m_storage.visitBlocks(
               [&aRowCollection, aFilter](Block& aBlock,
                                          blocknum_t aBlocknum) -> StatusResult {
-                  auto theRow = std::make_unique<Row>(aBlocknum);
-                  theRow->decode(aBlock);
-                  if (!aFilter || aFilter->match(*theRow)) {
+                  Row theRow(aBlocknum);
+                  theRow.decode(aBlock);
+                  if (!aFilter || aFilter->match(theRow)) {
                       aRowCollection.addRow(std::move(theRow));
                   }
                   return StatusResult(Error::no_error);

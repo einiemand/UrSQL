@@ -14,8 +14,8 @@ public:
     explicit Row(blocknum_t aBlocknum);
     ~Row() override = default;
 
-    URSQL_DEFAULT_MOVE_CTOR(Row);
-    URSQL_DISABLE_COPY_ASSIGN(Row);
+    URSQL_DISABLE_COPY(Row);
+    URSQL_DEFAULT_MOVE(Row);
 
     void serialize(BufferWriter& aWriter) const override;
     void deserialize(BufferReader& aReader) override;
@@ -23,12 +23,12 @@ public:
     BlockType expectedBlockType() const override;
 
     inline bool fieldExists(const std::string& aFieldName) const {
-        return m_data.count(aFieldName) == 1;
+        return m_data.find(aFieldName) != std::end(m_data);
     }
 
     const Value& getField(const std::string& aFieldName) const;
     void addField(std::string aFieldName, Value aValue);
-    void updateField(std::string aFieldName, Value aValue);
+    void updateField(const std::string& aFieldName, Value aValue);
 
 private:
     DataMap m_data;
@@ -38,7 +38,6 @@ class Order;
 
 class RowCollection {
 public:
-    using RowList = std::vector<std::unique_ptr<Row>>;
     using RowVisitor = std::function<void(Row&)>;
     using CleanRowVisitor = std::function<void(const Row&)>;
 
@@ -48,7 +47,7 @@ public:
     RowCollection(const RowCollection&) = delete;
     RowCollection& operator=(const RowCollection&) = delete;
 
-    void addRow(std::unique_ptr<Row>&& aRow);
+    void addRow(Row&& aRow);
 
     inline size_type size() const {
         return m_rows.size();
@@ -64,7 +63,7 @@ public:
     void reorder(const Order& anOrder);
 
 private:
-    RowList m_rows;
+    std::vector<Row> m_rows;
 };
 
 }  // namespace UrSQL
