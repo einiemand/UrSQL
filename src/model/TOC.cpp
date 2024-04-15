@@ -24,15 +24,13 @@ void TOC::serialize(BufferWriter& aWriter) const {
 }
 
 void TOC::deserialize(BufferReader& aReader) {
-    size_type theMapSize;
-    aReader >> theMapSize;
+    auto theMapSize = aReader.read<size_type>();
 
     for (; theMapSize > 0; --theMapSize) {
-        std::string theEntityName;
-        blocknum_t theBlocknum;
-        aReader >> theEntityName >> theBlocknum;
+        auto theEntityName = aReader.read<std::string>();
+        auto theBlocknum = aReader.read<blocknum_t>();
 
-        m_entityMap.insert({ theEntityName, theBlocknum });
+        m_entityMap.emplace(theEntityName, theBlocknum);
     }
 }
 

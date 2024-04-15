@@ -17,13 +17,10 @@ void Row::serialize(BufferWriter& aWriter) const {
 }
 
 void Row::deserialize(BufferReader& aReader) {
-    size_type theColumnSize;
-    aReader >> theColumnSize;
+    auto theColumnSize = aReader.read<size_type>();
     for (; theColumnSize > 0; --theColumnSize) {
-        std::string theFieldName;
-        aReader >> theFieldName;
-        Value theValue;
-        aReader >> theValue;
+        auto theFieldName = aReader.read<std::string>();
+        auto theValue = aReader.read<Value>();
         addField(std::move(theFieldName), std::move(theValue));
     }
 }
@@ -45,7 +42,8 @@ void Row::addField(std::string aFieldName, Value aValue) {
 
 void Row::updateField(const std::string& aFieldName, Value aValue) {
     auto it = m_data.find(aFieldName);
-    URSQL_TRUTH(it != std::end(m_data), "Trying to update a field that doesn't exist");
+    URSQL_TRUTH(it != std::end(m_data),
+                "Trying to update a field that doesn't exist");
     it->second = std::move(aValue);
 }
 
@@ -70,15 +68,13 @@ void RowCollection::reorder(const Order& anOrder) {
     bool isDesc = anOrder.isDesc();
     if (isDesc) {
         std::sort(m_rows.begin(), m_rows.end(),
-                  [&theFieldName](const Row& lhs,
-                                  const Row& rhs) -> bool {
+                  [&theFieldName](const Row& lhs, const Row& rhs) -> bool {
                       return lhs.getField(theFieldName) >
                              rhs.getField(theFieldName);
                   });
     } else {
         std::sort(m_rows.begin(), m_rows.end(),
-                  [&theFieldName](const Row& lhs,
-                                  const Row& rhs) -> bool {
+                  [&theFieldName](const Row& lhs, const Row& rhs) -> bool {
                       return lhs.getField(theFieldName) <
                              rhs.getField(theFieldName);
                   });

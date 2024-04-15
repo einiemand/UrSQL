@@ -48,13 +48,13 @@ public:
         std::swap(m_impl, rhs.m_impl);
     }
 
-    ValueType getType() const;
-    size_type getSize() const;
+    ValueType type() const;
+    size_type size() const;
     StatusResult become(ValueType aType);
     size_type hash() const;
 
     inline bool isNull() const {
-        return getType() == ValueType::null_type;
+        return type() == ValueType::null_type;
     }
 
     std::string toString() const;

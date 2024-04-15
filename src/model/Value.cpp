@@ -42,6 +42,7 @@ namespace detail {
 
 class Impl {
 public:
+    virtual void serialize(BufferWriter& aWriter) const = 0;
     virtual ValueType type() const = 0;
     virtual size_type size() const = 0;
     virtual std::unique_ptr<Impl> copyAndConvert(ValueType aType) const = 0;
@@ -58,8 +59,6 @@ public:
 template<typename T>
 class ValueImpl : public Impl {
 public:
-    static constexpr ValueType val_type = val_type_traits<T>::val_type;
-
     ValueImpl() : ValueImpl(T{}) {}
 
     ValueImpl(T aVal) : m_val(std::move(aVal)) {}
@@ -69,8 +68,12 @@ public:
     URSQL_DEFAULT_COPY(ValueImpl);
     URSQL_DEFAULT_MOVE(ValueImpl);
 
+    void serialize(BufferWriter& aWriter) const override {
+        aWriter << type() << m_val;
+    }
+
     ValueType type() const override {
-        return val_type;
+        return val_type_traits<T>::val_type;
     }
 
     size_type size() const override {
@@ -110,8 +113,6 @@ private:
 template<>
 class ValueImpl<varchar_t> : public Impl {
 public:
-    static constexpr ValueType val_type = val_type_traits<varchar_t>::val_type;
-
     ValueImpl(varchar_t aVal = "") : m_val(std::move(aVal)) {}
 
     ~ValueImpl() override = default;
@@ -119,8 +120,12 @@ public:
     URSQL_DEFAULT_COPY(ValueImpl);
     URSQL_DEFAULT_MOVE(ValueImpl);
 
+    void serialize(BufferWriter& aWriter) const override {
+        aWriter << type() << m_val;
+    }
+
     ValueType type() const override {
-        return val_type;
+        return val_type_traits<varchar_t>::val_type;
     }
 
     size_type size() const override {
@@ -164,16 +169,17 @@ private:
 template<>
 class ValueImpl<null_t> : public Impl {
 public:
-    static constexpr ValueType val_type = val_type_traits<null_t>::val_type;
-
     ValueImpl() = default;
-
     ~ValueImpl() override = default;
 
     URSQL_DEFAULT_COPY(ValueImpl);
 
+    void serialize(BufferWriter& aWriter) const override {
+        aWriter << type();
+    }
+
     ValueType type() const override {
-        return val_type;
+        return val_type_traits<null_t>::val_type;
     }
 
     size_type size() const override {
@@ -310,7 +316,7 @@ Value::Value(varchar_t aString)
     : m_impl(std::make_unique<detail::VCharValue>(std::move(aString))) {}
 
 Value::Value(const Value& rhs)
-    : m_impl(rhs.m_impl->copyAndConvert(rhs.getType())) {}
+    : m_impl(rhs.m_impl->copyAndConvert(rhs.type())) {}
 
 Value::Value(Value&& rhs) noexcept : m_impl(std::move(rhs.m_impl)) {}
 
@@ -327,31 +333,43 @@ Value& Value::operator=(Value&& rhs) noexcept {
 }
 
 void Value::serialize(BufferWriter& aWriter) const {
-    aWriter << static_cast<char>(getType()) << m_impl->toString();
+    m_impl->serialize(aWriter);
 }
 
 void Value::deserialize(BufferReader& aReader) {
-    char theChar;
-    aReader >> theChar;
-    std::string theString;
-    aReader >> theString;
-    Value theValue(std::move(theString));
-    StatusResult theResult = theValue.become(static_cast<ValueType>(theChar));
-    URSQL_TRUTH(theResult, "Value parse error");
-    swap(theValue);
+    auto theValueType = aReader.read<ValueType>();
+    switch (theValueType) {
+    case ValueType::int_type:
+        *this = aReader.read<int_t>();
+        break;
+    case ValueType::float_type:
+        *this = aReader.read<float_t>();
+        break;
+    case ValueType::bool_type:
+        *this = aReader.read<bool_t>();
+        break;
+    case ValueType::varchar_type:
+        *this = aReader.read<varchar_t>();
+        break;
+    case ValueType::null_type:
+        *this = Value();
+        break;
+    default:
+        URSQL_TRUTH(false, "Unreachable switch-case branch for ValueType");
+    }
 }
 
-ValueType Value::getType() const {
+ValueType Value::type() const {
     return m_impl->type();
 }
 
-size_type Value::getSize() const {
+size_type Value::size() const {
     return m_impl->size();
 }
 
 StatusResult Value::become(ValueType aType) {
     m_impl = m_impl->copyAndConvert(aType);
-    return getType() == aType ?
+    return type() == aType ?
              StatusResult(Error::no_error) :
              StatusResult(Error::conversion_fail, "Invalid ValueType");
 }

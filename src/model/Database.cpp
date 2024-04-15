@@ -198,7 +198,7 @@ StatusResult Database::updateTable(const std::string& anEntityName,
             if (theEntity->attributeExistsByName(theAttributeName)) {
                 const Attribute& theAttribute =
                   theEntity->getAttributeByName(theAttributeName);
-                if (theAttribute.getType() != iter->second.getType()) {
+                if (theAttribute.getType() != iter->second.type()) {
                     theResult.setError(Error::keyValue_mismatch,
                                        '\'' + theAttributeName + '\'');
                 }

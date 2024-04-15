@@ -40,7 +40,8 @@ public:
 
     URSQL_DISABLE_COPY(BufferReader);
 
-    template<typename T, typename = std::enable_if_t<std::is_arithmetic_v<T>>>
+    template<typename T, typename = std::enable_if_t<std::is_arithmetic_v<T> ||
+                                                     std::is_enum_v<T>>>
     BufferReader& operator>>(T& aNum) {
         constexpr size_type theTypeSize = sizeof(T);
         memcpy(&aNum, m_bufData.getAndAdvance(theTypeSize), theTypeSize);
@@ -49,6 +50,13 @@ public:
 
     BufferReader& operator>>(std::string& aString);
     BufferReader& operator>>(Storable& aStorable);
+
+    template<typename T>
+    T read() {
+        T theVal;
+        *this >> theVal;
+        return theVal;
+    }
 
 private:
     detail::BufferData m_bufData;
@@ -61,7 +69,8 @@ public:
 
     URSQL_DISABLE_COPY(BufferWriter);
 
-    template<typename T, typename = std::enable_if_t<std::is_arithmetic_v<T>>>
+    template<typename T, typename = std::enable_if_t<std::is_arithmetic_v<T> ||
+                                                     std::is_enum_v<T>>>
     BufferWriter& operator<<(const T aNum) {
         constexpr size_type theTypeSize = sizeof(T);
         memcpy(m_bufData.getAndAdvance(theTypeSize), &aNum, theTypeSize);

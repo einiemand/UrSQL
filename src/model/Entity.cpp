@@ -29,19 +29,15 @@ void Entity::serialize(BufferWriter& aWriter) const {
 }
 
 void Entity::deserialize(BufferReader& aReader) {
-    size_type theAttrCount;
-    aReader >> theAttrCount;
+    auto theAttrCount = aReader.read<size_type>();
     for (; theAttrCount > 0; --theAttrCount) {
-        Attribute theAttr;
-        aReader >> theAttr;
+        auto theAttr = aReader.read<Attribute>();
         m_attributes.emplace_back(std::move(theAttr));
     }
     aReader >> m_autoincr;
-    size_type theRowCount;
-    aReader >> theRowCount;
+    auto theRowCount = aReader.read<size_type>();
     for (; theRowCount > 0; --theRowCount) {
-        blocknum_t theBlocknum;
-        aReader >> theBlocknum;
+        auto theBlocknum = aReader.read<blocknum_t>();
         m_rowPos.push_back(theBlocknum);
     }
 }
