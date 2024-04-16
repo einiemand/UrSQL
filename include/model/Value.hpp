@@ -49,9 +49,8 @@ public:
     }
 
     ValueType type() const;
-    size_type size() const;
+    size_type ostreamSize() const;
     StatusResult become(ValueType aType);
-    size_type hash() const;
 
     inline bool isNull() const {
         return type() == ValueType::null_type;

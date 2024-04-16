@@ -2,26 +2,6 @@
 
 #include <cstdlib>
 
-// Platform macros
-#if defined(__unix__)
-#define OSPLATFORM_UNIX
-#elif defined(_WIN32)
-#define OSPLATFORM_WINDOWS
-#else
-// unknown os
-#endif
-
-// Compiler macros
-#if defined(__GNUC__)
-#define COMPILER_GNUC
-#elif defined(__MINGW64__)
-#define COMPILER_MINGW64
-#elif defined(_MSC_VER)
-#define COMPILER_MSVC
-#else
-// other compilers not supported
-#endif
-
 // Helper macros
 #define URSQL_DISABLE_COPY_CTOR(Class) Class(const Class&) = delete
 #define URSQL_DISABLE_COPY_ASSIGN(Class) Class& operator=(const Class&) = delete
@@ -50,6 +30,15 @@
     URSQL_DEFAULT_MOVE_CTOR(Class); \
     URSQL_DEFAULT_MOVE_ASSIGN(Class)
 
+// std::unreachable()
+#ifdef __GNUC__
+#define URSQL_UNREACHABLE __builtin_unreachable()
+#elif defined(_MSC_VER)
+#define URSQL_UNREACHABLE __assume(false)
+#else
+#define URSQL_UNREACHABLE ((void)0)
+#endif
+
 // Debug macros
 #ifndef NDEBUG
 #define URSQL_DEBUG
@@ -57,7 +46,7 @@
 
 #ifdef URSQL_DEBUG
 
-#ifdef OSPLATFORM_UNIX
+#ifdef __GNUC__
 #include <execinfo.h>
 #define BACKTRACE_MAX_DEPTH (1 << 10)
 #define URSQL_PRINT_BACKTRACE                               \
@@ -84,7 +73,7 @@
                       << "'\n";                                              \
             std::cerr << "Truth is a lie! " << (MESSAGE) << '\n';            \
             URSQL_PRINT_BACKTRACE;                                           \
-            std::cerr << "Aborting...\n";                                    \
+            std::cerr << "Terminating...\n";                                 \
             std::terminate();                                                \
         }                                                                    \
     } while (false)

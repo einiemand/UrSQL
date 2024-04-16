@@ -187,8 +187,9 @@ void ShowTablesView::show() const {
 void View::printHorizontalLine(const std::vector<size_type>& aWidths) {
     defaultOutput << View::vertex;
     for (size_type aWidth : aWidths) {
-        defaultOutput << std::string(aWidth + 2, View::horizontalEdge)
-                      << View::vertex;
+        std::fill_n(std::ostream_iterator<char>(defaultOutput), aWidth + 2,
+                    horizontalEdge);
+        defaultOutput << View::vertex;
     }
     defaultOutput << '\n';
 }
@@ -206,13 +207,18 @@ void View::printLine(const StringList& aStrings,
 }
 
 std::string View::valueType2String(ValueType aType) {
-    static const std::unordered_map<ValueType, const char*> theTypeMap{
-        { ValueType::int_type, "int" },
-        { ValueType::bool_type, "bool" },
-        { ValueType::float_type, "float" },
-        { ValueType::varchar_type, "varchar" },
-    };
-    return theTypeMap.at(aType);
+    switch (aType) {
+    case ValueType::int_type:
+        return "int";
+    case ValueType::float_type:
+        return "float";
+    case ValueType::bool_type:
+        return "bool";
+    case ValueType::varchar_type:
+        return "varchar";
+    default:
+        URSQL_UNREACHABLE;
+    }
 }
 
 }  // namespace UrSQL

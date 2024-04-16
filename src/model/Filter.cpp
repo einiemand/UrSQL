@@ -104,8 +104,7 @@ bool Expression::match(const Row& aRow) const {
     case Comparator::ge_op:
         return (theValue >= m_value);
     default:
-        URSQL_TRUTH(false, "Unknown comparator");
-        return false;
+        URSQL_UNREACHABLE;
     }
 }
 

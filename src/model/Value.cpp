@@ -44,9 +44,8 @@ class Impl {
 public:
     virtual void serialize(BufferWriter& aWriter) const = 0;
     virtual ValueType type() const = 0;
-    virtual size_type size() const = 0;
+    virtual size_type ostreamSize() const = 0;
     virtual std::unique_ptr<Impl> copyAndConvert(ValueType aType) const = 0;
-    virtual size_type hash() const = 0;
     virtual std::string toString() const = 0;
     virtual std::ostream& dump(std::ostream& anOutput) const = 0;
 
@@ -61,12 +60,11 @@ class ValueImpl : public Impl {
 public:
     ValueImpl() : ValueImpl(T{}) {}
 
-    ValueImpl(T aVal) : m_val(std::move(aVal)) {}
+    explicit ValueImpl(T aVal) : m_val(std::move(aVal)) {}
 
     ~ValueImpl() override = default;
 
-    URSQL_DEFAULT_COPY(ValueImpl);
-    URSQL_DEFAULT_MOVE(ValueImpl);
+    URSQL_DISABLE_COPY(ValueImpl);
 
     void serialize(BufferWriter& aWriter) const override {
         aWriter << type() << m_val;
@@ -76,15 +74,21 @@ public:
         return val_type_traits<T>::val_type;
     }
 
-    size_type size() const override {
-        return sizeof(T);
+    size_type ostreamSize() const override {
+        if constexpr (std::is_same_v<T, int_t>) {
+            size_type theSize = m_val <= 0 ? 1 : 0;
+            for (int_t theInt = std::abs(m_val); theInt > 0; theInt /= 10) {
+                ++theSize;
+            }
+            return theSize;
+        } else if constexpr (std::is_same_v<T, float_t>) {
+            return std::to_string(m_val).size();
+        } else {
+            URSQL_UNREACHABLE;
+        }
     }
 
     std::unique_ptr<Impl> copyAndConvert(ValueType aType) const override;
-
-    size_type hash() const override {
-        return std::hash<T>()(m_val);
-    }
 
     std::string toString() const override {
         return std::to_string(m_val);
@@ -111,14 +115,65 @@ private:
 };
 
 template<>
-class ValueImpl<varchar_t> : public Impl {
+class ValueImpl<bool_t> : public Impl {
 public:
-    ValueImpl(varchar_t aVal = "") : m_val(std::move(aVal)) {}
+    ValueImpl() : ValueImpl(bool_t{}) {}
+
+    explicit ValueImpl(bool_t aBool) : m_val(aBool) {}
 
     ~ValueImpl() override = default;
 
-    URSQL_DEFAULT_COPY(ValueImpl);
-    URSQL_DEFAULT_MOVE(ValueImpl);
+    URSQL_DISABLE_COPY(ValueImpl);
+
+    void serialize(BufferWriter& aWriter) const override {
+        aWriter << type() << m_val;
+    }
+
+    ValueType type() const override {
+        return val_type_traits<bool_t>::val_type;
+    }
+
+    size_type ostreamSize() const override {
+        // 't' or 'f'
+        return 1;
+    }
+
+    std::unique_ptr<Impl> copyAndConvert(ValueType aType) const override;
+
+    std::string toString() const override {
+        return m_val ? "t" : "f";
+    }
+
+    std::ostream& dump(std::ostream& anOutput) const override {
+        return anOutput << (m_val ? 't' : 'f');
+    }
+
+    bool lt(const Impl& rhs) const override {
+        URSQL_TRUTH(type() == rhs.type(),
+                    "Values of different types are not comparable");
+        return m_val < dynamic_cast<const ValueImpl&>(rhs).m_val;
+    }
+
+    bool eq(const Impl& rhs) const override {
+        URSQL_TRUTH(type() == rhs.type(),
+                    "Values of different types are not comparable");
+        return m_val == dynamic_cast<const ValueImpl&>(rhs).m_val;
+    }
+
+private:
+    bool_t m_val;
+};
+
+template<>
+class ValueImpl<varchar_t> : public Impl {
+public:
+    ValueImpl() : ValueImpl(varchar_t{}) {}
+
+    explicit ValueImpl(varchar_t aVal) : m_val(std::move(aVal)) {}
+
+    ~ValueImpl() override = default;
+
+    URSQL_DISABLE_COPY(ValueImpl);
 
     void serialize(BufferWriter& aWriter) const override {
         aWriter << type() << m_val;
@@ -128,15 +183,11 @@ public:
         return val_type_traits<varchar_t>::val_type;
     }
 
-    size_type size() const override {
+    size_type ostreamSize() const override {
         return m_val.size();
     }
 
     std::unique_ptr<Impl> copyAndConvert(ValueType aType) const override;
-
-    size_type hash() const override {
-        return std::hash<varchar_t>()(m_val);
-    }
 
     std::string toString() const override {
         return m_val;
@@ -172,7 +223,7 @@ public:
     ValueImpl() = default;
     ~ValueImpl() override = default;
 
-    URSQL_DEFAULT_COPY(ValueImpl);
+    URSQL_DISABLE_COPY(ValueImpl);
 
     void serialize(BufferWriter& aWriter) const override {
         aWriter << type();
@@ -182,15 +233,11 @@ public:
         return val_type_traits<null_t>::val_type;
     }
 
-    size_type size() const override {
-        return 0;
+    size_type ostreamSize() const override {
+        return std::char_traits<char>::length(strRep);
     }
 
     std::unique_ptr<Impl> copyAndConvert(ValueType aType) const override;
-
-    size_type hash() const override {
-        return 0;
-    }
 
     std::string toString() const override {
         return strRep;
@@ -251,7 +298,6 @@ std::unique_ptr<Impl> ValueImpl<float_t>::copyAndConvert(
     }
 }
 
-template<>
 std::unique_ptr<Impl> ValueImpl<bool_t>::copyAndConvert(ValueType aType) const {
     switch (aType) {
     case ValueType::int_type:
@@ -355,7 +401,7 @@ void Value::deserialize(BufferReader& aReader) {
         *this = Value();
         break;
     default:
-        URSQL_TRUTH(false, "Unreachable switch-case branch for ValueType");
+        URSQL_UNREACHABLE;
     }
 }
 
@@ -363,8 +409,8 @@ ValueType Value::type() const {
     return m_impl->type();
 }
 
-size_type Value::size() const {
-    return m_impl->size();
+size_type Value::ostreamSize() const {
+    return m_impl->ostreamSize();
 }
 
 StatusResult Value::become(ValueType aType) {
@@ -372,10 +418,6 @@ StatusResult Value::become(ValueType aType) {
     return type() == aType ?
              StatusResult(Error::no_error) :
              StatusResult(Error::conversion_fail, "Invalid ValueType");
-}
-
-size_type Value::hash() const {
-    return m_impl->hash();
 }
 
 std::string Value::toString() const {
@@ -417,8 +459,7 @@ ValueType Value::keyword2ValueType(Keyword aKeyword) {
     case Keyword::varchar_kw:
         return ValueType::varchar_type;
     default:
-        // TODO: throw exception
-        return ValueType::null_type;
+        URSQL_UNREACHABLE;
     }
 }
 
