@@ -2,7 +2,7 @@
 
 #include <unordered_map>
 
-namespace UrSQL {
+namespace ursql {
 
 const std::unordered_map<std::string_view, Keyword> str2keyword{
     { "add", Keyword::add_kw },
@@ -59,4 +59,4 @@ Keyword toKeyword(std::string_view aWord) {
     return it != std::end(str2keyword) ? it->second : Keyword::unknown_kw;
 }
 
-}  // namespace UrSQL
+}  // namespace ursql

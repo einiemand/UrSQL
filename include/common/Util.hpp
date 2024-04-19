@@ -6,7 +6,7 @@
 
 #include "Macros.hpp"
 
-namespace UrSQL {
+namespace ursql {
 
 using size_type = std::size_t;
 
@@ -27,4 +27,4 @@ using blocknum_t = size_trait<sizeof(void*)>::int_t;
 
 using StringList = std::vector<std::string>;
 
-}  // namespace UrSQL
+}  // namespace ursql

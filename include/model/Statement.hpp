@@ -3,7 +3,7 @@
 #include "Keyword.hpp"
 #include "common/Error.hpp"
 
-namespace UrSQL {
+namespace ursql {
 
 class Tokenizer;
 
@@ -37,4 +37,4 @@ private:
     Keyword m_keyword;
 };
 
-}  // namespace UrSQL
+}  // namespace ursql

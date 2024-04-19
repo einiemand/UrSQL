@@ -2,7 +2,7 @@
 
 #include "model/BufferStream.hpp"
 
-namespace UrSQL {
+namespace ursql {
 
 using int_t = Value::int_t;
 using float_t = Value::float_t;
@@ -463,4 +463,4 @@ ValueType Value::keyword2ValueType(Keyword aKeyword) {
     }
 }
 
-}  // namespace UrSQL
+}  // namespace ursql

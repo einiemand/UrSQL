@@ -12,7 +12,7 @@
 #define ENABLE_BLOCKCACHE
 #endif
 
-namespace UrSQL {
+namespace ursql {
 
 class Block;
 
@@ -121,4 +121,4 @@ private:
     StatusResult _loadTOC(TOC& aTOC);
 };
 
-}  // namespace UrSQL
+}  // namespace ursql

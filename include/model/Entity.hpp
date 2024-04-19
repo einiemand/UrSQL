@@ -4,7 +4,7 @@
 
 #include "Attribute.hpp"
 
-namespace UrSQL {
+namespace ursql {
 
 class Row;
 
@@ -60,4 +60,4 @@ private:
     size_type _indexOfBlocknum(blocknum_t aBlocknum) const;
 };
 
-}  // namespace UrSQL
+}  // namespace ursql

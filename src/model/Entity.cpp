@@ -3,7 +3,7 @@
 #include "model/BufferStream.hpp"
 #include "model/Row.hpp"
 
-namespace UrSQL {
+namespace ursql {
 
 Entity::Entity(blocknum_t aBlocknum)
     : MonoStorable(aBlocknum),
@@ -149,4 +149,4 @@ size_type Entity::_indexOfBlocknum(blocknum_t aBlocknum) const {
       std::find(m_rowPos.cbegin(), m_rowPos.cend(), aBlocknum));
 }
 
-}  // namespace UrSQL
+}  // namespace ursql

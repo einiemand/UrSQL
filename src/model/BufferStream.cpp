@@ -2,7 +2,7 @@
 
 #include "model/Storable.hpp"
 
-namespace UrSQL {
+namespace ursql {
 
 namespace detail {
 
@@ -52,4 +52,4 @@ BufferWriter& BufferWriter::operator<<(const Storable& aStorable) {
     return *this;
 }
 
-}  // namespace UrSQL
+}  // namespace ursql

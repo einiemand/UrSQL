@@ -8,7 +8,7 @@
 #include "model/FolderReader.hpp"
 #include "model/Row.hpp"
 
-namespace UrSQL {
+namespace ursql {
 
 /* -------------------------------ShowDatabasesView-------------------------------
  */
@@ -221,4 +221,4 @@ std::string View::valueType2String(ValueType aType) {
     }
 }
 
-}  // namespace UrSQL
+}  // namespace ursql

@@ -3,7 +3,7 @@
 #include "model/BufferStream.hpp"
 #include "model/Storable.hpp"
 
-namespace UrSQL {
+namespace ursql {
 
 Block::Block(BlockType aType) : m_type(aType), m_Data("") {}
 
@@ -25,4 +25,4 @@ Block& Block::operator=(const Block& rhs) noexcept {
     return *this;
 }
 
-}  // namespace UrSQL
+}  // namespace ursql

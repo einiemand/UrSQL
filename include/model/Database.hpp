@@ -10,7 +10,7 @@
 #include "Storage.hpp"
 #include "TOC.hpp"
 
-namespace UrSQL {
+namespace ursql {
 
 class Filter;
 class Order;
@@ -89,4 +89,4 @@ private:
     StatusResult _dropEntity(const std::string& anEntityName);
 };
 
-}  // namespace UrSQL
+}  // namespace ursql

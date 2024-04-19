@@ -1,15 +1,10 @@
-add_subdirectory(common)
-add_subdirectory(controller)
-add_subdirectory(model)
-add_subdirectory(view)
+file(GLOB_RECURSE URSQL_HEADERS ${CMAKE_SOURCE_DIR}/include/*.hpp)
+file(GLOB_RECURSE URSQL_SOURCES *.cpp)
 
-set(URSQL_MVC
-        ursql_common
-        ursql_controller
-        ursql_model
-        ursql_view
-        )
-set(URSQL_MAIN main.cpp)
+list(REMOVE_ITEM URSQL_SOURCES main.cpp)
 
-add_executable(ursql ${URSQL_MAIN})
-target_link_libraries(ursql ${URSQL_MVC})
+add_library(ursql_lib ${URSQL_SOURCES})
+target_include_directories(ursql_lib PUBLIC ${CMAKE_SOURCE_DIR}/include)
+
+add_executable(ursql main.cpp)
+target_link_libraries(ursql ursql_lib)

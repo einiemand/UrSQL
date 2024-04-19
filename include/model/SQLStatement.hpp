@@ -4,7 +4,7 @@
 
 #include "Statement.hpp"
 
-namespace UrSQL {
+namespace ursql {
 
 class SQLInterpreter;
 
@@ -23,4 +23,4 @@ protected:
     StatusResult _parseTableName();
 };
 
-}  // namespace UrSQL
+}  // namespace ursql

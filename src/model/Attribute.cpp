@@ -2,7 +2,7 @@
 
 #include "model/BufferStream.hpp"
 
-namespace UrSQL {
+namespace ursql {
 
 Attribute::Attribute()
     : m_name(),
@@ -22,4 +22,4 @@ void Attribute::deserialize(BufferReader& aReader) {
       m_isPrimary >> m_isAutoIncr;
 }
 
-}  // namespace UrSQL
+}  // namespace ursql

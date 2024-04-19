@@ -8,7 +8,7 @@
 #include <sys/stat.h>
 #endif
 
-namespace UrSQL {
+namespace ursql {
 
 #ifdef _WIN32
 class WindowsDirEntIterator {
@@ -137,4 +137,4 @@ StatusResult FolderReader::eachFile(FileVisitor aVisitor) const {
     return theResult;
 }
 
-}  // namespace UrSQL
+}  // namespace ursql

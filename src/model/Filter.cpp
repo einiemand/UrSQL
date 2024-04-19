@@ -4,9 +4,9 @@
 
 #include "model/Entity.hpp"
 #include "model/Row.hpp"
-#include "model/Tokenizer.hpp"
+#include "token/Tokenizer.hpp"
 
-namespace UrSQL {
+namespace ursql {
 
 static const std::unordered_map<std::string_view, Comparator> compMap{
     { "=", Comparator::eq_op },  { "==", Comparator::eq_op },
@@ -179,4 +179,4 @@ bool Filter::match(const Row& aRow) const {
     return matched;
 }
 
-}  // namespace UrSQL
+}  // namespace ursql

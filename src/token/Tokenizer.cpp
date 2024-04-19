@@ -1,12 +1,12 @@
-#include "model/Tokenizer.hpp"
+#include "token/Tokenizer.hpp"
 
 #include <algorithm>
 #include <cstring>
 
 #include "model/Keyword.hpp"
-#include "model/Token.hpp"
+#include "token/Token.hpp"
 
-namespace UrSQL {
+namespace ursql {
 
 constexpr char leftParen = '(';
 constexpr char rightParen = ')';
@@ -160,4 +160,4 @@ std::string Tokenizer::_readUntil(TokenizeCondition aCondition) {
     return theData;
 }
 
-}  // namespace UrSQL
+}  // namespace ursql

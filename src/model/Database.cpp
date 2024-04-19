@@ -3,7 +3,7 @@
 #include "model/Filter.hpp"
 #include "model/Order.hpp"
 
-namespace UrSQL {
+namespace ursql {
 
 Database::Database(const std::string& aFileName, CreateNewFile,
                    StatusResult& aResult)
@@ -301,4 +301,4 @@ StatusResult Database::_dropEntity(const std::string& anEntityName) {
     return theResult;
 }
 
-}  // namespace UrSQL
+}  // namespace ursql

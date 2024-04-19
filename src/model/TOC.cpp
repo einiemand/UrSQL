@@ -2,7 +2,7 @@
 
 #include "model/BufferStream.hpp"
 
-namespace UrSQL {
+namespace ursql {
 
 TOC::TOC() : MonoStorable(0), m_dirty(false), m_entityMap() {}
 
@@ -62,4 +62,4 @@ StringList TOC::collectEntityNames() const {
     return theEntityNames;
 }
 
-}  // namespace UrSQL
+}  // namespace ursql

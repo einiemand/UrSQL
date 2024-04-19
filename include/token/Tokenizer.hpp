@@ -7,7 +7,7 @@
 #include "Token.hpp"
 #include "common/Error.hpp"
 
-namespace UrSQL {
+namespace ursql {
 
 class Tokenizer {
 public:
@@ -62,4 +62,4 @@ private:
     }
 };
 
-}  // namespace UrSQL
+}  // namespace ursql

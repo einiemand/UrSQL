@@ -4,10 +4,10 @@
 #include "model/Filter.hpp"
 #include "model/Order.hpp"
 #include "model/SQLStatement.hpp"
-#include "model/Tokenizer.hpp"
+#include "token/Tokenizer.hpp"
 #include "view/View.hpp"
 
-namespace UrSQL {
+namespace ursql {
 
 SQLInterpreter::SQLInterpreter(Interpreter* next) : Interpreter(next) {}
 
@@ -194,4 +194,4 @@ StatusResult SQLInterpreter::updateTable(const std::string& anEntityName,
     return theResult;
 }
 
-}  // namespace UrSQL
+}  // namespace ursql

@@ -4,7 +4,7 @@
 #include "model/Attribute.hpp"
 #include "model/Row.hpp"
 
-namespace UrSQL {
+namespace ursql {
 
 class Filter;
 class Order;
@@ -39,4 +39,4 @@ public:
                              const Filter* aFilter) const;
 };
 
-}  // namespace UrSQL
+}  // namespace ursql

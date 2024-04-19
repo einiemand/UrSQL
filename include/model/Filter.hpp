@@ -2,7 +2,7 @@
 
 #include "Value.hpp"
 
-namespace UrSQL {
+namespace ursql {
 
 class Tokenizer;
 class Row;
@@ -51,7 +51,10 @@ using ExpressionList = std::vector<Expression>;
 
 class Filter {
 public:
-    enum class ExpRelation { AND, OR };
+    enum class ExpRelation {
+        AND,
+        OR
+    };
     using ExpRelationList = std::vector<ExpRelation>;
 
     Filter() = default;
@@ -70,4 +73,4 @@ private:
     ExpRelationList m_relations;
 };
 
-}  // namespace UrSQL
+}  // namespace ursql

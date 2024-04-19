@@ -5,7 +5,7 @@
 #include "model/BufferStream.hpp"
 #include "model/Order.hpp"
 
-namespace UrSQL {
+namespace ursql {
 
 Row::Row(blocknum_t aBlocknum) : MonoStorable(aBlocknum), m_data() {}
 
@@ -81,4 +81,4 @@ void RowCollection::reorder(const Order& anOrder) {
     }
 }
 
-}  // namespace UrSQL
+}  // namespace ursql

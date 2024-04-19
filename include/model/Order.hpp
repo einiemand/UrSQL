@@ -4,7 +4,7 @@
 
 #include "common/Error.hpp"
 
-namespace UrSQL {
+namespace ursql {
 
 class Entity;
 
@@ -33,4 +33,4 @@ private:
     bool m_desc;
 };
 
-}  // namespace UrSQL
+}  // namespace ursql

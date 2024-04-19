@@ -5,7 +5,7 @@
 
 #include "Value.hpp"
 
-namespace UrSQL {
+namespace ursql {
 
 class Row : public MonoStorable {
 public:
@@ -66,4 +66,4 @@ private:
     std::vector<Row> m_rows;
 };
 
-}  // namespace UrSQL
+}  // namespace ursql

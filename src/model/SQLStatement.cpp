@@ -8,9 +8,9 @@
 #include "model/Filter.hpp"
 #include "model/Order.hpp"
 #include "model/Row.hpp"
-#include "model/Tokenizer.hpp"
+#include "token/Tokenizer.hpp"
 
-namespace UrSQL {
+namespace ursql {
 
 SQLStatement::SQLStatement(Tokenizer& aTokenizer, SQLInterpreter& anInterpreter)
     : Statement(aTokenizer),
@@ -786,4 +786,4 @@ std::unique_ptr<SQLStatement> SQLStatement::factory(
     }
 }
 
-}  // namespace UrSQL
+}  // namespace ursql

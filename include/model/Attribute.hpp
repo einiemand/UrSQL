@@ -3,7 +3,7 @@
 #include "Storable.hpp"
 #include "Value.hpp"
 
-namespace UrSQL {
+namespace ursql {
 
 class Attribute : public Storable {
 public:
@@ -75,4 +75,4 @@ private:
 
 using AttributeList = std::vector<Attribute>;
 
-}  // namespace UrSQL
+}  // namespace ursql

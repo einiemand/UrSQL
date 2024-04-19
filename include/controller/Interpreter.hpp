@@ -5,7 +5,7 @@
 #include "common/Error.hpp"
 #include "model/Statement.hpp"
 
-namespace UrSQL {
+namespace ursql {
 
 class Tokenizer;
 class Database;
@@ -39,4 +39,4 @@ protected:
     Interpreter* m_next;
 };
 
-}  // namespace UrSQL
+}  // namespace ursql

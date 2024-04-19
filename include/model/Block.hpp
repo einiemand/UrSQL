@@ -4,7 +4,7 @@
 
 #include "common/Util.hpp"
 
-namespace UrSQL {
+namespace ursql {
 
 enum class BlockType : char {
     TOC_type = 'C',
@@ -53,4 +53,4 @@ private:
 static_assert(sizeof(Block) == defaultBlockSize,
               "Block size is not equal to defaultBlockSize. Fix it!");
 
-}  // namespace UrSQL
+}  // namespace ursql

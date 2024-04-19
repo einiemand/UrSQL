@@ -5,7 +5,7 @@
 #include "model/Database.hpp"
 
 int main(int argc, char* argv[]) {
-    using namespace UrSQL;
+    using namespace ursql;
     if (argc > 2) {
         defaultOutput << "Too many arguments(>2) to unpack\n";
         return 0;

@@ -5,7 +5,7 @@
 
 #include "model/TOC.hpp"
 
-namespace UrSQL {
+namespace ursql {
 
 #ifdef ENABLE_BLOCKCACHE
 /* -------------------------------BlockCache------------------------------- */
@@ -255,4 +255,4 @@ StatusResult Storage::findFreeBlocknumber(blocknum_t& aFreeBlocknum) {
     return theResult;
 }
 
-}  // namespace UrSQL
+}  // namespace ursql

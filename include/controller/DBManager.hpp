@@ -2,7 +2,7 @@
 
 #include "Interpreter.hpp"
 
-namespace UrSQL {
+namespace ursql {
 
 class Statement;
 class Database;
@@ -34,4 +34,4 @@ private:
     static StatusResult _collectDBNames(StringList& aDBNames);
 };
 
-}  // namespace UrSQL
+}  // namespace ursql

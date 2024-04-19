@@ -2,7 +2,7 @@
 
 #include <string_view>
 
-namespace UrSQL {
+namespace ursql {
 
 enum class Keyword {
     add_kw,
@@ -55,4 +55,4 @@ bool isKeyword(std::string_view aWord);
 
 Keyword toKeyword(std::string_view aWord);
 
-}  // namespace UrSQL
+}  // namespace ursql

@@ -3,7 +3,7 @@
 #include "Block.hpp"
 #include "common/Error.hpp"
 
-namespace UrSQL {
+namespace ursql {
 
 class BufferWriter;
 class BufferReader;
@@ -39,4 +39,4 @@ protected:
     blocknum_t m_blocknum;
 };
 
-}  // namespace UrSQL
+}  // namespace ursql

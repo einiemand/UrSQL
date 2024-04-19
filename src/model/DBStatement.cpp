@@ -1,9 +1,9 @@
 #include "model/DBStatement.hpp"
 
 #include "controller/DBManager.hpp"
-#include "model/Tokenizer.hpp"
+#include "token/Tokenizer.hpp"
 
-namespace UrSQL {
+namespace ursql {
 
 DBStatement::DBStatement(Tokenizer& aTokenizer, DBManager& aDBManager)
     : Statement(aTokenizer),
@@ -285,4 +285,4 @@ std::unique_ptr<DBStatement> DBStatement::factory(Tokenizer& aTokenizer,
     }
 }
 
-}  // namespace UrSQL
+}  // namespace ursql

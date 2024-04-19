@@ -7,7 +7,7 @@
 
 #include "controller/Interpreter.hpp"
 
-namespace UrSQL {
+namespace ursql {
 
 class Processor {
 public:
@@ -37,4 +37,4 @@ private:
     InterpreterList m_interpreters;
 };
 
-} /* namespace UrSQL */
+} /* namespace ursql */

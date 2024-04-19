@@ -12,8 +12,7 @@ endif()
 message(STATUS "Flags: ${CMAKE_CXX_FLAGS}")
 
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-include_directories(include)
-
-add_subdirectory(include)
 add_subdirectory(src)
+add_subdirectory(test)

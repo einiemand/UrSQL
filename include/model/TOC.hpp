@@ -2,7 +2,7 @@
 
 #include "Storable.hpp"
 
-namespace UrSQL {
+namespace ursql {
 
 class TOC : public MonoStorable {
 public:
@@ -41,4 +41,4 @@ private:
     EntityMap m_entityMap;
 };
 
-}  // namespace UrSQL
+}  // namespace ursql

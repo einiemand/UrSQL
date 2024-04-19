@@ -1,9 +1,9 @@
 #include "controller/BasicInterpreter.hpp"
 
 #include "model/Statement.hpp"
-#include "model/Tokenizer.hpp"
+#include "token/Tokenizer.hpp"
 
-namespace UrSQL {
+namespace ursql {
 
 BasicInterpreter::BasicInterpreter(Interpreter* anInterpreter)
     : Interpreter(anInterpreter) {}
@@ -21,4 +21,4 @@ std::unique_ptr<Statement> BasicInterpreter::getStatement(
     }
 }
 
-}  // namespace UrSQL
+}  // namespace ursql

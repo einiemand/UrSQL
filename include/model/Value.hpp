@@ -5,7 +5,7 @@
 #include "Keyword.hpp"
 #include "Storable.hpp"
 
-namespace UrSQL {
+namespace ursql {
 
 enum class ValueType : char {
     int_type,
@@ -86,4 +86,4 @@ inline bool operator>=(const Value& lhs, const Value& rhs) {
     return rhs <= lhs;
 }
 
-}  // namespace UrSQL
+}  // namespace ursql

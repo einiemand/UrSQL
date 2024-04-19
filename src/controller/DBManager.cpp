@@ -3,10 +3,10 @@
 #include "model/DBStatement.hpp"
 #include "model/Database.hpp"
 #include "model/FolderReader.hpp"
-#include "model/Tokenizer.hpp"
+#include "token/Tokenizer.hpp"
 #include "view/View.hpp"
 
-namespace UrSQL {
+namespace ursql {
 
 DBManager::DBManager(Interpreter* anInterpreter)
     : Interpreter(anInterpreter),
@@ -164,4 +164,4 @@ StatusResult DBManager::_collectDBNames(StringList& aDBNames) {
       });
 }
 
-}  // namespace UrSQL
+}  // namespace ursql

@@ -2,7 +2,7 @@
 
 #include "model/BufferStream.hpp"
 
-namespace UrSQL {
+namespace ursql {
 
 MonoStorable::MonoStorable(blocknum_t aBlocknum)
     : Storable(),
@@ -21,4 +21,4 @@ void MonoStorable::decode(const Block& aBlock) {
     deserialize(theReader);
 }
 
-}  // namespace UrSQL
+}  // namespace ursql

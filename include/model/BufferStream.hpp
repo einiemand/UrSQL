@@ -5,7 +5,7 @@
 
 #include "common/Error.hpp"
 
-namespace UrSQL {
+namespace ursql {
 
 class Storable;
 
@@ -84,4 +84,4 @@ private:
     detail::BufferData m_bufData;
 };
 
-}  // namespace UrSQL
+}  // namespace ursql

@@ -2,7 +2,7 @@
 
 #include "model/Entity.hpp"
 
-namespace UrSQL {
+namespace ursql {
 
 Order::Order() : m_fieldName(), m_desc(false) {}
 
@@ -20,4 +20,4 @@ void Order::setDesc(bool aDesc) {
     m_desc = aDesc;
 }
 
-}  // namespace UrSQL
+}  // namespace ursql

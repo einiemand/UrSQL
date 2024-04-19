@@ -2,7 +2,7 @@
 
 #include <unordered_map>
 
-namespace UrSQL {
+namespace ursql {
 
 std::ostream& defaultOutput = std::cout;
 
@@ -53,4 +53,4 @@ void StatusResult::showError() const {
     defaultOutput << m_msg;
 }
 
-}  // namespace UrSQL
+}  // namespace ursql

@@ -4,7 +4,7 @@
 
 #include "common/Error.hpp"
 
-namespace UrSQL {
+namespace ursql {
 
 class FolderReader {
 public:
@@ -21,4 +21,4 @@ private:
     std::string m_path;
 };
 
-}  // namespace UrSQL
+}  // namespace ursql

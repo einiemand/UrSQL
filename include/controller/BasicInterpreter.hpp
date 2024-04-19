@@ -2,7 +2,7 @@
 
 #include "Interpreter.hpp"
 
-namespace UrSQL {
+namespace ursql {
 
 class BasicInterpreter : public Interpreter {
 public:
@@ -12,4 +12,4 @@ public:
     std::unique_ptr<Statement> getStatement(Tokenizer& aTokenizer) override;
 };
 
-}  // namespace UrSQL
+}  // namespace ursql

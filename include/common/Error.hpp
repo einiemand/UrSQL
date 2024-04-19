@@ -4,7 +4,7 @@
 
 #include "common/Util.hpp"
 
-namespace UrSQL {
+namespace ursql {
 
 enum class Error {
     // parse related...
@@ -96,4 +96,4 @@ private:
     std::string m_msg;
 };
 
-}  // namespace UrSQL
+}  // namespace ursql

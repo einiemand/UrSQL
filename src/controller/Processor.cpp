@@ -5,9 +5,9 @@
 #include <iomanip>
 #include <sstream>
 
-#include "model/Tokenizer.hpp"
+#include "token/Tokenizer.hpp"
 
-namespace UrSQL {
+namespace ursql {
 
 class TimeCounter {
 public:
@@ -64,4 +64,4 @@ bool Processor::consumeOne(const std::string& aCommandString) {
     return theResult.getCode() == Error::user_terminated;
 }
 
-}  // namespace UrSQL
+}  // namespace ursql

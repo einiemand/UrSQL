@@ -1,8 +1,8 @@
 #include "model/Statement.hpp"
 
-#include "model/Tokenizer.hpp"
+#include "token/Tokenizer.hpp"
 
-namespace UrSQL {
+namespace ursql {
 
 Statement::Statement(Tokenizer& aTokenizer) : m_tokenizer(aTokenizer) {}
 
@@ -59,4 +59,4 @@ StatusResult BasicStatement::execute() const {
     return theResult;
 }
 
-}  // namespace UrSQL
+}  // namespace ursql

@@ -4,7 +4,7 @@
 
 #include "Statement.hpp"
 
-namespace UrSQL {
+namespace ursql {
 
 class DBManager;
 
@@ -20,4 +20,4 @@ protected:
     DBManager& m_manager;
 };
 
-}  // namespace UrSQL
+}  // namespace ursql

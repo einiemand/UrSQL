@@ -2,7 +2,7 @@
 
 #include "common/Error.hpp"
 
-namespace UrSQL {
+namespace ursql {
 
 enum class ValueType : char;
 
@@ -102,4 +102,4 @@ private:
     const StringList& m_entityNames;
 };
 
-}  // namespace UrSQL
+}  // namespace ursql
