@@ -25,6 +25,4 @@ struct size_trait<8> {
 
 using blocknum_t = size_trait<sizeof(void*)>::int_t;
 
-using StringList = std::vector<std::string>;
-
 }  // namespace ursql
