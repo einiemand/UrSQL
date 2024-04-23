@@ -8,9 +8,11 @@ namespace ursql {
 
 class TokenIterator {
 public:
-    using TokenEvalFunction = std::function<bool(const Token&)>;
+    using TokenPredicate = std::function<bool(const Token&)>;
 
-    explicit TokenIterator(std::vector<Token> tokens);
+    static TokenIterator tokenize(std::istream& input);
+
+    explicit TokenIterator(std::vector<Token>&& tokens);
     ~TokenIterator() = default;
 
     [[nodiscard]] bool hasNext() const noexcept;
@@ -19,7 +21,7 @@ public:
     [[nodiscard]] std::size_t remaining() const noexcept;
     [[nodiscard]] const Token& peek() const;
 
-    bool skipIf(const TokenEvalFunction& evalFunction);
+    bool skipIf(const TokenPredicate& pred);
     bool skipIf(Keyword keyword);
     bool skipIf(Punctuation punctuation);
 
