@@ -1,6 +1,9 @@
 #include "parser/TokenIterator.hpp"
+
 #include <istream>
 #include <regex>
+
+#include "exception/UserError.hpp"
 
 namespace ursql {
 
@@ -39,7 +42,9 @@ using CharPredicate = std::function<bool(char)>;
 
 std::string readUntil(std::istream& input, const CharPredicate& pred) {
     std::string str;
-    for (auto peek = input.peek(); std::char_traits<char>::not_eof(peek); peek = input.peek()) {
+    for (auto peek = input.peek(); std::char_traits<char>::not_eof(peek);
+         peek = input.peek())
+    {
         char c = std::char_traits<char>::to_char_type(peek);
         if (pred(c)) {
             break;
@@ -51,61 +56,76 @@ std::string readUntil(std::istream& input, const CharPredicate& pred) {
 }
 
 std::string readUntil(std::istream& input, char c) {
-    return readUntil(input, [c](char ch) { return c == ch; });
+    return readUntil(input, [c](char ch) {
+        return c == ch;
+    });
 }
 
 std::string readWhile(std::istream& input, const CharPredicate& pred) {
-    return readUntil(input, [&](char c) { return !pred(c); });
+    return readUntil(input, [&](char c) {
+        return !pred(c);
+    });
 }
 
-}
+}  // namespace
 
 TokenIterator TokenIterator::tokenize(std::istream& input) {
     std::vector<Token> tokens;
-    for (auto peek = input.peek(); std::char_traits<char>::not_eof(peek); peek = input.peek()) {
+    for (auto peek = input.peek(); std::char_traits<char>::not_eof(peek);
+         peek = input.peek())
+    {
         char ch = std::char_traits<char>::to_char_type(peek);
         if (isWhiteSpace(ch)) {
             input.ignore();
         } else if (isAlpha(ch)) {
             std::string str = readUntil(input, isSeparator);
-            std::transform(std::begin(str), std::end(str), std::begin(str), ::tolower);
+            std::transform(std::begin(str), std::end(str), std::begin(str),
+                           ::tolower);
             if (isKeyword(str)) {
-                tokens.emplace_back(token_type_index<TokenType::keyword>, toKeyword(str));
+                tokens.emplace_back(token_type_index<TokenType::keyword>,
+                                    toKeyword(str));
             } else {
-                tokens.emplace_back(token_type_index<TokenType::identifier>, std::move(str));
+                tokens.emplace_back(token_type_index<TokenType::identifier>,
+                                    std::move(str));
             }
         } else if (isPunctuation(ch)) {
-            tokens.emplace_back(token_type_index<TokenType::punctuation>, toPunctuation(ch));
+            tokens.emplace_back(token_type_index<TokenType::punctuation>,
+                                toPunctuation(ch));
             input.ignore();
         } else if (charIsComparator(ch)) {
             std::string str = readWhile(input, charIsComparator);
             if (!strIsComparator(str)) {
-                // TODO: throw here
+                throw SyntaxError(str + " is not a comparator");
             }
-            tokens.emplace_back(token_type_index<TokenType::comparator>, toComparator(str));
+            tokens.emplace_back(token_type_index<TokenType::comparator>,
+                                toComparator(str));
         } else if (isDigit(ch)) {
             std::string str = readUntil(input, isSeparator);
             if (!isNumber(str)) {
-                // TODO: throw here
+                throw SyntaxError(str + " is not a number");
             }
-            tokens.emplace_back(token_type_index<TokenType::number>, std::stof(str));
+            tokens.emplace_back(token_type_index<TokenType::number>,
+                                std::stof(str));
         } else if (isOperator(ch)) {
-            tokens.emplace_back(token_type_index<TokenType::op>, toOperator(ch));
+            tokens.emplace_back(token_type_index<TokenType::op>,
+                                toOperator(ch));
             input.ignore();
         } else if (isQuote(ch)) {
             input.ignore();
             std::string str = readUntil(input, ch);
             if (input.peek() != peek) {
-                // TODO: throw here
+                throw SyntaxError(std::string("a closing quote ") + ch +
+                                  " is missing");
             }
             input.ignore();
             if (ch == singleQuote) {
                 tokens.emplace_back(token_type_index<TokenType::text>, str);
             } else {
-                tokens.emplace_back(token_type_index<TokenType::identifier>, str);
+                tokens.emplace_back(token_type_index<TokenType::identifier>,
+                                    str);
             }
         } else {
-            // TODO: throw here
+            throw SyntaxError(std::string("unknown character ") + ch);
         }
     }
     return TokenIterator(std::move(tokens));

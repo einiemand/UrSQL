@@ -1,7 +1,11 @@
 #include "parser/TokenEnums.hpp"
-#include "common/Macros.hpp"
 
+#include <iostream>
+#include <string>
 #include <unordered_map>
+
+#include "common/Macros.hpp"
+#include "exception/InternalError.hpp"
 
 namespace ursql {
 
@@ -59,15 +63,11 @@ const std::unordered_map<std::string_view, Keyword> str2keyword{
 };
 
 const std::unordered_map<std::string_view, Comparator> str2Comparator{
-    { "=", Comparator::eq },
-    { "!=", Comparator::ne },
-    { "<", Comparator::lt },
-    { "<=", Comparator::le },
-    { ">", Comparator::gt },
-    { ">=", Comparator::ge }
+    { "=", Comparator::eq },  { "!=", Comparator::ne }, { "<", Comparator::lt },
+    { "<=", Comparator::le }, { ">", Comparator::gt },  { ">=", Comparator::ge }
 };
 
-}
+}  // namespace
 
 bool strIsComparator(std::string_view str) {
     return str2Comparator.find(str) != std::end(str2Comparator);
@@ -75,10 +75,9 @@ bool strIsComparator(std::string_view str) {
 
 Comparator toComparator(std::string_view str) {
     auto it = str2Comparator.find(str);
-    if (it != std::end(str2Comparator)) {
-        return it->second;
-    }
-    URSQL_UNREACHABLE;
+    URSQL_ASSERT(it != std::end(str2Comparator),
+                 std::string(str) + " is not a comparator");
+    return it->second;
 }
 
 bool charIsComparator(char c) {
@@ -109,7 +108,7 @@ Operator toOperator(char c) {
     case '/':
         return Operator::slash;
     default:
-        URSQL_UNREACHABLE;
+        URSQL_UNREACHABLE(std::string(1, c) + " is not an operator");
     }
 }
 
@@ -126,7 +125,7 @@ Punctuation toPunctuation(char c) {
     case rightParen:
         return Punctuation::rparen;
     default:
-        URSQL_UNREACHABLE;
+        URSQL_UNREACHABLE(std::string(1, c) + " is not a punctuation");
     }
 }
 

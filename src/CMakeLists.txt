@@ -1,5 +1,5 @@
-file(GLOB_RECURSE URSQL_HEADERS ${CMAKE_SOURCE_DIR}/include/parser/*.hpp)
-file(GLOB_RECURSE URSQL_SOURCES parser/*.cpp)
+file(GLOB_RECURSE URSQL_HEADERS ${CMAKE_SOURCE_DIR}/include/parser/*.hpp ${CMAKE_SOURCE_DIR}/include/exception/*.hpp)
+file(GLOB_RECURSE URSQL_SOURCES parser/*.cpp exception/*.cpp)
 
 #list(REMOVE_ITEM URSQL_SOURCES main.cpp)
 
