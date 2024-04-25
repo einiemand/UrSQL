@@ -54,7 +54,6 @@ enum class Keyword {
     table_kw,
     tables_kw,
     unique_kw,
-    unknown_kw,
     update_kw,
     use_kw,
     values_kw,

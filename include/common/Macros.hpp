@@ -52,19 +52,23 @@
 
 #define URSQL_PRINT_LOCATION \
     std::cerr << __FILE__ << ':' << __func__ << ':' << __LINE__ << '\n'
-#define URSQL_ASSERT(predicate, message)  \
-    do {                                  \
-        if (!(predicate)) {               \
-            URSQL_PRINT_LOCATION;         \
-            URSQL_PRINT_BACKTRACE;        \
-            throw AssertFailure(message); \
-        }                                 \
+
+#define URSQL_FAIL(e, message) \
+    do {                       \
+        URSQL_PRINT_LOCATION;  \
+        URSQL_PRINT_BACKTRACE; \
+        throw e(message);      \
     } while (false)
 
-// unreachable
-#define URSQL_UNREACHABLE(message)         \
-    do {                                   \
-        URSQL_PRINT_LOCATION;              \
-        URSQL_PRINT_BACKTRACE;             \
-        throw UnreachableReached(message); \
+#define URSQL_EXPECT(predicate, e, message) \
+    do {                                    \
+        if (!(predicate)) {                 \
+            URSQL_FAIL(e, message);          \
+        }                                   \
     } while (false)
+
+#define URSQL_ASSERT(predicate, message) \
+    URSQL_EXPECT(predicate, AssertFailure, message)
+
+// unreachable
+#define URSQL_UNREACHABLE(message) URSQL_FAIL(UnreachableReached, message)

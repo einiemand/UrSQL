@@ -1,7 +1,7 @@
 #include "parser/TokenEnums.hpp"
 
 #include <iostream>
-#include <string>
+#include <format>
 #include <unordered_map>
 
 #include "common/Macros.hpp"
@@ -15,7 +15,7 @@ constexpr const char leftParen = '(';
 constexpr const char rightParen = ')';
 constexpr const char comma = ',';
 
-const std::unordered_map<std::string_view, Keyword> str2keyword{
+const std::unordered_map<std::string_view, Keyword> str2Keyword{
     { "add", Keyword::add_kw },
     { "and", Keyword::and_kw },
     { "asc", Keyword::asc_kw },
@@ -76,7 +76,7 @@ bool strIsComparator(std::string_view str) {
 Comparator toComparator(std::string_view str) {
     auto it = str2Comparator.find(str);
     URSQL_ASSERT(it != std::end(str2Comparator),
-                 std::string(str) + " is not a comparator");
+                 std::format("{} is not a comparator", str));
     return it->second;
 }
 
@@ -84,13 +84,14 @@ bool charIsComparator(char c) {
     return strchr("!<=>", c) != nullptr;
 }
 
-bool isKeyword(std::string_view aWord) {
-    return str2keyword.find(aWord) != std::end(str2keyword);
+bool isKeyword(std::string_view str) {
+    return str2Keyword.find(str) != std::end(str2Keyword);
 }
 
-Keyword toKeyword(std::string_view aWord) {
-    auto it = str2keyword.find(aWord);
-    return it != std::end(str2keyword) ? it->second : Keyword::unknown_kw;
+Keyword toKeyword(std::string_view str) {
+    auto it = str2Keyword.find(str);
+    URSQL_ASSERT(it != std::end(str2Keyword), std::format("{} is not a keyword", str));
+    return it->second;
 }
 
 bool isOperator(char c) {
@@ -108,7 +109,7 @@ Operator toOperator(char c) {
     case '/':
         return Operator::slash;
     default:
-        URSQL_UNREACHABLE(std::string(1, c) + " is not an operator");
+        URSQL_UNREACHABLE(std::format("{} is not an operator", c));
     }
 }
 
@@ -125,7 +126,7 @@ Punctuation toPunctuation(char c) {
     case rightParen:
         return Punctuation::rparen;
     default:
-        URSQL_UNREACHABLE(std::string(1, c) + " is not a punctuation");
+        URSQL_UNREACHABLE(std::format("{} is not a punctuation", c));
     }
 }
 
