@@ -80,8 +80,6 @@ TokenIterator TokenIterator::tokenize(std::istream& input) {
             input.ignore();
         } else if (isAlpha(ch)) {
             std::string str = readUntil(input, isSeparator);
-            std::transform(std::begin(str), std::end(str), std::begin(str),
-                           ::tolower);
             if (isKeyword(str)) {
                 tokens.emplace_back(token_type_index<TokenType::keyword>,
                                     toKeyword(str));

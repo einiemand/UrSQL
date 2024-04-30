@@ -3,6 +3,7 @@
 #include <iostream>
 #include <format>
 #include <unordered_map>
+#include <cstring>
 
 #include "common/Macros.hpp"
 #include "exception/InternalError.hpp"
@@ -55,6 +56,7 @@ const std::unordered_map<std::string_view, Keyword> str2Keyword{
     { "table", Keyword::table_kw },
     { "tables", Keyword::tables_kw },
     { "true", Keyword::true_kw },
+    { "truncate", Keyword::truncate_kw },
     { "unique", Keyword::unique_kw },
     { "update", Keyword::update_kw },
     { "use", Keyword::use_kw },
@@ -68,6 +70,15 @@ const std::unordered_map<std::string_view, Comparator> str2Comparator{
     { "=", Comparator::eq },  { "!=", Comparator::ne }, { "<", Comparator::lt },
     { "<=", Comparator::le }, { ">", Comparator::gt },  { ">=", Comparator::ge }
 };
+
+std::string tolower(std::string_view str) {
+    std::string lowerStr;
+    lowerStr.reserve(str.length());
+    for (char ch : str) {
+        lowerStr += std::char_traits<char>::to_char_type(std::tolower(std::char_traits<char>::to_int_type(ch)));
+    }
+    return lowerStr;
+}
 
 }  // namespace
 
@@ -87,11 +98,13 @@ bool charIsComparator(char c) {
 }
 
 bool isKeyword(std::string_view str) {
-    return str2Keyword.find(str) != std::end(str2Keyword);
+    std::string lowerStr = tolower(str);
+    return str2Keyword.find(lowerStr) != std::end(str2Keyword);
 }
 
 Keyword toKeyword(std::string_view str) {
-    auto it = str2Keyword.find(str);
+    std::string lowerStr = tolower(str);
+    auto it = str2Keyword.find(lowerStr);
     URSQL_ASSERT(it != std::end(str2Keyword), std::format("{} is not a keyword", str));
     return it->second;
 }

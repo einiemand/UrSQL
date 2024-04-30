@@ -2,6 +2,7 @@
 
 #include <gtest/gtest.h>
 #include "parser/TokenIterator.hpp"
+#include "exception/UserError.hpp"
 
 namespace ursql {
 
@@ -83,6 +84,27 @@ TEST(TokenIteratorTest, del) {
     ASSERT_EQ("free form", it.next().get<TokenType::identifier>());
     ASSERT_EQ(Comparator::eq, it.next().get<TokenType::comparator>());
     ASSERT_EQ(Keyword::false_kw, it.next().get<TokenType::keyword>());
+    ASSERT_FALSE(it.hasNext());
+}
+
+TEST(TokenIteratorTest, drop) {
+    std::istringstream iss("Drop \v \t\f TaBlE \"sOme idEntifier\"");
+    TokenIterator it = TokenIterator::tokenize(iss);
+    ASSERT_EQ(3, it.remaining());
+    ASSERT_EQ(Keyword::drop_kw, it.next().get<TokenType::keyword>());
+    ASSERT_EQ(Keyword::table_kw, it.next().get<TokenType::keyword>());
+    ASSERT_EQ("sOme idEntifier", it.next().get<TokenType::identifier>());
+    ASSERT_FALSE(it.hasNext());
+}
+
+TEST(TokenIteratorTest, truncate) {
+    std::istringstream iss("tRunCaTE \v \t\f TaBlE \nwHat\r");
+    TokenIterator it = TokenIterator::tokenize(iss);
+    ASSERT_EQ(3, it.remaining());
+    ASSERT_EQ(Keyword::truncate_kw, it.next().get<TokenType::keyword>());
+    ASSERT_EQ(Keyword::table_kw, it.next().get<TokenType::keyword>());
+    ASSERT_EQ("wHat", it.next().get<TokenType::identifier>());
+    ASSERT_FALSE(it.hasNext());
 }
 
 TEST(TokenIteratorTest, select) {
@@ -100,7 +122,7 @@ TEST(TokenIteratorTest, select) {
     ASSERT_EQ(Comparator::eq, it.next().get<TokenType::comparator>());
     ASSERT_FLOAT_EQ(1, it.next().get<TokenType::number>());
     ASSERT_EQ(Keyword::and_kw, it.next().get<TokenType::keyword>());
-    ASSERT_EQ("job", it.next().get<TokenType::identifier>());
+    ASSERT_EQ("jOb", it.next().get<TokenType::identifier>());
     ASSERT_EQ(Comparator::eq, it.next().get<TokenType::comparator>());
     ASSERT_EQ("no job", it.next().get<TokenType::text>());
     ASSERT_EQ(Keyword::and_kw, it.next().get<TokenType::keyword>());
@@ -116,9 +138,29 @@ TEST(TokenIteratorTest, select) {
     ASSERT_EQ(Punctuation::rparen, it.next().get<TokenType::punctuation>());
     ASSERT_EQ(Keyword::order_kw, it.next().get<TokenType::keyword>());
     ASSERT_EQ(Keyword::by_kw, it.next().get<TokenType::keyword>());
-    ASSERT_EQ("name", it.next().get<TokenType::identifier>());
+    ASSERT_EQ("nAme", it.next().get<TokenType::identifier>());
     ASSERT_EQ(Keyword::desc_kw, it.next().get<TokenType::keyword>());
     ASSERT_FALSE(it.hasNext());
+}
+
+TEST(TokenIteratorTest, describe) {
+    std::istringstream iss("DeSc descRibE datAbAse taBlE \"what iDentifier\" iden");
+    TokenIterator it = TokenIterator::tokenize(iss);
+    ASSERT_EQ(6, it.remaining());
+    ASSERT_EQ(Keyword::desc_kw, it.next().get<TokenType::keyword>());
+    ASSERT_EQ(Keyword::describe_kw, it.next().get<TokenType::keyword>());
+    ASSERT_EQ(Keyword::database_kw, it.next().get<TokenType::keyword>());
+    ASSERT_EQ(Keyword::table_kw, it.next().get<TokenType::keyword>());
+    ASSERT_EQ("what iDentifier", it.next().get<TokenType::identifier>());
+    ASSERT_EQ("iden", it.next().get<TokenType::identifier>());
+    ASSERT_FALSE(it.hasNext());
+}
+
+TEST(TokenIteratorTest, comp) {
+    for (std::string compStr : { "!==", "<<", ">==", "=!", "><" }) {
+        std::istringstream iss(compStr);
+        ASSERT_THROW(TokenIterator::tokenize(iss), SyntaxError);
+    }
 }
 
 }
