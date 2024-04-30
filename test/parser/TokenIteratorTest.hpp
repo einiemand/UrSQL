@@ -167,10 +167,25 @@ TEST(TokenIteratorTest, describe) {
 TEST(TokenIteratorTest, comp) {
     for (std::string compStr : { "!=", "=", "<", "<=", ">", ">=" }) {
         std::istringstream iss(compStr);
-        ASSERT_NO_THROW(TokenIterator::tokenize(iss));
+        TokenIterator it = TokenIterator::tokenize(iss);
+        ASSERT_EQ(1, it.remaining());
+        ASSERT_EQ(TokenType::comparator, it.next().getType());
     }
     for (std::string compStr : { "!==", "<<", ">==", "=!", "><", "==" }) {
         std::istringstream iss(compStr);
+        ASSERT_THROW(TokenIterator::tokenize(iss), SyntaxError);
+    }
+}
+
+TEST(TokenIteratorTest, number) {
+    for (std::string numStr : { "152736.67123", "0", "0.0000", "00000.123400112", "001739" }) {
+        std::istringstream iss(numStr);
+        TokenIterator it = TokenIterator::tokenize(iss);
+        ASSERT_EQ(1, it.remaining());
+        ASSERT_EQ(TokenType::number, it.next().getType());
+    }
+    for (std::string numStr : { "0.000.0", "123a", "0789?", "921.123.", "897!2" }) {
+        std::istringstream iss(numStr);
         ASSERT_THROW(TokenIterator::tokenize(iss), SyntaxError);
     }
 }
