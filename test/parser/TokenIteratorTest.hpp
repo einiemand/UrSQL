@@ -1,8 +1,9 @@
 #pragma once
 
 #include <gtest/gtest.h>
-#include "parser/TokenIterator.hpp"
+
 #include "exception/UserError.hpp"
+#include "parser/TokenIterator.hpp"
 
 namespace ursql {
 
@@ -13,7 +14,9 @@ TEST(TokenIteratorTest, empty) {
 }
 
 TEST(TokenIteratorTest, create) {
-    std::istringstream iss("CrEatE taBLe \t\"some table\" (\"pri key\" prImary key auto_inCrement , f1 varchAr nOt null, somef float\v, inte iNteger) \r \n ");
+    std::istringstream iss(
+      "CrEatE taBLe \t\"some table\" (\"pri key\" prImary key auto_inCrement , "
+      "f1 varchAr nOt null, somef float\v, inte iNteger) \r \n ");
     TokenIterator it = TokenIterator::tokenize(iss);
     ASSERT_EQ(20, it.remaining());
     ASSERT_EQ(Keyword::create_kw, it.next().get<TokenType::keyword>());
@@ -40,7 +43,8 @@ TEST(TokenIteratorTest, create) {
 }
 
 TEST(TokenIteratorTest, insert) {
-    std::istringstream iss("InSerT iNTo \"some table\"(field1, field_2, fie3d) valuEs \t ('zqdsffa', -3.33, true)  ");
+    std::istringstream iss("InSerT iNTo \"some table\"(field1, field_2, fie3d) "
+                           "valuEs \t ('zqdsffa', -3.33, true)  ");
     TokenIterator it = TokenIterator::tokenize(iss);
     ASSERT_EQ(19, it.remaining());
     ASSERT_EQ(Keyword::insert_kw, it.next().get<TokenType::keyword>());
@@ -66,7 +70,8 @@ TEST(TokenIteratorTest, insert) {
 }
 
 TEST(TokenIteratorTest, del) {
-    std::istringstream iss("DelETE from \"qwe zxc\" where f1 != 'sdf' or num\t< 222.543 and \"free form\" =\vfalse\f");
+    std::istringstream iss("DelETE from \"qwe zxc\" where f1 != 'sdf' or "
+                           "num\t< 222.543 and \"free form\" =\vfalse\f");
     TokenIterator it = TokenIterator::tokenize(iss);
     ASSERT_EQ(15, it.remaining());
     ASSERT_EQ(Keyword::delete_kw, it.next().get<TokenType::keyword>());
@@ -108,7 +113,9 @@ TEST(TokenIteratorTest, truncate) {
 }
 
 TEST(TokenIteratorTest, select) {
-    std::istringstream iss("select *\vfROm table1 \t wHere \"some id\"-\r34.5=1 \n and\fjOb='no job' and (age >5 or address is nOt null) oRdEr by nAme desc");
+    std::istringstream iss(
+      "select *\vfROm table1 \t wHere \"some id\"-\r34.5=1 \n and\fjOb='no "
+      "job' and (age >5 or address is nOt null) oRdEr by nAme desc");
     TokenIterator it = TokenIterator::tokenize(iss);
     ASSERT_EQ(29, it.remaining());
     ASSERT_EQ(Keyword::select_kw, it.next().get<TokenType::keyword>());
@@ -144,7 +151,8 @@ TEST(TokenIteratorTest, select) {
 }
 
 TEST(TokenIteratorTest, describe) {
-    std::istringstream iss("DeSc descRibE datAbAse taBlE \"what iDentifier\" iden");
+    std::istringstream iss(
+      "DeSc descRibE datAbAse taBlE \"what iDentifier\" iden");
     TokenIterator it = TokenIterator::tokenize(iss);
     ASSERT_EQ(6, it.remaining());
     ASSERT_EQ(Keyword::desc_kw, it.next().get<TokenType::keyword>());
@@ -157,10 +165,14 @@ TEST(TokenIteratorTest, describe) {
 }
 
 TEST(TokenIteratorTest, comp) {
-    for (std::string compStr : { "!==", "<<", ">==", "=!", "><" }) {
+    for (std::string compStr : { "!=", "=", "<", "<=", ">", ">=" }) {
+        std::istringstream iss(compStr);
+        ASSERT_NO_THROW(TokenIterator::tokenize(iss));
+    }
+    for (std::string compStr : { "!==", "<<", ">==", "=!", "><", "==" }) {
         std::istringstream iss(compStr);
         ASSERT_THROW(TokenIterator::tokenize(iss), SyntaxError);
     }
 }
 
-}
+}  // namespace ursql

@@ -1,8 +1,8 @@
 #include "parser/TokenIterator.hpp"
 
+#include <format>
 #include <iostream>
 #include <regex>
-#include <format>
 
 #include "exception/UserError.hpp"
 
@@ -93,12 +93,14 @@ TokenIterator TokenIterator::tokenize(std::istream& input) {
             input.ignore();
         } else if (charIsComparator(ch)) {
             std::string str = readWhile(input, charIsComparator);
-            URSQL_EXPECT(strIsComparator(str), SyntaxError, std::format("{} is not a comparator", str));
+            URSQL_EXPECT(strIsComparator(str), SyntaxError,
+                         std::format("{} is not a comparator", str));
             tokens.emplace_back(token_type_index<TokenType::comparator>,
                                 toComparator(str));
         } else if (isDigit(ch)) {
             std::string str = readUntil(input, isSeparator);
-            URSQL_EXPECT(isNumber(str), SyntaxError, std::format("{} is not a number", str));
+            URSQL_EXPECT(isNumber(str), SyntaxError,
+                         std::format("{} is not a number", str));
             tokens.emplace_back(token_type_index<TokenType::number>,
                                 std::stof(str));
         } else if (isOperator(ch)) {
@@ -108,7 +110,8 @@ TokenIterator TokenIterator::tokenize(std::istream& input) {
         } else if (isQuote(ch)) {
             input.ignore();
             std::string str = readUntil(input, ch);
-            URSQL_EXPECT(input.peek() == peek, SyntaxError, std::format("a closing quote {} is missing", ch));
+            URSQL_EXPECT(input.peek() == peek, SyntaxError,
+                         std::format("a closing quote {} is missing", ch));
             input.ignore();
             if (ch == singleQuote) {
                 tokens.emplace_back(token_type_index<TokenType::text>, str);

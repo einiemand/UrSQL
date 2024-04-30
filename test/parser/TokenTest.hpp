@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+
 #include "parser/Token.hpp"
 
 namespace ursql {
@@ -71,4 +72,4 @@ TEST(TokenTest, text) {
     ASSERT_EQ(str, token.get<TokenType::text>());
 }
 
-}
+}  // namespace ursql

@@ -1,9 +1,9 @@
 #include "parser/TokenEnums.hpp"
 
-#include <iostream>
-#include <format>
-#include <unordered_map>
 #include <cstring>
+#include <format>
+#include <iostream>
+#include <unordered_map>
 
 #include "common/Macros.hpp"
 #include "exception/InternalError.hpp"
@@ -75,7 +75,8 @@ std::string tolower(std::string_view str) {
     std::string lowerStr;
     lowerStr.reserve(str.length());
     for (char ch : str) {
-        lowerStr += std::char_traits<char>::to_char_type(std::tolower(std::char_traits<char>::to_int_type(ch)));
+        lowerStr += std::char_traits<char>::to_char_type(
+          std::tolower(std::char_traits<char>::to_int_type(ch)));
     }
     return lowerStr;
 }
@@ -105,7 +106,8 @@ bool isKeyword(std::string_view str) {
 Keyword toKeyword(std::string_view str) {
     std::string lowerStr = tolower(str);
     auto it = str2Keyword.find(lowerStr);
-    URSQL_ASSERT(it != std::end(str2Keyword), std::format("{} is not a keyword", str));
+    URSQL_ASSERT(it != std::end(str2Keyword),
+                 std::format("{} is not a keyword", str));
     return it->second;
 }
 
