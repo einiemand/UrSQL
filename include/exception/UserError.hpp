@@ -6,7 +6,7 @@ namespace ursql {
 
 class UserError : public Exception {
 public:
-    explicit UserError(const std::string& what);
+    explicit UserError(std::string what);
     ~UserError() override = default;
 };
 

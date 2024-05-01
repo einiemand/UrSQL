@@ -7,13 +7,13 @@
 
 namespace ursql {
 
-TEST(TokenIteratorTest, empty) {
+TEST(TokenIterator, empty) {
     std::istringstream empty(" \t \v \r   \f   \n");
     TokenIterator it = TokenIterator::tokenize(empty);
     ASSERT_FALSE(it.hasNext());
 }
 
-TEST(TokenIteratorTest, create) {
+TEST(TokenIterator, create) {
     std::istringstream iss(
       "CrEatE taBLe \t\"some table\" (\"pri key\" prImary key auto_inCrement , "
       "f1 varchAr nOt null, somef float\v, inte iNteger) \r \n ");
@@ -42,7 +42,7 @@ TEST(TokenIteratorTest, create) {
     ASSERT_FALSE(it.hasNext());
 }
 
-TEST(TokenIteratorTest, insert) {
+TEST(TokenIterator, insert) {
     std::istringstream iss("InSerT iNTo \"some table\"(field1, field_2, fie3d) "
                            "valuEs \t ('zqdsffa', -3.33, true)  ");
     TokenIterator it = TokenIterator::tokenize(iss);
@@ -69,7 +69,7 @@ TEST(TokenIteratorTest, insert) {
     ASSERT_FALSE(it.hasNext());
 }
 
-TEST(TokenIteratorTest, del) {
+TEST(TokenIterator, del) {
     std::istringstream iss("DelETE from \"qwe zxc\" where f1 != 'sdf' or "
                            "num\t< 222.543 and \"free form\" =\vfalse\f");
     TokenIterator it = TokenIterator::tokenize(iss);
@@ -92,7 +92,7 @@ TEST(TokenIteratorTest, del) {
     ASSERT_FALSE(it.hasNext());
 }
 
-TEST(TokenIteratorTest, drop) {
+TEST(TokenIterator, drop) {
     std::istringstream iss("Drop \v \t\f TaBlE \"sOme idEntifier\"");
     TokenIterator it = TokenIterator::tokenize(iss);
     ASSERT_EQ(3, it.remaining());
@@ -102,7 +102,7 @@ TEST(TokenIteratorTest, drop) {
     ASSERT_FALSE(it.hasNext());
 }
 
-TEST(TokenIteratorTest, truncate) {
+TEST(TokenIterator, truncate) {
     std::istringstream iss("tRunCaTE \v \t\f TaBlE \nwHat\r");
     TokenIterator it = TokenIterator::tokenize(iss);
     ASSERT_EQ(3, it.remaining());
@@ -112,7 +112,7 @@ TEST(TokenIteratorTest, truncate) {
     ASSERT_FALSE(it.hasNext());
 }
 
-TEST(TokenIteratorTest, select) {
+TEST(TokenIterator, select) {
     std::istringstream iss(
       "select *\vfROm table1 \t wHere \"some id\"-\r34.5=1 \n and\fjOb='no "
       "job' and (age >5 or address is nOt null) oRdEr by nAme desc");
@@ -150,7 +150,7 @@ TEST(TokenIteratorTest, select) {
     ASSERT_FALSE(it.hasNext());
 }
 
-TEST(TokenIteratorTest, describe) {
+TEST(TokenIterator, describe) {
     std::istringstream iss(
       "DeSc descRibE datAbAse taBlE \"what iDentifier\" iden");
     TokenIterator it = TokenIterator::tokenize(iss);
@@ -164,7 +164,7 @@ TEST(TokenIteratorTest, describe) {
     ASSERT_FALSE(it.hasNext());
 }
 
-TEST(TokenIteratorTest, comp) {
+TEST(TokenIterator, comp) {
     for (std::string compStr : { "!=", "=", "<", "<=", ">", ">=" }) {
         std::istringstream iss(compStr);
         TokenIterator it = TokenIterator::tokenize(iss);
@@ -177,15 +177,49 @@ TEST(TokenIteratorTest, comp) {
     }
 }
 
-TEST(TokenIteratorTest, number) {
-    for (std::string numStr : { "152736.67123", "0", "0.0000", "00000.123400112", "001739" }) {
+TEST(TokenIterator, number) {
+    for (std::string numStr :
+         { "152736.67123", "0", "0.0000", "00000.123400112", "001739" })
+    {
         std::istringstream iss(numStr);
         TokenIterator it = TokenIterator::tokenize(iss);
         ASSERT_EQ(1, it.remaining());
         ASSERT_EQ(TokenType::number, it.next().getType());
     }
-    for (std::string numStr : { "0.000.0", "123a", "0789?", "921.123.", "897!2" }) {
+    for (std::string numStr :
+         { "0.000.0", "123a", "0789?", "921.123.", "897!2" })
+    {
         std::istringstream iss(numStr);
+        ASSERT_THROW(TokenIterator::tokenize(iss), SyntaxError);
+    }
+}
+
+TEST(TokenIterator, quote) {
+    for (std::string str : { "\"asdsafa\"", "\"hfoa\tndfoa   qhrq\"" }) {
+        std::istringstream iss(str);
+        TokenIterator it = TokenIterator::tokenize(iss);
+        ASSERT_EQ(1, it.remaining());
+        ASSERT_EQ(TokenType::identifier, it.next().getType());
+    }
+
+    for (std::string str : { "'afhwoh21893dafsif'", "'asdnfo\t\f\v128*(&('" }) {
+        std::istringstream iss(str);
+        TokenIterator it = TokenIterator::tokenize(iss);
+        ASSERT_EQ(1, it.remaining());
+        ASSERT_EQ(TokenType::text, it.next().getType());
+    }
+
+    for (std::string str :
+         { "'abc\"", "\"abc'", "'abc", "\"abc", "abc'", "abc\"" })
+    {
+        std::istringstream iss(str);
+        ASSERT_THROW(TokenIterator::tokenize(iss), SyntaxError);
+    }
+}
+
+TEST(TokenIterator, unknown) {
+    for (std::string str : { "!", "@", "#", "$", "%", "^", "&", "_" }) {
+        std::istringstream iss(str);
         ASSERT_THROW(TokenIterator::tokenize(iss), SyntaxError);
     }
 }

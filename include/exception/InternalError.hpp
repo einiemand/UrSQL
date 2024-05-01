@@ -6,7 +6,7 @@ namespace ursql {
 
 class InternalError : public Exception {
 public:
-    explicit InternalError(const std::string& what);
+    explicit InternalError(std::string what);
     ~InternalError() override = default;
 };
 

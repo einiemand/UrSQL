@@ -4,7 +4,7 @@
 
 namespace ursql {
 
-InternalError::InternalError(const std::string& what) : Exception(what) {}
+InternalError::InternalError(std::string what) : Exception(std::move(what)) {}
 
 AssertFailure::AssertFailure(const std::string& what)
     : InternalError(std::format("assert failure: {}", what)) {}
