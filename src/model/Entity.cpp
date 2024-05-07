@@ -1,152 +1,147 @@
 #include "model/Entity.hpp"
 
-#include "model/BufferStream.hpp"
-#include "model/Row.hpp"
+#include <format>
+
+#include "exception/InternalError.hpp"
+#include "persistence/BufferStream.hpp"
 
 namespace ursql {
 
-Entity::Entity(blocknum_t aBlocknum)
-    : MonoStorable(aBlocknum),
-      m_dirty(false),
-      m_attributes(),
-      m_autoincr(0),
-      m_rowPos() {}
+Entity::Entity(std::size_t blockNum)
+    : LazySaveMonoStorable(blockNum),
+      attributes_(),
+      autoInc_(1),
+      rowBlockNums_() {}
 
 BlockType Entity::expectedBlockType() const {
-    return BlockType::entity_type;
+    return BlockType::entity;
 }
 
-void Entity::serialize(BufferWriter& aWriter) const {
-    aWriter << static_cast<size_type>(m_attributes.size());
-    for (const Attribute& theAttr : m_attributes) {
-        aWriter << theAttr;
+void Entity::serialize(BufferWriter& writer) const {
+    writer << attributes_.size();
+    for (auto& attribute : attributes_) {
+        writer << attribute;
     }
-    aWriter << m_autoincr;
-    aWriter << static_cast<size_type>(m_rowPos.size());
-    for (blocknum_t theBlocknum : m_rowPos) {
-        aWriter << theBlocknum;
-    }
-}
-
-void Entity::deserialize(BufferReader& aReader) {
-    auto theAttrCount = aReader.read<size_type>();
-    for (; theAttrCount > 0; --theAttrCount) {
-        auto theAttr = aReader.read<Attribute>();
-        m_attributes.emplace_back(std::move(theAttr));
-    }
-    aReader >> m_autoincr;
-    auto theRowCount = aReader.read<size_type>();
-    for (; theRowCount > 0; --theRowCount) {
-        auto theBlocknum = aReader.read<blocknum_t>();
-        m_rowPos.push_back(theBlocknum);
+    writer << autoInc_;
+    writer << rowBlockNums_.size();
+    for (std::size_t blockNum : rowBlockNums_) {
+        writer << blockNum;
     }
 }
 
-void Entity::addAttribute(Attribute anAttribute) {
-    m_attributes.emplace_back(std::move(anAttribute));
-    makeDirty(true);
-}
-
-bool Entity::attributeExistsByName(const std::string& aName) const {
-    return std::find_if(m_attributes.cbegin(), m_attributes.cend(),
-                        [&aName](const auto& anAttribute) -> bool {
-                            return anAttribute.getName() == aName;
-                        }) != m_attributes.cend();
-}
-
-const Attribute& Entity::getAttributeByName(const std::string& aName) const {
-    URSQL_TRUTH(attributeExistsByName(aName),
-                "Check if attribute exists before getting it!");
-    return *std::find_if(m_attributes.cbegin(), m_attributes.cend(),
-                         [&aName](const auto& anAttribute) -> bool {
-                             return anAttribute.getName() == aName;
-                         });
-}
-
-Entity::int_t Entity::getNextAutoincr() {
-    makeDirty(true);
-    return m_autoincr++;
-}
-
-void Entity::addRowPosition(blocknum_t aBlocknum) {
-    URSQL_TRUTH(!_blocknumExists(aBlocknum),
-                "Attempting to add a new row position that's ALREADY recorded");
-    m_rowPos.push_back(aBlocknum);
-    makeDirty(true);
-}
-
-void Entity::dropRowPosition(blocknum_t aBlocknum) {
-    URSQL_TRUTH(_blocknumExists(aBlocknum),
-                "Attempting to drop a row position that's NOT recorded");
-    m_rowPos.erase(m_rowPos.cbegin() + _indexOfBlocknum(aBlocknum));
-    makeDirty(true);
-}
-
-StatusResult Entity::generateNewRow(Row& aRow, const StringList& aFieldNames,
-                                    const StringList& aValueStrs) {
-    StatusResult theResult(Error::no_error);
-    for (size_type i = 0; theResult && i < aFieldNames.size(); ++i) {
-        const std::string& theFieldName = aFieldNames[i];
-        if (attributeExistsByName(theFieldName)) {
-            const Attribute& theAttribute = getAttributeByName(theFieldName);
-            const std::string& theValueStr = aValueStrs[i];
-            Value theValue(theValueStr);
-            theResult = theValue.become(theAttribute.getType());
-            if (theResult) {
-                aRow.addField(theFieldName, std::move(theValue));
-            }
-        } else {
-            theResult.setError(Error::unknown_attribute,
-                               '\'' + theFieldName + '\'');
-        }
-    }
-
-    // Validate all required fields are given.
-    for (auto iter = m_attributes.cbegin();
-         theResult && iter != m_attributes.cend(); ++iter)
+void Entity::deserialize(BufferReader& reader) {
+    for (auto attributeCount = reader.read<std::size_t>(); attributeCount > 0;
+         --attributeCount)
     {
-        const auto& theAttribute = *iter;
-        const std::string& theAttributeName = theAttribute.getName();
-        if (!aRow.fieldExists(theAttributeName) && !theAttribute.isAutoIncr() &&
-            !theAttribute.isNullable())
-        {
-            theResult.setError(Error::invalid_arguments,
-                               '\'' + theAttributeName +
-                                 "' is NOT nullable, but value is not given");
-            break;
-        }
+        attributes_.emplace_back(reader.read<Attribute>());
     }
-
-    // Add fields that are not specified by user.
-    for (auto iter = m_attributes.cbegin();
-         theResult && iter != m_attributes.cend(); ++iter)
-    {
-        const auto& theAttribute = *iter;
-        const std::string& theAttributeName = iter->getName();
-        if (!aRow.fieldExists(theAttributeName)) {
-            URSQL_TRUTH(theAttribute.isAutoIncr() || theAttribute.isNullable(),
-                        "The attribute must be auto_increment or nullable!");
-            if (theAttribute.isAutoIncr()) {
-                aRow.addField(theAttributeName, Value(getNextAutoincr()));
-            } else if (theAttribute.isNullable()) {
-                aRow.addField(theAttributeName, theAttribute.getDefaultValue());
-            }
-        }
+    reader >> autoInc_;
+    for (auto rowCount = reader.read<std::size_t>(); rowCount > 0; --rowCount) {
+        rowBlockNums_.push_back(reader.read<std::size_t>());
     }
-    return theResult;
 }
 
-bool Entity::_blocknumExists(blocknum_t aBlocknum) const {
-    return std::find(m_rowPos.cbegin(), m_rowPos.cend(), aBlocknum) !=
-           m_rowPos.cend();
+void Entity::addAttribute(Attribute&& attribute) {
+    attributes_.emplace_back(std::move(attribute));
+    makeDirty(true);
 }
 
-size_type Entity::_indexOfBlocknum(blocknum_t aBlocknum) const {
-    URSQL_TRUTH(_blocknumExists(aBlocknum),
-                "Cannot find block number in Entity's row numbers");
-    return std::distance(
-      m_rowPos.cbegin(),
-      std::find(m_rowPos.cbegin(), m_rowPos.cend(), aBlocknum));
+bool Entity::attributeExistsByName(std::string_view name) const {
+    return std::find_if(std::begin(attributes_), std::end(attributes_),
+                        [&name](auto& attribute) -> bool {
+                            return attribute.getName() == name;
+                        }) != std::end(attributes_);
 }
+
+const Attribute& Entity::getAttributeByName(std::string_view name) const {
+    auto it = std::find_if(std::begin(attributes_), std::end(attributes_),
+                           [&name](auto& attribute) {
+                               return attribute.getName() == name;
+                           });
+    URSQL_ASSERT(it != std::end(attributes_),
+                 std::format("attribute {} doesn't exist", name));
+    return *it;
+}
+
+std::size_t Entity::getNextAutoInc() {
+    makeDirty(true);
+    return autoInc_++;
+}
+
+void Entity::addRowPosition(std::size_t blockNum) {
+    auto it =
+      std::find(std::begin(rowBlockNums_), std::end(rowBlockNums_), blockNum);
+    URSQL_ASSERT(it == std::end(rowBlockNums_),
+                 std::format("block num {} already exists", blockNum));
+    rowBlockNums_.push_back(blockNum);
+    makeDirty(true);
+}
+
+void Entity::dropRowPosition(std::size_t blockNum) {
+    auto it =
+      std::find(std::begin(rowBlockNums_), std::end(rowBlockNums_), blockNum);
+    URSQL_ASSERT(it != std::end(rowBlockNums_),
+                 std::format("block num {} doesn't exist", blockNum));
+    rowBlockNums_.erase(it);
+    makeDirty(true);
+}
+
+// StatusResult Entity::generateNewRow(Row& aRow, const StringList& aFieldNames,
+//                                     const StringList& aValueStrs) {
+//     StatusResult theResult(Error::no_error);
+//     for (size_type i = 0; theResult && i < aFieldNames.size(); ++i) {
+//         const std::string& theFieldName = aFieldNames[i];
+//         if (attributeExistsByName(theFieldName)) {
+//             const Attribute& theAttribute = getAttributeByName(theFieldName);
+//             const std::string& theValueStr = aValueStrs[i];
+//             Value theValue(theValueStr);
+//             theResult = theValue.become(theAttribute.getType());
+//             if (theResult) {
+//                 aRow.addField(theFieldName, std::move(theValue));
+//             }
+//         } else {
+//             theResult.setError(Error::unknown_attribute,
+//                                '\'' + theFieldName + '\'');
+//         }
+//     }
+//
+//     // Validate all required fields are given.
+//     for (auto iter = m_attributes.cbegin();
+//          theResult && iter != m_attributes.cend(); ++iter)
+//     {
+//         const auto& theAttribute = *iter;
+//         const std::string& theAttributeName = theAttribute.getName();
+//         if (!aRow.fieldExists(theAttributeName) && !theAttribute.isAutoIncr()
+//         &&
+//             !theAttribute.isNullable())
+//         {
+//             theResult.setError(Error::invalid_arguments,
+//                                '\'' + theAttributeName +
+//                                  "' is NOT nullable, but value is not
+//                                  given");
+//             break;
+//         }
+//     }
+//
+//     // Add fields that are not specified by user.
+//     for (auto iter = m_attributes.cbegin();
+//          theResult && iter != m_attributes.cend(); ++iter)
+//     {
+//         const auto& theAttribute = *iter;
+//         const std::string& theAttributeName = iter->getName();
+//         if (!aRow.fieldExists(theAttributeName)) {
+//             URSQL_TRUTH(theAttribute.isAutoIncr() ||
+//             theAttribute.isNullable(),
+//                         "The attribute must be auto_increment or nullable!");
+//             if (theAttribute.isAutoIncr()) {
+//                 aRow.addField(theAttributeName, Value(getNextAutoincr()));
+//             } else if (theAttribute.isNullable()) {
+//                 aRow.addField(theAttributeName,
+//                 theAttribute.getDefaultValue());
+//             }
+//         }
+//     }
+//     return theResult;
+// }
 
 }  // namespace ursql

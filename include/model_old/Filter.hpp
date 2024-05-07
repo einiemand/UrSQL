@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Value.hpp"
+#include "model/Value.hpp"
 
 namespace ursql {
 

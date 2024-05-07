@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Block.hpp"
 #include "common/Error.hpp"
+#include "persistence/Block.hpp"
 
 namespace ursql {
 
@@ -10,33 +10,38 @@ class BufferReader;
 
 class Storable {
 public:
-    Storable() = default;
+    explicit Storable() = default;
     virtual ~Storable() = default;
 
-    virtual void serialize(BufferWriter& aWriter) const = 0;
-    virtual void deserialize(BufferReader& aReader) = 0;
+    virtual void serialize(BufferWriter& writer) const = 0;
+    virtual void deserialize(BufferReader& reader) = 0;
 };
 
 class MonoStorable : public Storable {
 public:
-    explicit MonoStorable(blocknum_t aBlocknum);
+    explicit MonoStorable(std::size_t blockNum);
     ~MonoStorable() override = default;
 
-    virtual BlockType expectedBlockType() const = 0;
+    [[nodiscard]] std::size_t getBlockNum() const;
+    [[nodiscard]] virtual BlockType expectedBlockType() const = 0;
 
-    void encode(Block& aBlock) const;
-    void decode(const Block& aBlock);
-
-    inline blocknum_t getBlocknum() const {
-        return m_blocknum;
-    }
-
-    inline void setBlocknum(blocknum_t aBlocknum) {
-        m_blocknum = aBlocknum;
-    }
+    void encode(Block& block) const;
+    void decode(const Block& block);
 
 protected:
-    blocknum_t m_blocknum;
+    std::size_t blockNum_;
+};
+
+class LazySaveMonoStorable : public MonoStorable {
+public:
+    explicit LazySaveMonoStorable(std::size_t blockNum);
+    ~LazySaveMonoStorable() override = default;
+
+    [[nodiscard]] bool isDirty() const;
+    void makeDirty(bool dirty) const;
+
+private:
+    mutable bool dirty_;
 };
 
 }  // namespace ursql

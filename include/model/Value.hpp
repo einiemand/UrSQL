@@ -1,62 +1,79 @@
 #pragma once
 
 #include <memory>
+#include <tuple>
 
-#include "Keyword.hpp"
 #include "Storable.hpp"
+#include "parser/TokenEnums.hpp"
 
 namespace ursql {
 
-enum class ValueType : char {
+enum class ValueType : std::size_t {
+    null_type,
     int_type,
     float_type,
     bool_type,
     varchar_type,
-    null_type
 };
 
-namespace detail {
+namespace {
 
-class Impl;
+template<ValueType valueType>
+struct val_type_ordinal
+    : std::integral_constant<std::size_t, static_cast<std::size_t>(valueType)> {
+};
 
-}
+template<ValueType valueType>
+inline constexpr const std::size_t val_type_ordinal_v =
+  val_type_ordinal<valueType>::value;
+
+}  // namespace
 
 class Value : public Storable {
 public:
-    using int_t = typename size_trait<sizeof(void*)>::int_t;
+    using null_t = std::monostate;
+    using int_t = int;
     using float_t = float;
     using bool_t = bool;
     using varchar_t = std::string;
-    using null_t = void;
 
-    Value();
-    Value(int_t anInt);
-    Value(float_t aFloat);
-    Value(bool_t aBool);
-    Value(varchar_t aString);
-    ~Value() override;
+    explicit Value() noexcept(
+      std::is_nothrow_constructible_v<
+        Var, std::in_place_index_t<val_type_ordinal_v<ValueType::null_type>>,
+        null_t>) = default;
+    explicit Value(int_t intVal) noexcept(
+      std::is_nothrow_constructible_v<
+        Var, std::in_place_index_t<val_type_ordinal_v<ValueType::int_type>>,
+        int_t>);
+    explicit Value(float_t floatVal) noexcept(
+      std::is_nothrow_constructible_v<
+        Var, std::in_place_index_t<val_type_ordinal_v<ValueType::float_type>>,
+        float_t>);
+    explicit Value(bool_t boolVal) noexcept(
+      std::is_nothrow_constructible_v<
+        Var, std::in_place_index_t<val_type_ordinal_v<ValueType::bool_type>>,
+        bool_t>);
+    explicit Value(varchar_t varcharVal) noexcept(
+      std::is_nothrow_constructible_v<
+        Var, std::in_place_index_t<val_type_ordinal_v<ValueType::varchar_type>>,
+        std::add_rvalue_reference_t<varchar_t>>);
 
-    Value(const Value& rhs);
-    Value(Value&& rhs) noexcept;
-    Value& operator=(const Value& rhs);
-    Value& operator=(Value&& rhs) noexcept;
+    ~Value() override = default;
+
+    constexpr Value(const Value& rhs) noexcept(
+      std::is_nothrow_copy_constructible_v<Var>) = default;
+    constexpr Value(Value&& rhs) noexcept(
+      std::is_nothrow_move_constructible_v<Var>) = default;
+    Value& operator=(const Value& rhs) noexcept(
+      std::is_nothrow_copy_assignable_v<Var>) = default;
+    Value& operator=(Value&& rhs) noexcept(
+      std::is_nothrow_move_assignable_v<Var>) = default;
+
+    [[nodiscard]] ValueType getType() const;
+    [[nodiscard]] std::string toString() const;
 
     void serialize(BufferWriter& aWriter) const override;
     void deserialize(BufferReader& aReader) override;
-
-    inline void swap(Value& rhs) noexcept {
-        std::swap(m_impl, rhs.m_impl);
-    }
-
-    ValueType type() const;
-    size_type ostreamSize() const;
-    StatusResult become(ValueType aType);
-
-    inline bool isNull() const {
-        return type() == ValueType::null_type;
-    }
-
-    std::string toString() const;
 
     friend bool operator<(const Value& lhs, const Value& rhs);
     friend bool operator==(const Value& lhs, const Value& rhs);
@@ -67,23 +84,29 @@ public:
     static ValueType keyword2ValueType(Keyword aKeyword);
 
 private:
-    std::unique_ptr<detail::Impl> m_impl;
+    using Var = std::variant<null_t, int_t, float_t, bool_t, varchar_t>;
+
+    Var var_;
+
+    template<ValueType valueType>
+    struct var_alt {
+        using type =
+          std::variant_alternative_t<val_type_ordinal_v<valueType>, Var>;
+    };
+
+    template<ValueType valueType>
+    using var_alt_t = typename var_alt<valueType>::type;
+
+    static_assert(std::is_same_v<null_t, var_alt_t<ValueType::null_type>>,
+                  "null type should match variant index");
+    static_assert(std::is_same_v<int_t, var_alt_t<ValueType::int_type>>,
+                  "int type should match variant index");
+    static_assert(std::is_same_v<float_t, var_alt_t<ValueType::float_type>>,
+                  "float type should match variant index");
+    static_assert(std::is_same_v<bool_t, var_alt_t<ValueType::bool_type>>,
+                  "bool type should match variant index");
+    static_assert(std::is_same_v<varchar_t, var_alt_t<ValueType::varchar_type>>,
+                  "varchar type should match variant index");
 };
-
-inline bool operator!=(const Value& lhs, const Value& rhs) {
-    return !(lhs == rhs);
-}
-
-inline bool operator<=(const Value& lhs, const Value& rhs) {
-    return lhs < rhs || lhs == rhs;
-}
-
-inline bool operator>(const Value& lhs, const Value& rhs) {
-    return rhs < lhs;
-}
-
-inline bool operator>=(const Value& lhs, const Value& rhs) {
-    return rhs <= lhs;
-}
 
 }  // namespace ursql

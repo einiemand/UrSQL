@@ -4,41 +4,29 @@
 
 namespace ursql {
 
-class TOC : public MonoStorable {
+class TOC : public LazySaveMonoStorable {
 public:
-    using EntityMap = std::unordered_map<std::string, blocknum_t>;
-
-    TOC();
+    explicit TOC();
     ~TOC() override = default;
 
     URSQL_DISABLE_COPY(TOC);
 
-    BlockType expectedBlockType() const override;
+    [[nodiscard]] BlockType expectedBlockType() const override;
+
     void serialize(BufferWriter& aWriter) const override;
     void deserialize(BufferReader& aReader) override;
 
-    inline bool isDirty() const {
-        return m_dirty;
-    }
+    [[nodiscard]] bool entityExists(const std::string& entityName) const;
+    [[nodiscard]] std::size_t getEntityPosByName(
+      const std::string& entityName) const;
 
-    inline void makeDirty(bool anIsDirty) {
-        m_dirty = anIsDirty;
-    }
+    void addEntity(const std::string& entityName, std::size_t blockNum);
+    void dropEntity(const std::string& entityName);
 
-    inline bool entityExists(const std::string& anEntityName) const {
-        return m_entityMap.count(anEntityName) == 1;
-    }
-
-    blocknum_t getEntityPosByName(const std::string& anEntityName) const;
-
-    void add(const std::string& anEntityName, blocknum_t aBlocknum);
-    void drop(const std::string& anEntityName);
-
-    StringList collectEntityNames() const;
+    [[nodiscard]] std::vector<std::string> getAllEntityNames() const;
 
 private:
-    bool m_dirty;
-    EntityMap m_entityMap;
+    std::unordered_map<std::string, std::size_t> entityPosMap_;
 };
 
 }  // namespace ursql

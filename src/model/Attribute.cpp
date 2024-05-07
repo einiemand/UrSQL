@@ -1,25 +1,65 @@
 #include "model/Attribute.hpp"
 
-#include "model/BufferStream.hpp"
+#include "persistence/BufferStream.hpp"
 
 namespace ursql {
 
-Attribute::Attribute()
-    : m_name(),
-      m_type(ValueType::null_type),
-      m_defaultValue(),
-      m_isNullable(true),
-      m_isPrimary(false),
-      m_isAutoIncr(false) {}
-
 void Attribute::serialize(BufferWriter& aWriter) const {
-    aWriter << m_name << m_type << m_defaultValue << m_isNullable << m_isPrimary
-            << m_isAutoIncr;
+    aWriter << name_ << valueType_ << defaultValue_ << isNullable_ << isPrimary_
+            << isAutoInc_;
 }
 
 void Attribute::deserialize(BufferReader& aReader) {
-    aReader >> m_name >> m_type >> m_defaultValue >> m_isNullable >>
-      m_isPrimary >> m_isAutoIncr;
+    aReader >> name_ >> valueType_ >> defaultValue_ >> isNullable_ >>
+      isPrimary_ >> isAutoInc_;
+}
+
+void Attribute::setName(std::string name) {
+    name_ = std::move(name);
+}
+
+void Attribute::setValueType(ValueType valueType) {
+    valueType_ = valueType;
+}
+
+void Attribute::setDefaultValue(Value defaultValue) {
+    defaultValue_ = std::move(defaultValue);
+}
+
+void Attribute::setNullable(bool isNullable) {
+    isNullable_ = isNullable;
+}
+
+void Attribute::setPrimary() {
+    isPrimary_ = true;
+}
+
+void Attribute::setAutoInc() {
+    isAutoInc_ = true;
+}
+
+const std::string& Attribute::getName() const {
+    return name_;
+}
+
+ValueType Attribute::getType() const {
+    return valueType_;
+}
+
+const Value& Attribute::getDefaultValue() const {
+    return defaultValue_;
+}
+
+bool Attribute::isNullable() const {
+    return isNullable_;
+}
+
+bool Attribute::isPrimary() const {
+    return isPrimary_;
+}
+
+bool Attribute::isAutoInc() const {
+    return isAutoInc_;
 }
 
 }  // namespace ursql

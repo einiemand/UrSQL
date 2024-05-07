@@ -16,9 +16,9 @@ TEST(TokenIterator, empty) {
 TEST(TokenIterator, create) {
     std::istringstream iss(
       "CrEatE taBLe \t\"some table\" (\"pri key\" prImary key auto_inCrement , "
-      "f1 varchAr nOt null, somef float\v, inte iNteger) \r \n ");
+      "f1 varchAr nOt null DeFauLt 'qwe', somef float\v, inte iNteger) \r \n ");
     TokenIterator it = TokenIterator::tokenize(iss);
-    ASSERT_EQ(20, it.remaining());
+    ASSERT_EQ(22, it.remaining());
     ASSERT_EQ(Keyword::create_kw, it.next().get<TokenType::keyword>());
     ASSERT_EQ(Keyword::table_kw, it.next().get<TokenType::keyword>());
     ASSERT_EQ("some table", it.next().get<TokenType::identifier>());
@@ -32,6 +32,8 @@ TEST(TokenIterator, create) {
     ASSERT_EQ(Keyword::varchar_kw, it.next().get<TokenType::keyword>());
     ASSERT_EQ(Keyword::not_kw, it.next().get<TokenType::keyword>());
     ASSERT_EQ(Keyword::null_kw, it.next().get<TokenType::keyword>());
+    ASSERT_EQ(Keyword::default_kw, it.next().get<TokenType::keyword>());
+    ASSERT_EQ("qwe", it.next().get<TokenType::text>());
     ASSERT_EQ(Punctuation::comma, it.next().get<TokenType::punctuation>());
     ASSERT_EQ("somef", it.next().get<TokenType::identifier>());
     ASSERT_EQ(Keyword::float_kw, it.next().get<TokenType::keyword>());

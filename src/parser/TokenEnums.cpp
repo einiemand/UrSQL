@@ -27,6 +27,7 @@ const std::unordered_map<std::string_view, Keyword> str2Keyword{
     { "create", Keyword::create_kw },
     { "database", Keyword::database_kw },
     { "databases", Keyword::databases_kw },
+    { "default", Keyword::default_kw },
     { "delete", Keyword::delete_kw },
     { "desc", Keyword::desc_kw },
     { "describe", Keyword::describe_kw },

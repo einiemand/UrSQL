@@ -7,72 +7,46 @@ namespace ursql {
 
 class Attribute : public Storable {
 public:
-    Attribute();
+    explicit Attribute() = default;
     ~Attribute() override = default;
 
     URSQL_DEFAULT_COPY_CTOR(Attribute);
     URSQL_DISABLE_COPY_ASSIGN(Attribute);
 
-    void serialize(BufferWriter& aWriter) const override;
-    void deserialize(BufferReader& aReader) override;
+    void serialize(BufferWriter& writer) const override;
+    void deserialize(BufferReader& reader) override;
 
-    inline void setName(std::string aName) {
-        m_name = std::move(aName);
-    }
+    void setName(std::string name);
 
-    inline void setType(ValueType aType) {
-        m_type = aType;
-    }
+    void setValueType(ValueType valueType);
 
-    inline void setDefaultValue(Value aValue) {
-        m_defaultValue = std::move(aValue);
-    }
+    void setDefaultValue(Value defaultValue);
 
-    inline void setNullable(bool aNullable) {
-        m_isNullable = aNullable;
-    }
+    void setNullable(bool isNullable);
 
-    inline void setPrimary(bool aPrimary) {
-        m_isPrimary = aPrimary;
-    }
+    void setPrimary();
 
-    inline void setAutoIncr(bool anAutoincr) {
-        m_isAutoIncr = anAutoincr;
-    }
+    void setAutoInc();
 
-    inline const std::string& getName() const {
-        return m_name;
-    }
+    [[nodiscard]] const std::string& getName() const;
 
-    inline ValueType getType() const {
-        return m_type;
-    }
+    [[nodiscard]] ValueType getType() const;
 
-    inline const Value& getDefaultValue() const {
-        return m_defaultValue;
-    }
+    [[nodiscard]] const Value& getDefaultValue() const;
 
-    inline bool isNullable() const {
-        return m_isNullable;
-    }
+    [[nodiscard]] bool isNullable() const;
 
-    inline bool isPrimary() const {
-        return m_isPrimary;
-    }
+    [[nodiscard]] bool isPrimary() const;
 
-    inline bool isAutoIncr() const {
-        return m_isAutoIncr;
-    }
+    [[nodiscard]] bool isAutoInc() const;
 
 private:
-    std::string m_name;
-    ValueType m_type;
-    Value m_defaultValue;
-    bool m_isNullable;
-    bool m_isPrimary;
-    bool m_isAutoIncr;
+    std::string name_;
+    ValueType valueType_ = ValueType::null_type;
+    Value defaultValue_;
+    bool isNullable_ = true;
+    bool isPrimary_ = false;
+    bool isAutoInc_ = false;
 };
-
-using AttributeList = std::vector<Attribute>;
 
 }  // namespace ursql

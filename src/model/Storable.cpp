@@ -1,24 +1,48 @@
 #include "model/Storable.hpp"
 
-#include "model/BufferStream.hpp"
+#include <format>
+
+#include "exception/InternalError.hpp"
+#include "persistence/BufferStream.hpp"
 
 namespace ursql {
 
-MonoStorable::MonoStorable(blocknum_t aBlocknum)
+MonoStorable::MonoStorable(std::size_t blockNum)
     : Storable(),
-      m_blocknum(aBlocknum) {}
+      blockNum_(blockNum) {}
 
-void MonoStorable::encode(Block& aBlock) const {
-    aBlock.setType(expectedBlockType());
-    BufferWriter theWriter(aBlock.getData(), defaultBlockSize);
-    serialize(theWriter);
+std::size_t MonoStorable::getBlockNum() const {
+    return blockNum_;
 }
 
-void MonoStorable::decode(const Block& aBlock) {
-    URSQL_TRUTH(expectedBlockType() == aBlock.getType(),
-                "Block type is NOT correct!");
-    BufferReader theReader(aBlock.getData(), defaultBlockSize);
-    deserialize(theReader);
+void MonoStorable::encode(Block& block) const {
+    block.setType(expectedBlockType());
+    BufferWriter writer(block.getData(), Block::size);
+    serialize(writer);
+}
+
+void MonoStorable::decode(const Block& block) {
+    char expected =
+      static_cast<std::underlying_type_t<BlockType>>(expectedBlockType());
+    char actual =
+      static_cast<std::underlying_type_t<BlockType>>(block.getType());
+    URSQL_ASSERT(
+      expected == actual,
+      std::format("expected block type={}, actual={}", expected, actual));
+    BufferReader reader(block.getData(), Block::size);
+    deserialize(reader);
+}
+
+LazySaveMonoStorable::LazySaveMonoStorable(std::size_t blockNum)
+    : MonoStorable(blockNum),
+      dirty_(false) {}
+
+bool LazySaveMonoStorable::isDirty() const {
+    return dirty_;
+}
+
+void LazySaveMonoStorable::makeDirty(bool dirty) const {
+    dirty_ = dirty;
 }
 
 }  // namespace ursql

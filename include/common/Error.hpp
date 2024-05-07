@@ -2,8 +2,6 @@
 
 #include <iostream>
 
-#include "common/Util.hpp"
-
 namespace ursql {
 
 enum class Error {
@@ -66,34 +64,5 @@ enum class Error {
 };
 
 extern std::ostream& defaultOutput;
-
-class StatusResult {
-public:
-    explicit StatusResult(Error aCode, std::string aMsg = "");
-    ~StatusResult() = default;
-
-    StatusResult(StatusResult&& rhs) noexcept;
-    StatusResult& operator=(StatusResult&& rhs) noexcept;
-
-    inline operator bool() noexcept {
-        return m_code == Error::no_error;
-    }
-
-    inline Error getCode() const {
-        return m_code;
-    }
-
-    void setError(Error aCode, std::string aMsg = "") noexcept;
-
-    inline void setMessage(std::string aMsg) noexcept {
-        setError(getCode(), std::move(aMsg));
-    }
-
-    void showError() const;
-
-private:
-    Error m_code;
-    std::string m_msg;
-};
 
 }  // namespace ursql

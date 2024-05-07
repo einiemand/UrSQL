@@ -3,7 +3,7 @@
 #include <functional>
 #include <unordered_map>
 
-#include "Value.hpp"
+#include "model/Value.hpp"
 
 namespace ursql {
 

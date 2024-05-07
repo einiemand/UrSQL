@@ -2,8 +2,8 @@
 
 #include <algorithm>
 
-#include "model/BufferStream.hpp"
 #include "model/Order.hpp"
+#include "storage/BufferStream.hpp"
 
 namespace ursql {
 

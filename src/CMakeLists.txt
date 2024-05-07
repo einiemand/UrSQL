@@ -1,5 +1,8 @@
-file(GLOB_RECURSE URSQL_HEADERS ${CMAKE_SOURCE_DIR}/include/parser/*.hpp ${CMAKE_SOURCE_DIR}/include/exception/*.hpp)
-file(GLOB_RECURSE URSQL_SOURCES parser/*.cpp exception/*.cpp)
+file(GLOB_RECURSE URSQL_HEADERS ${CMAKE_SOURCE_DIR}/include/parser/*.hpp ${CMAKE_SOURCE_DIR}/include/exception/*.hpp
+        ${CMAKE_SOURCE_DIR}/include/model/*.hpp
+        ${CMAKE_SOURCE_DIR}/include/persistence/*.hpp
+)
+file(GLOB_RECURSE URSQL_SOURCES parser/*.cpp exception/*.cpp model/*.cpp persistence/*.cpp)
 
 find_package(Boost 1.65 REQUIRED COMPONENTS stacktrace_basic)
 

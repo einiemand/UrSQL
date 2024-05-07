@@ -4,11 +4,11 @@
 #include <memory>
 #include <unordered_map>
 
-#include "Attribute.hpp"
-#include "Entity.hpp"
 #include "Row.hpp"
-#include "Storage.hpp"
-#include "TOC.hpp"
+#include "model/Attribute.hpp"
+#include "model/Entity.hpp"
+#include "model/TOC.hpp"
+#include "storage/Storage.hpp"
 
 namespace ursql {
 

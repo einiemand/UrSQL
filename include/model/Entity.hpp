@@ -8,56 +8,38 @@ namespace ursql {
 
 class Row;
 
-class Entity : public MonoStorable {
+class Entity : public LazySaveMonoStorable {
 public:
-    using int_t = Value::int_t;
-
-    explicit Entity(blocknum_t aBlocknum);
+    explicit Entity(std::size_t blockNum);
     ~Entity() override = default;
 
     URSQL_DISABLE_COPY(Entity);
 
-    BlockType expectedBlockType() const override;
-    void serialize(BufferWriter& aWriter) const override;
-    void deserialize(BufferReader& aReader) override;
+    [[nodiscard]] BlockType expectedBlockType() const override;
+    void serialize(BufferWriter& writer) const override;
+    void deserialize(BufferReader& reader) override;
 
-    inline bool isDirty() const {
-        return m_dirty;
-    }
+    void addAttribute(Attribute&& attribute);
 
-    inline void makeDirty(bool anIsDirty) {
-        m_dirty = anIsDirty;
-    }
+    bool attributeExistsByName(std::string_view name) const;
+    const Attribute& getAttributeByName(std::string_view name) const;
 
-    void addAttribute(Attribute anAttribute);
+    const std::vector<Attribute>& getAttributes() const;
 
-    bool attributeExistsByName(const std::string& aName) const;
-    const Attribute& getAttributeByName(const std::string& aName) const;
+    std::size_t getNextAutoInc();
 
-    inline const AttributeList& getAttributes() const {
-        return m_attributes;
-    }
+    void addRowPosition(std::size_t blockNum);
+    void dropRowPosition(std::size_t blockNum);
 
-    int_t getNextAutoincr();
+    const std::vector<std::size_t>& getRowBlockNums();
 
-    void addRowPosition(blocknum_t aBlocknum);
-    void dropRowPosition(blocknum_t aBlocknum);
-
-    inline const std::vector<blocknum_t>& getRowPos() const {
-        return m_rowPos;
-    }
-
-    StatusResult generateNewRow(Row& aRow, const StringList& aFieldNames,
-                                const StringList& aValueStrs);
+    //    Row generateNewRow(const std::vector<std::string>& fieldNames, const
+    //    StringList& aValueStrs);
 
 private:
-    bool m_dirty;
-    AttributeList m_attributes;
-    size_type m_autoincr;
-    std::vector<blocknum_t> m_rowPos;
-
-    bool _blocknumExists(blocknum_t aBlocknum) const;
-    size_type _indexOfBlocknum(blocknum_t aBlocknum) const;
+    std::vector<Attribute> attributes_;
+    std::size_t autoInc_;
+    std::vector<std::size_t> rowBlockNums_;
 };
 
 }  // namespace ursql
