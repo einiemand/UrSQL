@@ -1,6 +1,6 @@
-#include "parser/TokenIteratorTest.hpp"
-#include "parser/TokenTest.hpp"
 #include "model/ValueTest.hpp"
+#include "parser/TokenStreamTest.hpp"
+#include "parser/TokenTest.hpp"
 
 int main(int argc, char** argv) {
     std::cerr.rdbuf(nullptr);

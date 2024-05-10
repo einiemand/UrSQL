@@ -21,8 +21,8 @@ public:
 
     void addAttribute(Attribute&& attribute);
 
-    bool attributeExistsByName(std::string_view name) const;
-    const Attribute& getAttributeByName(std::string_view name) const;
+    std::size_t attributeIndex(std::string_view name) const;
+    const Attribute& getAttribute(std::size_t index) const;
 
     const std::vector<Attribute>& getAttributes() const;
 
@@ -31,10 +31,9 @@ public:
     void addRowPosition(std::size_t blockNum);
     void dropRowPosition(std::size_t blockNum);
 
-    const std::vector<std::size_t>& getRowBlockNums();
-
     //    Row generateNewRow(const std::vector<std::string>& fieldNames, const
     //    StringList& aValueStrs);
+    static constexpr const std::size_t npos = std::numeric_limits<std::size_t>::max();
 
 private:
     std::vector<Attribute> attributes_;

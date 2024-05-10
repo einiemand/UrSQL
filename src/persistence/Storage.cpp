@@ -2,11 +2,18 @@
 
 #include <format>
 #include <sstream>
+#include <iostream>
 
 #include "exception/InternalError.hpp"
 #include "model/TOC.hpp"
 
 namespace ursql {
+
+namespace {
+
+constexpr const char fileExtension[] = ".db";
+
+}
 
 #ifdef ENABLE_BLOCKCACHE
 /* -------------------------------BlockCache------------------------------- */
@@ -78,15 +85,14 @@ Storage::Storage(const std::string& fileName, OpenExistingFile)
 }
 
 std::string Storage::getDBFilePath(const std::string& dbName) {
-    return std::format("{}/{}{}", defaultStoragePath, dbName,
-                       defaultFileExtension);
+    return std::format("{}/{}{}", std::filesystem::temp_directory_path().string(), dbName, fileExtension);
 }
 
 bool Storage::hasDefaultExtension(const std::string& fileName) {
     return fileName.length() >=
-             std::char_traits<char>::length(defaultFileExtension) &&
-           std::equal(std::rbegin(defaultFileExtension),
-                      std::rend(defaultFileExtension), std::rbegin(fileName));
+             std::char_traits<char>::length(fileExtension) &&
+           std::equal(std::rbegin(fileExtension),
+                      std::rend(fileExtension), std::rbegin(fileName));
 }
 
 std::size_t Storage::_getBlockCount() {
@@ -137,7 +143,25 @@ void Storage::writeBlock(const Block& block, std::size_t blockNum) {
 
 void Storage::releaseBlock(std::size_t blockNum) {
     Block theBlock(BlockType::free);
-    return writeBlock(theBlock, blockNum);
+    writeBlock(theBlock, blockNum);
+}
+
+void Storage::save(const MonoStorable& monoStorable) {
+    Block block;
+    monoStorable.encode(block);
+    writeBlock(block, monoStorable.getBlockNum());
+}
+
+void Storage::saveIfDirty(const LazySaveMonoStorable& lazySaveMonoStorable) {
+    if (lazySaveMonoStorable.isDirty()) {
+        save(lazySaveMonoStorable);
+    }
+}
+
+void Storage::load(MonoStorable& monoStorable) {
+    Block block;
+    readBlock(block, monoStorable.getBlockNum());
+    monoStorable.decode(block);
 }
 
 std::size_t Storage::findFreeBlockNumber() {

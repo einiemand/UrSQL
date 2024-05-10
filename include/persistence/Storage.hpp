@@ -51,6 +51,7 @@ struct CreateNewFile {};
 
 class TOC;
 class MonoStorable;
+class LazySaveMonoStorable;
 
 class Storage {
 public:
@@ -70,11 +71,12 @@ public:
 
     std::size_t findFreeBlockNumber();
 
-    static std::string getDBFilePath(const std::string& aDBName);
-    static bool hasDefaultExtension(const std::string& aFileName);
+    void save(const MonoStorable& monoStorable);
+    void saveIfDirty(const LazySaveMonoStorable& lazySaveMonoStorable);
+    void load(MonoStorable& monoStorable);
 
-    static constexpr const char defaultStoragePath[] = "./tmp";
-    static constexpr const char defaultFileExtension[] = ".db";
+    static std::string getDBFilePath(const std::string& dbName);
+    static bool hasDefaultExtension(const std::string& fileName);
 
 private:
     std::fstream file_;

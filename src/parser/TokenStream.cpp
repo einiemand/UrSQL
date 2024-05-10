@@ -1,10 +1,9 @@
-#include "parser/TokenIterator.hpp"
-
 #include <format>
 #include <iostream>
 #include <regex>
 
 #include "exception/UserError.hpp"
+#include "parser/TokenStream.hpp"
 
 namespace ursql {
 
@@ -70,7 +69,7 @@ std::string readWhile(std::istream& input, const CharPredicate& pred) {
 
 }  // namespace
 
-TokenIterator TokenIterator::tokenize(std::istream& input) {
+std::vector<Token> TokenStream::tokenize(std::istream& input) {
     std::vector<Token> tokens;
     for (auto peek = input.peek(); std::char_traits<char>::not_eof(peek);
          peek = input.peek())
@@ -123,29 +122,29 @@ TokenIterator TokenIterator::tokenize(std::istream& input) {
             URSQL_FAIL(SyntaxError, std::format("unknown character {}", ch));
         }
     }
-    return TokenIterator(std::move(tokens));
+    return tokens;
 }
 
-TokenIterator::TokenIterator(std::vector<Token>&& tokens)
-    : tokens_(std::move(tokens)) {}
+TokenStream::TokenStream(std::istream& input)
+    : tokens_(tokenize(input)), i_(0) {}
 
-bool TokenIterator::hasNext() const noexcept {
+bool TokenStream::hasNext() const noexcept {
     return remaining() > 0;
 }
 
-const Token& TokenIterator::next() {
+const Token& TokenStream::next() {
     return tokens_[i_++];
 }
 
-std::size_t TokenIterator::remaining() const noexcept {
+std::size_t TokenStream::remaining() const noexcept {
     return i_ < tokens_.size() ? tokens_.size() - i_ : 0;
 }
 
-const Token& TokenIterator::peek() const {
+const Token& TokenStream::peek() const {
     return tokens_[i_];
 }
 
-bool TokenIterator::skipIf(const TokenPredicate& pred) {
+bool TokenStream::skipIf(const TokenPredicate& pred) {
     if (hasNext() && pred(peek())) {
         ++i_;
         return true;
@@ -153,13 +152,13 @@ bool TokenIterator::skipIf(const TokenPredicate& pred) {
     return false;
 }
 
-bool TokenIterator::skipIf(Keyword keyword) {
+bool TokenStream::skipIf(Keyword keyword) {
     return skipIf([keyword](const Token& token) {
         return token.is<TokenType::keyword>(keyword);
     });
 }
 
-bool TokenIterator::skipIf(Punctuation punctuation) {
+bool TokenStream::skipIf(Punctuation punctuation) {
     return skipIf([punctuation](const Token& token) {
         return token.is<TokenType::punctuation>(punctuation);
     });

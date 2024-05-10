@@ -1,6 +1,7 @@
 #include "model/Entity.hpp"
 
 #include <format>
+#include <iostream>
 
 #include "exception/InternalError.hpp"
 #include "persistence/BufferStream.hpp"
@@ -46,21 +47,17 @@ void Entity::addAttribute(Attribute&& attribute) {
     makeDirty(true);
 }
 
-bool Entity::attributeExistsByName(std::string_view name) const {
-    return std::find_if(std::begin(attributes_), std::end(attributes_),
-                        [&name](auto& attribute) -> bool {
-                            return attribute.getName() == name;
-                        }) != std::end(attributes_);
-}
-
-const Attribute& Entity::getAttributeByName(std::string_view name) const {
+std::size_t Entity::attributeIndex(std::string_view name) const {
     auto it = std::find_if(std::begin(attributes_), std::end(attributes_),
-                           [&name](auto& attribute) {
+                           [&](auto& attribute) {
                                return attribute.getName() == name;
                            });
-    URSQL_ASSERT(it != std::end(attributes_),
-                 std::format("attribute {} doesn't exist", name));
-    return *it;
+    return it == std::end(attributes_) ? npos : std::distance(std::begin(attributes_), it);
+}
+
+const Attribute& Entity::getAttribute(std::size_t index) const {
+    URSQL_ASSERT(index < attributes_.size(), "attribute index out of range");
+    return attributes_[index];
 }
 
 std::size_t Entity::getNextAutoInc() {

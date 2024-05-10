@@ -1,5 +1,6 @@
 #include "model/TOC.hpp"
 
+#include <iostream>
 #include <format>
 
 #include "exception/InternalError.hpp"

@@ -63,6 +63,4 @@ enum class Error {
     no_error = 5000
 };
 
-extern std::ostream& defaultOutput;
-
 }  // namespace ursql

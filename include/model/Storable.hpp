@@ -1,6 +1,5 @@
 #pragma once
 
-#include "common/Error.hpp"
 #include "persistence/Block.hpp"
 
 namespace ursql {

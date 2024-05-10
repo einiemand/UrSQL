@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include "Statement.hpp"
+#include "statement/Statement.hpp"
 
 namespace ursql {
 

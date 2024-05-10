@@ -1,7 +1,9 @@
 #include "model/Value.hpp"
 
 #include <format>
+#include <iostream>
 
+#include "common/Message.hpp"
 #include "exception/InternalError.hpp"
 #include "persistence/BufferStream.hpp"
 
@@ -98,8 +100,7 @@ void Value::deserialize(BufferReader& reader) {
           reader.read<varchar_t>());
         break;
     default:
-        URSQL_UNREACHABLE(std::format("unknown value type: {}",
-                                      static_cast<std::size_t>(type)));
+        URSQL_UNREACHABLE(std::format("unknown value type: {}", type));
     }
 }
 
@@ -126,9 +127,7 @@ ValueType Value::keyword2ValueType(Keyword keyword) {
     case Keyword::varchar_kw:
         return ValueType::varchar_type;
     default:
-        URSQL_UNREACHABLE(
-          std::format("unknown keyword: {}",
-                      static_cast<std::underlying_type_t<Keyword>>(keyword)));
+        URSQL_UNREACHABLE(std::format("unknown keyword: {}", keyword));
     }
 }
 

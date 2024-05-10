@@ -1,7 +1,9 @@
 #include "model/Storable.hpp"
 
 #include <format>
+#include <iostream>
 
+#include "common/Message.hpp"
 #include "exception/InternalError.hpp"
 #include "persistence/BufferStream.hpp"
 
@@ -22,13 +24,9 @@ void MonoStorable::encode(Block& block) const {
 }
 
 void MonoStorable::decode(const Block& block) {
-    char expected =
-      static_cast<std::underlying_type_t<BlockType>>(expectedBlockType());
-    char actual =
-      static_cast<std::underlying_type_t<BlockType>>(block.getType());
-    URSQL_ASSERT(
-      expected == actual,
-      std::format("expected block type={}, actual={}", expected, actual));
+    BlockType expected = expectedBlockType();
+    BlockType actual = block.getType();
+    URSQL_ASSERT(expected == actual, std::format("expected block type={}, actual={}", expected, actual));
     BufferReader reader(block.getData(), Block::size);
     deserialize(reader);
 }

@@ -6,14 +6,14 @@
 
 namespace ursql {
 
-class TokenIterator {
+class TokenStream {
 public:
     using TokenPredicate = std::function<bool(const Token&)>;
 
-    static TokenIterator tokenize(std::istream& input);
+    explicit TokenStream(std::istream& input);
+    ~TokenStream() = default;
 
-    explicit TokenIterator(std::vector<Token>&& tokens);
-    ~TokenIterator() = default;
+    URSQL_DISABLE_COPY(TokenStream);
 
     [[nodiscard]] bool hasNext() const noexcept;
     const Token& next();
@@ -27,7 +27,9 @@ public:
 
 private:
     const std::vector<Token> tokens_;
-    std::size_t i_ = 0;
+    std::size_t i_;
+
+    static std::vector<Token> tokenize(std::istream& input);
 };
 
 }  // namespace ursql
