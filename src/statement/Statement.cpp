@@ -3,11 +3,17 @@
 #include <format>
 #include <iostream>
 
-#include "common/Message.hpp"
+#include "common/Messaging.hpp"
 #include "exception/InternalError.hpp"
 #include "parser/TokenEnums.hpp"
 
 namespace ursql {
+
+void NopStatement::validate() const {}
+
+bool NopStatement::execute() const {
+    return true;
+}
 
 BasicStatement::BasicStatement(Keyword keyword) : Statement(), keyword_(keyword) {}
 

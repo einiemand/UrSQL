@@ -3,7 +3,7 @@
 #include <format>
 #include <iostream>
 
-#include "common/Message.hpp"
+#include "common/Messaging.hpp"
 #include "exception/InternalError.hpp"
 #include "persistence/BufferStream.hpp"
 

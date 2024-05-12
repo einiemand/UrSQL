@@ -1,9 +1,8 @@
 #include "model/Value.hpp"
 
 #include <format>
-#include <iostream>
 
-#include "common/Message.hpp"
+#include "common/Messaging.hpp"
 #include "exception/InternalError.hpp"
 #include "persistence/BufferStream.hpp"
 
@@ -53,27 +52,28 @@ ValueType Value::getType() const {
 }
 
 std::string Value::toString() const {
-    return std::visit(overloaded{ [](auto&& val) {
-                                     return std::to_string(val);
-                                 },
-                                  [](null_t) -> std::string {
-                                      return "NULL";
-                                  },
-                                  [](bool_t boolVal) -> std::string {
-                                      return boolVal ? "t" : "f";
-                                  },
-                                  [](const varchar_t& varcharVal) {
-                                      return varcharVal;
-                                  } },
-                      var_);
+    return std::visit(
+      overloaded{
+        [](auto&& val) {
+            return std::to_string(val);
+        },
+        [](null_t) -> std::string {
+            return "NULL";
+        },
+        [](bool_t boolVal) -> std::string {
+            return boolVal ? "t" : "f";
+        },
+        [](const varchar_t& varcharVal) {
+            return varcharVal;
+        }
+      }, var_);
 }
 
 void Value::serialize(BufferWriter& writer) const {
     writer << getType();
-    std::visit(overloaded{ [&](auto&& val) {
-                              writer << val;
-                          },
-                           [](null_t) {} },
+    std::visit(overloaded{
+                 [&](auto&& val) { writer << val; },
+                 [](null_t) {} },
                var_);
 }
 

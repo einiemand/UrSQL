@@ -1,41 +1,56 @@
-#include "common/Message.hpp"
-#include "parser/StatementParser.hpp"
+#include <readline/readline.h>
+
+#include <iostream>
+#include <sstream>
+
+#include "common/Finally.hpp"
+#include "exception/InternalError.hpp"
+#include "parser/Parser.hpp"
+#include "parser/SQLBlob.hpp"
 #include "parser/TokenStream.hpp"
 #include "statement/Statement.hpp"
-#include "exception/UserError.hpp"
-#include "exception/InternalError.hpp"
-#include <iostream>
-
-#include <readline/readline.h>
-#include <sstream>
 
 namespace ursql {
 
 std::ostream& out = std::cout;
+std::ostream& err = std::cerr;
 
 }
 
 int main(int argc, char* argv[]) {
     using namespace ursql;
 
-    std::stringstream strStream;
-    while (true) {
-        try {
-            char* line = readline("ursql> ");
-
-            TokenStream tokenStream(iss);
-            auto pStmt = parser::parse(tokenStream);
-            pStmt->validate();
-            if (!pStmt->execute()) {
-                break;
+    SQLBlob blob;
+    bool running = true;
+    while (running) {
+        char* line = readline("ursql> ");
+        if (!line) {
+            continue;
+        }
+        Finally cleanup([line]() { std::free(line); });
+        std::istringstream input(line);
+        while (running && input >> blob) {
+            try {
+                try {
+                    if (blob.ready()) {
+                        TokenStream tokenStream = blob.tokenize();
+                        auto pStmt = parser::parse(tokenStream);
+                        pStmt->validate();
+                        running = pStmt->execute();
+                    }
+                } catch (const FatalError& fatalError) {
+                    running = false;
+                    throw;
+                } catch (const std::exception&) {
+                    throw;
+                }
+            } catch (const std::exception& e) {
+                err << e.what() << '\n';
+                const boost::stacktrace::stacktrace* st = boost::get_error_info<Traced>(e);
+                if (st) {
+                    err << *st << '\n';
+                }
             }
-        } catch (const UserError& userError) {
-            out << userError.what();
-        } catch (const FatalError& fatalError) {
-            out << fatalError.what();
-            break;
-        } catch (const InternalError& internalError) {
-            out << internalError.what();
         }
     }
 

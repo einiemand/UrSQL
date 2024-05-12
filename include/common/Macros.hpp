@@ -1,6 +1,5 @@
 #pragma once
 
-#include <boost/stacktrace.hpp>
 #include <cstdlib>
 
 // Helper macros
@@ -31,27 +30,19 @@
     URSQL_DEFAULT_MOVE_CTOR(Class); \
     URSQL_DEFAULT_MOVE_ASSIGN(Class)
 
-#define URSQL_PRINT_BACKTRACE                             \
-    do {                                                  \
-        std::cerr << __FILE__ << ':' << __LINE__ << '\n'; \
-        std::cerr << boost::stacktrace::stacktrace();     \
-    } while (false)
+#define URSQL_THROW(t, e, message) t(e(message))
+#define URSQL_THROW_NORMAL(e, message) URSQL_THROW(throw, e, message)
+#define URSQL_THROW_TRACED(e, message) URSQL_THROW(throw_traced, e, message)
 
-#define URSQL_FAIL(e, message) \
-    do {                       \
-        URSQL_PRINT_BACKTRACE; \
-        throw e(message);      \
-    } while (false)
-
-#define URSQL_EXPECT(predicate, e, message) \
+#define URSQL_CHECK(predicate, t, e, message) \
     do {                                    \
         if (!(predicate)) {                 \
-            URSQL_FAIL(e, message);         \
+            t(e, message);         \
         }                                   \
     } while (false)
 
-#define URSQL_ASSERT(predicate, message) \
-    URSQL_EXPECT(predicate, AssertFailure, message)
+#define URSQL_EXPECT(predicate, e, message) URSQL_CHECK(predicate, URSQL_THROW_NORMAL, e, message)
+#define URSQL_ASSERT(predicate, message) URSQL_CHECK(predicate, URSQL_THROW_TRACED, AssertFailure, message)
 
 // unreachable
-#define URSQL_UNREACHABLE(message) URSQL_FAIL(UnreachableReached, message)
+#define URSQL_UNREACHABLE(message) URSQL_THROW_TRACED(UnreachableReached, message)

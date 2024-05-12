@@ -1,9 +1,11 @@
 #pragma once
 #include <format>
+#include <iostream>
 
 namespace ursql {
 
 extern std::ostream& out;
+extern std::ostream& err;
 
 }
 

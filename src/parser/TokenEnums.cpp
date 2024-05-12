@@ -2,10 +2,10 @@
 
 #include <cstring>
 #include <format>
-#include <iostream>
 #include <unordered_map>
 
 #include "common/Macros.hpp"
+#include "common/Messaging.hpp"
 #include "exception/InternalError.hpp"
 
 namespace ursql {

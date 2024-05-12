@@ -1,6 +1,7 @@
 #pragma once
 
 #include <functional>
+#include <sstream>
 
 #include "Token.hpp"
 
@@ -10,7 +11,7 @@ class TokenStream {
 public:
     using TokenPredicate = std::function<bool(const Token&)>;
 
-    explicit TokenStream(std::istream& input);
+    explicit TokenStream(std::vector<Token>&& tokens);
     ~TokenStream() = default;
 
     URSQL_DISABLE_COPY(TokenStream);
@@ -26,10 +27,8 @@ public:
     bool skipIf(Punctuation punctuation);
 
 private:
-    const std::vector<Token> tokens_;
+    std::vector<Token> tokens_;
     std::size_t i_;
-
-    static std::vector<Token> tokenize(std::istream& input);
 };
 
 }  // namespace ursql

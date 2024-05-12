@@ -13,7 +13,16 @@ public:
     URSQL_DISABLE_COPY(Statement);
 
     virtual void validate() const = 0;
-    virtual bool execute() const = 0;
+    [[nodiscard]] virtual bool execute() const = 0;
+};
+
+class NopStatement : public Statement {
+public:
+    explicit NopStatement() = default;
+    ~NopStatement() override = default;
+
+    void validate() const override;
+    [[nodiscard]] bool execute() const override;
 };
 
 class BasicStatement : public Statement {
@@ -22,7 +31,7 @@ public:
     ~BasicStatement() override = default;
 
     void validate() const override;
-    bool execute() const override;
+    [[nodiscard]] bool execute() const override;
 
 private:
     Keyword keyword_;

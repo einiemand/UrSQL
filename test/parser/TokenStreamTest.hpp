@@ -4,20 +4,25 @@
 
 #include "exception/UserError.hpp"
 #include "parser/TokenStream.hpp"
+#include "parser/SQLBlob.hpp"
 
 namespace ursql {
 
 TEST(TokenStream, empty) {
+    SQLBlob blob;
     std::istringstream empty(" \t \v \r   \f   \n");
-    TokenStream stream(empty);
+    empty >> blob;
+    TokenStream stream = blob.tokenize();
     ASSERT_FALSE(stream.hasNext());
 }
 
 TEST(TokenStream, create) {
+    SQLBlob blob;
     std::istringstream iss(
       "CrEatE taBLe \t\"some table\" (\"pri key\" prImary key auto_inCrement , "
       "f1 varchAr nOt null DeFauLt 'qwe', somef float\v, inte iNteger) \r \n ");
-    TokenStream stream(iss);
+    iss >> blob;
+    TokenStream stream = blob.tokenize();
     ASSERT_EQ(22, stream.remaining());
     ASSERT_EQ(Keyword::create_kw, stream.next().get<TokenType::keyword>());
     ASSERT_EQ(Keyword::table_kw, stream.next().get<TokenType::keyword>());
@@ -45,9 +50,11 @@ TEST(TokenStream, create) {
 }
 
 TEST(TokenStream, insert) {
+    SQLBlob blob;
     std::istringstream iss("InSerT iNTo \"some table\"(field1, field_2, fie3d) "
                            "valuEs \t ('zqdsffa', -3.33, true)  ");
-    TokenStream stream(iss);
+    iss >> blob;
+    TokenStream stream = blob.tokenize();
     ASSERT_EQ(19, stream.remaining());
     ASSERT_EQ(Keyword::insert_kw, stream.next().get<TokenType::keyword>());
     ASSERT_EQ(Keyword::into_kw, stream.next().get<TokenType::keyword>());
@@ -72,9 +79,11 @@ TEST(TokenStream, insert) {
 }
 
 TEST(TokenStream, del) {
+    SQLBlob blob;
     std::istringstream iss("DelETE from \"qwe zxc\" where f1 != 'sdf' or "
                            "num\t< 222.543 and \"free form\" =\vfalse\f");
-    TokenStream stream(iss);
+    iss >> blob;
+    TokenStream stream = blob.tokenize();
     ASSERT_EQ(15, stream.remaining());
     ASSERT_EQ(Keyword::delete_kw, stream.next().get<TokenType::keyword>());
     ASSERT_EQ(Keyword::from_kw, stream.next().get<TokenType::keyword>());
@@ -95,8 +104,10 @@ TEST(TokenStream, del) {
 }
 
 TEST(TokenStream, drop) {
+    SQLBlob blob;
     std::istringstream iss("Drop \v \t\f TaBlE \"sOme idEntifier\"");
-    TokenStream stream(iss);
+    iss >> blob;
+    TokenStream stream = blob.tokenize();
     ASSERT_EQ(3, stream.remaining());
     ASSERT_EQ(Keyword::drop_kw, stream.next().get<TokenType::keyword>());
     ASSERT_EQ(Keyword::table_kw, stream.next().get<TokenType::keyword>());
@@ -105,8 +116,10 @@ TEST(TokenStream, drop) {
 }
 
 TEST(TokenStream, truncate) {
+    SQLBlob blob;
     std::istringstream iss("tRunCaTE \v \t\f TaBlE \nwHat\r");
-    TokenStream stream(iss);
+    iss >> blob;
+    TokenStream stream = blob.tokenize();
     ASSERT_EQ(3, stream.remaining());
     ASSERT_EQ(Keyword::truncate_kw, stream.next().get<TokenType::keyword>());
     ASSERT_EQ(Keyword::table_kw, stream.next().get<TokenType::keyword>());
@@ -115,10 +128,12 @@ TEST(TokenStream, truncate) {
 }
 
 TEST(TokenStream, select) {
+    SQLBlob blob;
     std::istringstream iss(
       "select *\vfROm table1 \t wHere \"some id\"-\r34.5=1 \n and\fjOb='no "
       "job' and (age >5 or address is nOt null) oRdEr by nAme desc");
-    TokenStream stream(iss);
+    iss >> blob;
+    TokenStream stream = blob.tokenize();
     ASSERT_EQ(29, stream.remaining());
     ASSERT_EQ(Keyword::select_kw, stream.next().get<TokenType::keyword>());
     ASSERT_EQ(Operator::star, stream.next().get<TokenType::op>());
@@ -153,9 +168,11 @@ TEST(TokenStream, select) {
 }
 
 TEST(TokenStream, describe) {
+    SQLBlob blob;
     std::istringstream iss(
       "DeSc descRibE datAbAse taBlE \"what iDentifier\" iden");
-    TokenStream stream(iss);
+    iss >> blob;
+    TokenStream stream = blob.tokenize();
     ASSERT_EQ(6, stream.remaining());
     ASSERT_EQ(Keyword::desc_kw, stream.next().get<TokenType::keyword>());
     ASSERT_EQ(Keyword::describe_kw, stream.next().get<TokenType::keyword>());
@@ -168,14 +185,18 @@ TEST(TokenStream, describe) {
 
 TEST(TokenStream, comp) {
     for (std::string compStr : { "!=", "=", "<", "<=", ">", ">=" }) {
+        SQLBlob blob;
         std::istringstream iss(compStr);
-        TokenStream stream(iss);
+        iss >> blob;
+        TokenStream stream = blob.tokenize();
         ASSERT_EQ(1, stream.remaining());
         ASSERT_EQ(TokenType::comparator, stream.next().getType());
     }
     for (std::string compStr : { "!==", "<<", ">==", "=!", "><", "==" }) {
+        SQLBlob blob;
         std::istringstream iss(compStr);
-        ASSERT_THROW(TokenStream stream(iss), SyntaxError);
+        iss >> blob;
+        ASSERT_THROW((void) blob.tokenize(), SyntaxError);
     }
 }
 
@@ -183,30 +204,38 @@ TEST(TokenStream, number) {
     for (std::string numStr :
          { "152736.67123", "0", "0.0000", "00000.123400112", "001739" })
     {
+        SQLBlob blob;
         std::istringstream iss(numStr);
-        TokenStream stream(iss);
+        iss >> blob;
+        TokenStream stream = blob.tokenize();
         ASSERT_EQ(1, stream.remaining());
         ASSERT_EQ(TokenType::number, stream.next().getType());
     }
     for (std::string numStr :
          { "0.000.0", "123a", "0789?", "921.123.", "897!2" })
     {
+        SQLBlob blob;
         std::istringstream iss(numStr);
-        ASSERT_THROW(TokenStream stream(iss), SyntaxError);
+        iss >> blob;
+        ASSERT_THROW((void) blob.tokenize(), SyntaxError);
     }
 }
 
 TEST(TokenStream, quote) {
     for (std::string str : { "\"asdsafa\"", "\"hfoa\tndfoa   qhrq\"" }) {
+        SQLBlob blob;
         std::istringstream iss(str);
-        TokenStream stream(iss);
+        iss >> blob;
+        TokenStream stream = blob.tokenize();
         ASSERT_EQ(1, stream.remaining());
         ASSERT_EQ(TokenType::identifier, stream.next().getType());
     }
 
     for (std::string str : { "'afhwoh21893dafsif'", "'asdnfo\t\f\v128*(&('" }) {
+        SQLBlob blob;
         std::istringstream iss(str);
-        TokenStream stream(iss);
+        iss >> blob;
+        TokenStream stream = blob.tokenize();
         ASSERT_EQ(1, stream.remaining());
         ASSERT_EQ(TokenType::text, stream.next().getType());
     }
@@ -214,15 +243,19 @@ TEST(TokenStream, quote) {
     for (std::string str :
          { "'abc\"", "\"abc'", "'abc", "\"abc", "abc'", "abc\"" })
     {
+        SQLBlob blob;
         std::istringstream iss(str);
-        ASSERT_THROW(TokenStream stream(iss), SyntaxError);
+        iss >> blob;
+        ASSERT_THROW((void) blob.tokenize(), SyntaxError);
     }
 }
 
 TEST(TokenStream, unknown) {
     for (std::string str : { "!", "@", "#", "$", "%", "^", "&", "_" }) {
+        SQLBlob blob;
         std::istringstream iss(str);
-        ASSERT_THROW(TokenStream stream(iss), SyntaxError);
+        iss >> blob;
+        ASSERT_THROW((void) blob.tokenize(), SyntaxError);
     }
 }
 

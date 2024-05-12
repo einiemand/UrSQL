@@ -2,8 +2,8 @@
 
 #include <format>
 #include <sstream>
-#include <iostream>
 
+#include "common/Messaging.hpp"
 #include "exception/InternalError.hpp"
 #include "model/TOC.hpp"
 
@@ -110,7 +110,7 @@ void Storage::readBlock(Block& block, std::size_t blockNum) {
 #endif
     if (file_.seekg(blockNum * Block::size)) {
         if (!file_.read(reinterpret_cast<char*>(&block), Block::size)) {
-            URSQL_FAIL(FileAccessError, "unable to read from file");
+            URSQL_THROW_TRACED(FileAccessError, "unable to read from file");
         }
 #ifdef ENABLE_BLOCKCACHE
         else
@@ -119,15 +119,14 @@ void Storage::readBlock(Block& block, std::size_t blockNum) {
         }
 #endif
     } else {
-        URSQL_FAIL(FileAccessError,
-                   "unable to read from file. Probably offset issue");
+        URSQL_THROW_TRACED(FileAccessError, "unable to read from file. Probably offset issue");
     }
 }
 
 void Storage::writeBlock(const Block& block, std::size_t blockNum) {
     if (file_.seekp(blockNum * Block::size)) {
         if (!file_.write(reinterpret_cast<const char*>(&block), Block::size)) {
-            URSQL_FAIL(FileAccessError, "unable to write to file");
+            URSQL_THROW_TRACED(FileAccessError, "unable to write to file");
         }
 #ifdef ENABLE_BLOCKCACHE
         else
@@ -136,8 +135,7 @@ void Storage::writeBlock(const Block& block, std::size_t blockNum) {
         }
 #endif
     } else {
-        URSQL_FAIL(FileAccessError,
-                   "unable to write to file. Probably offset issue");
+        URSQL_THROW_TRACED(FileAccessError, "unable to write to file. Probably offset issue");
     }
 }
 

@@ -1,8 +1,10 @@
 #include "persistence/BufferStream.hpp"
 
+#include <iostream>
+
+#include "common/Messaging.hpp"
 #include "exception/InternalError.hpp"
 #include "model/Storable.hpp"
-#include <iostream>
 
 namespace ursql {
 

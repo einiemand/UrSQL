@@ -4,8 +4,6 @@
 
 namespace ursql {
 
-std::ostream& defaultOutput = std::cout;
-
 StatusResult::StatusResult(Error code, std::string msg)
     : m_code(code),
       m_msg(std::move(msg)) {}

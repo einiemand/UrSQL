@@ -1,6 +1,6 @@
 #pragma once
 
-#include <cstring>
+#include <string>
 #include <type_traits>
 
 #include "common/Macros.hpp"
@@ -44,7 +44,7 @@ public:
                                                      std::is_enum_v<T>>>
     BufferReader& operator>>(T& val) {
         constexpr const std::size_t typeSize = sizeof(T);
-        memcpy(&val, bufData_.getAndAdvance(typeSize), typeSize);
+        std::memcpy(&val, bufData_.getAndAdvance(typeSize), typeSize);
         return *this;
     }
 
@@ -73,7 +73,7 @@ public:
                                                      std::is_enum_v<T>>>
     BufferWriter& operator<<(const T val) {
         constexpr const std::size_t typeSize = sizeof(T);
-        memcpy(bufData_.getAndAdvance(typeSize), &val, typeSize);
+        std::memcpy(bufData_.getAndAdvance(typeSize), &val, typeSize);
         return *this;
     }
 

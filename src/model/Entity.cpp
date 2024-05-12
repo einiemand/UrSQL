@@ -1,8 +1,8 @@
 #include "model/Entity.hpp"
 
 #include <format>
-#include <iostream>
 
+#include "common/Messaging.hpp"
 #include "exception/InternalError.hpp"
 #include "persistence/BufferStream.hpp"
 
