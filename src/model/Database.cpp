@@ -5,16 +5,18 @@
 
 namespace ursql {
 
-Database::Database(const std::string& aFileName, CreateNewFile)
-    : toc_(),
-      storage_(aFileName, CreateNewFile{}),
+Database::Database(std::string name, const fs::path& filePath, CreateNewFile)
+    : name_(std::move(name)),
+      storage_(filePath, CreateNewFile{}),
+      toc_(),
       entityCache_() {
     storage_.save(toc_);
 }
 
-Database::Database(const std::string& aFileName, OpenExistingFile)
-    : toc_(),
-      storage_(aFileName, OpenExistingFile{}),
+Database::Database(std::string name, const fs::path& filePath, OpenExistingFile)
+    : name_(std::move(name)),
+      storage_(filePath, OpenExistingFile{}),
+      toc_(),
       entityCache_() {
     storage_.load(toc_);
 }
@@ -24,6 +26,10 @@ Database::~Database() {
     for (auto& [_, entity] : entityCache_) {
         storage_.saveIfDirty(*entity);
     }
+}
+
+const std::string& Database::getName() const {
+    return name_;
 }
 
 //StatusResult Database::createTable(const AttributeList& anAttributeList,

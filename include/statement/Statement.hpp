@@ -2,8 +2,11 @@
 
 #include "common/Macros.hpp"
 #include "parser/TokenEnums.hpp"
+#include "ExecuteResult.hpp"
 
 namespace ursql {
+
+class DBManager;
 
 class Statement {
 public:
@@ -12,8 +15,7 @@ public:
 
     URSQL_DISABLE_COPY(Statement);
 
-    virtual void validate() const = 0;
-    [[nodiscard]] virtual bool execute() const = 0;
+    [[nodiscard]] virtual ExecuteResult run(DBManager& dbManager) const = 0;
 };
 
 class NopStatement : public Statement {
@@ -21,20 +23,31 @@ public:
     explicit NopStatement() = default;
     ~NopStatement() override = default;
 
-    void validate() const override;
-    [[nodiscard]] bool execute() const override;
+    [[nodiscard]] ExecuteResult run(DBManager&) const override;
 };
 
-class BasicStatement : public Statement {
+class HelpStatement : public Statement {
 public:
-    explicit BasicStatement(Keyword keyword);
-    ~BasicStatement() override = default;
+    explicit HelpStatement() = default;
+    ~HelpStatement() override = default;
 
-    void validate() const override;
-    [[nodiscard]] bool execute() const override;
+    [[nodiscard]] ExecuteResult run(DBManager&) const override;
+};
 
-private:
-    Keyword keyword_;
+class VersionStatement : public Statement {
+public:
+    explicit VersionStatement() = default;
+    ~VersionStatement() override = default;
+
+    [[nodiscard]] ExecuteResult run(DBManager&) const override;
+};
+
+class QuitStatement : public Statement {
+public:
+    explicit QuitStatement() = default;
+    ~QuitStatement() override = default;
+
+    [[nodiscard]] ExecuteResult run(DBManager&) const override;
 };
 
 }  // namespace ursql

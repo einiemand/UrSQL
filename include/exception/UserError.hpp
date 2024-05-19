@@ -12,8 +12,40 @@ public:
 
 class SyntaxError : public UserError {
 public:
-    explicit SyntaxError(const std::string& what);
+    explicit SyntaxError(std::string_view what);
     ~SyntaxError() override = default;
+};
+
+class TokenStream;
+
+class UnknownCommand : public UserError {
+public:
+    explicit UnknownCommand(const TokenStream& ts);
+    ~UnknownCommand() override = default;
+};
+
+class AlreadyExists : public UserError {
+public:
+    explicit AlreadyExists(std::string_view what);
+    ~AlreadyExists() override = default;
+};
+
+class DoesNotExist : public UserError {
+public:
+    explicit DoesNotExist(std::string_view what);
+    ~DoesNotExist() override = default;
+};
+
+class MissingInput : public UserError {
+public:
+    explicit MissingInput(std::string_view what);
+    ~MissingInput() override = default;
+};
+
+class UnexpectedInput : public UserError {
+public:
+    explicit UnexpectedInput(std::string_view what);
+    ~UnexpectedInput() override = default;
 };
 
 }  // namespace ursql

@@ -13,8 +13,6 @@ namespace parser {
 
 std::unique_ptr<Statement> parse(TokenStream& stream);
 
-Token parse(std::istream& input);
-
 }
 
 }

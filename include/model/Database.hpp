@@ -19,13 +19,13 @@ public:
     using EntityCache =
       std::unordered_map<std::string, std::unique_ptr<Entity> >;
 
-    Database(const std::string& fileName, CreateNewFile);
-
-    Database(const std::string& fileName, OpenExistingFile);
-
+    Database(std::string name, const fs::path& filePath, CreateNewFile);
+    Database(std::string name, const fs::path& filePath, OpenExistingFile);
     ~Database();
 
     URSQL_DISABLE_COPY(Database);
+
+    const std::string& getName() const;
 
 //    StatusResult createTable(const AttributeList& anAttributeList,
 //                             const std::string& anEntityName);
@@ -65,8 +65,9 @@ public:
 //    }
 
 private:
-    TOC toc_;
+    std::string name_;
     Storage storage_;
+    TOC toc_;
     EntityCache entityCache_;
 };
 

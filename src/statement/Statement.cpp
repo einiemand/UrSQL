@@ -1,42 +1,32 @@
 #include "statement/Statement.hpp"
 
 #include <format>
-#include <iostream>
 
-#include "common/Messaging.hpp"
-#include "exception/InternalError.hpp"
-#include "parser/TokenEnums.hpp"
+#include "view/View.hpp"
+#include <memory>
 
 namespace ursql {
 
-void NopStatement::validate() const {}
-
-bool NopStatement::execute() const {
-    return true;
+ExecuteResult NopStatement::run(DBManager&) const {
+    return { nullptr, false };
 }
 
-BasicStatement::BasicStatement(Keyword keyword) : Statement(), keyword_(keyword) {}
-
-
-void BasicStatement::validate() const {
+ExecuteResult HelpStatement::run(DBManager&) const {
+    constexpr const char str[] =
+      "help    - show guide on how to use UrSQL\n"
+      "version - show UrSQL version\n"
+      "quit    - quit UrSQL";
+    return { std::make_unique<TextView>(str), false };
 }
 
-bool BasicStatement::execute() const {
-    switch (keyword_) {
-    case Keyword::help_kw:
-        out << "help    - show guide on how to use UrSQL" << '\n'
-            << "version - show UrSQL version" << '\n'
-            << "quit    - quit UrSQL\n";
-        return true;
-    case Keyword::version_kw:
-        out << "UrSQL 1.0\n";
-        return true;
-    case Keyword::quit_kw:
-        out << "Bye\n";
-        return false;
-    default:
-        URSQL_UNREACHABLE(std::format("unsupported keyword {} for a basic statement", keyword_));
-    }
+ExecuteResult VersionStatement::run(DBManager&) const {
+    constexpr const char str[] = "UrSQL 1.0";
+    return { std::make_unique<TextView>(str), false };
+}
+
+ExecuteResult QuitStatement::run(DBManager&) const {
+    constexpr const char str[] = "Bye";
+    return { std::make_unique<TextView>(str), true };
 }
 
 }  // namespace ursql

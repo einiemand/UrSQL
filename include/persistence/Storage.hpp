@@ -53,12 +53,14 @@ class TOC;
 class MonoStorable;
 class LazySaveMonoStorable;
 
+namespace fs = std::filesystem;
+
 class Storage {
 public:
     using BlockVisitor = std::function<bool(Block&, std::size_t)>;
 
-    Storage(const std::string& fileName, CreateNewFile);
-    Storage(const std::string& fileName, OpenExistingFile);
+    Storage(const fs::path& filePath, CreateNewFile);
+    Storage(const fs::path& filePath, OpenExistingFile);
 
     ~Storage() = default;
 
@@ -74,10 +76,6 @@ public:
     void save(const MonoStorable& monoStorable);
     void saveIfDirty(const LazySaveMonoStorable& lazySaveMonoStorable);
     void load(MonoStorable& monoStorable);
-
-    static std::string getDBFilePath(const std::string& dbName);
-    static bool hasDefaultExtension(const std::string& fileName);
-
 private:
     std::fstream file_;
 #ifdef ENABLE_BLOCKCACHE

@@ -20,6 +20,18 @@ const Token& TokenStream::peek() const {
     return tokens_[i_];
 }
 
+std::string TokenStream::toString() const {
+    if (tokens_.empty()) {
+        return {};
+    }
+    std::string str = tokens_[0].toString();
+    for (std::size_t i = 1; i < tokens_.size(); ++i) {
+        str += ' ';
+        str += tokens_[i].toString();
+    }
+    return str;
+}
+
 bool TokenStream::skipIf(const TokenPredicate& pred) {
     if (hasNext() && pred(peek())) {
         ++i_;

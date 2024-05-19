@@ -3,7 +3,6 @@
 #include <format>
 #include <sstream>
 
-#include "common/Messaging.hpp"
 #include "exception/InternalError.hpp"
 #include "model/TOC.hpp"
 
@@ -69,30 +68,17 @@ void BlockCache::_removeTail() {
 #endif
 
 /* -------------------------------Storage------------------------------- */
-Storage::Storage(const std::string& fileName, CreateNewFile)
-    : file_(getDBFilePath(fileName), std::ios_base::binary | std::ios_base::in |
-                                       std::ios_base::out |
-                                       std::ios_base::trunc) {
+Storage::Storage(const fs::path& filePath, CreateNewFile)
+    : file_(filePath, std::ios_base::binary | std::ios_base::in |
+                        std::ios_base::out | std::ios_base::trunc) {
     URSQL_EXPECT(file_, FileAccessError,
-                 std::format("unable to create file {}", fileName));
+                 std::format("unable to create file {}", filePath.native()));
 }
 
-Storage::Storage(const std::string& fileName, OpenExistingFile)
-    : file_(getDBFilePath(fileName),
-            std::ios_base::binary | std::ios_base::in | std::ios_base::out) {
+Storage::Storage(const fs::path& filePath, OpenExistingFile)
+    : file_(filePath, std::ios_base::binary | std::ios_base::in | std::ios_base::out) {
     URSQL_EXPECT(file_, FileAccessError,
-                 std::format("unable to open file {}", fileName));
-}
-
-std::string Storage::getDBFilePath(const std::string& dbName) {
-    return std::format("{}/{}{}", std::filesystem::temp_directory_path().string(), dbName, fileExtension);
-}
-
-bool Storage::hasDefaultExtension(const std::string& fileName) {
-    return fileName.length() >=
-             std::char_traits<char>::length(fileExtension) &&
-           std::equal(std::rbegin(fileExtension),
-                      std::rend(fileExtension), std::rbegin(fileName));
+                 std::format("unable to open file {}", filePath.native()));
 }
 
 std::size_t Storage::_getBlockCount() {

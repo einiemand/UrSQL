@@ -6,6 +6,7 @@
 
 #include "TokenEnums.hpp"
 #include "common/Macros.hpp"
+#include "common/Messaging.hpp"
 
 namespace ursql {
 
@@ -93,6 +94,10 @@ public:
     [[nodiscard]] constexpr bool is(const T& val) const noexcept {
         auto pVal = getIf<tokenType>();
         return pVal && *pVal == val;
+    }
+
+    [[nodiscard]] constexpr std::string toString() const {
+        return std::visit([](auto&& val) { return std::format("{}", val); }, var_);
     }
 
 private:

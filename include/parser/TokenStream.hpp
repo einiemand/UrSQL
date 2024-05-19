@@ -22,6 +22,8 @@ public:
     [[nodiscard]] std::size_t remaining() const noexcept;
     [[nodiscard]] const Token& peek() const;
 
+    [[nodiscard]] std::string toString() const;
+
     bool skipIf(const TokenPredicate& pred);
     bool skipIf(Keyword keyword);
     bool skipIf(Punctuation punctuation);

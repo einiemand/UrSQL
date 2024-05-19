@@ -30,9 +30,8 @@
     URSQL_DEFAULT_MOVE_CTOR(Class); \
     URSQL_DEFAULT_MOVE_ASSIGN(Class)
 
-#define URSQL_THROW(t, e, message) t(e(message))
-#define URSQL_THROW_NORMAL(e, message) URSQL_THROW(throw, e, message)
-#define URSQL_THROW_TRACED(e, message) URSQL_THROW(throw_traced, e, message)
+#define URSQL_THROW_NORMAL(e, message) throw e(message)
+#define URSQL_THROW_TRACED(e, message) throw_traced(e(message))
 
 #define URSQL_CHECK(predicate, t, e, message) \
     do {                                    \

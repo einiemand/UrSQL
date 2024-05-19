@@ -1,37 +1,25 @@
 #pragma once
 
-#include "Interpreter.hpp"
+#include "model/Database.hpp"
 
 namespace ursql {
 
-class Statement;
-class Database;
-
-class DBManager : public Interpreter {
+class DBManager {
 public:
-    explicit DBManager(Interpreter* anInterpreter = nullptr);
-    ~DBManager() override = default;
+    explicit DBManager() = default;
+    ~DBManager() = default;
 
-    std::unique_ptr<Statement> getStatement(Tokenizer& aTokenizer) override;
+    URSQL_DISABLE_COPY(DBManager);
 
-    StatusResult createDatabase(const std::string& aName);
-    StatusResult dropDatabase(const std::string& aName);
-    StatusResult useDatabase(const std::string& aName);
-    static StatusResult showDatabases();
-    StatusResult describeDatabase(const std::string& aName);
+    static bool databaseExists(std::string_view dbName);
 
-    Database* getActiveDatabase() const override;
-
-    static StatusResult databaseExists(bool& exists, const std::string& aName);
+    void createDatabase(std::string_view dbName);
+    void dropDatabase(std::string_view dbName);
+    void useDatabase(std::string_view dbName);
 
 private:
-    std::unique_ptr<Database> m_activeDB;
-
-    void _resetActiveDB(std::unique_ptr<Database>&& aNewDB);
-    void _releaseActiveDB();
-
-    static StatusResult _deleteDBFile(const std::string& aName);
-    static StatusResult _collectDBNames(StringList& aDBNames);
+    std::unique_ptr<Database> activeDB_;
 };
 
-}  // namespace ursql
+}
+

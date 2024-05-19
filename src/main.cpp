@@ -9,6 +9,7 @@
 #include "parser/SQLBlob.hpp"
 #include "parser/TokenStream.hpp"
 #include "statement/Statement.hpp"
+#include "controller/DBManager.hpp"
 
 namespace ursql {
 
@@ -20,26 +21,29 @@ std::ostream& err = std::cerr;
 int main(int argc, char* argv[]) {
     using namespace ursql;
 
+    DBManager dbManager;
+
     SQLBlob blob;
-    bool running = true;
-    while (running) {
+    bool quit = false;
+    do {
         char* line = readline("ursql> ");
         if (!line) {
             continue;
         }
         Finally cleanup([line]() { std::free(line); });
         std::istringstream input(line);
-        while (running && input >> blob) {
+        while (!quit && input >> blob) {
             try {
                 try {
                     if (blob.ready()) {
                         TokenStream tokenStream = blob.tokenize();
                         auto pStmt = parser::parse(tokenStream);
-                        pStmt->validate();
-                        running = pStmt->execute();
+                        ExecuteResult result = pStmt->run(dbManager);
+                        result.showView(out);
+                        quit = result.quit();
                     }
                 } catch (const FatalError& fatalError) {
-                    running = false;
+                    quit = true;
                     throw;
                 } catch (const std::exception&) {
                     throw;
@@ -50,9 +54,10 @@ int main(int argc, char* argv[]) {
                 if (st) {
                     err << *st << '\n';
                 }
+                err << '\n';
             }
         }
-    }
+    } while (!quit);
 
     return 0;
 }
