@@ -52,21 +52,19 @@ ValueType Value::getType() const {
 }
 
 std::string Value::toString() const {
-    return std::visit(
-      overloaded{
-        [](auto&& val) {
-            return std::to_string(val);
-        },
-        [](null_t) -> std::string {
-            return "NULL";
-        },
-        [](bool_t boolVal) -> std::string {
-            return boolVal ? "t" : "f";
-        },
-        [](const varchar_t& varcharVal) {
-            return varcharVal;
-        }
-      }, var_);
+    return std::visit(overloaded{ [](auto&& val) {
+                                     return std::to_string(val);
+                                 },
+                                  [](null_t) -> std::string {
+                                      return "NULL";
+                                  },
+                                  [](bool_t boolVal) -> std::string {
+                                      return boolVal ? "t" : "f";
+                                  },
+                                  [](const varchar_t& varcharVal) {
+                                      return varcharVal;
+                                  } },
+                      var_);
 }
 
 std::size_t Value::displayWidth() const {
@@ -74,19 +72,27 @@ std::size_t Value::displayWidth() const {
 }
 
 void Value::show(std::ostream& os) const {
-    std::visit(overloaded{
-                 [&](auto&& val) { os << val; },
-                 [&](std::monostate) { os << "NULL"; },
-                 [&](bool_t boolVal) { os << (boolVal ? 't' : 'f'); },
-                 [&](const varchar_t&& varcharVal) { os << varcharVal; }
-    }, var_);
+    std::visit(overloaded{ [&](auto&& val) {
+                              os << val;
+                          },
+                           [&](std::monostate) {
+                               os << "NULL";
+                           },
+                           [&](bool_t boolVal) {
+                               os << (boolVal ? 't' : 'f');
+                           },
+                           [&](const varchar_t&& varcharVal) {
+                               os << varcharVal;
+                           } },
+               var_);
 }
 
 void Value::serialize(BufferWriter& writer) const {
     writer << getType();
-    std::visit(overloaded{
-                 [&](auto&& val) { writer << val; },
-                 [](null_t) {} },
+    std::visit(overloaded{ [&](auto&& val) {
+                              writer << val;
+                          },
+                           [](null_t) {} },
                var_);
 }
 

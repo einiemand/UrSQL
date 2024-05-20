@@ -42,7 +42,7 @@ std::unique_ptr<Statement> parseShowStatement(TokenStream& ts) {
     URSQL_THROW_NORMAL(UnknownCommand, ts);
 }
 
-}
+}  // namespace
 
 std::unique_ptr<Statement> parse(TokenStream& ts) {
     if (!ts.hasNext()) {
@@ -66,6 +66,4 @@ std::unique_ptr<Statement> parse(TokenStream& ts) {
     URSQL_THROW_NORMAL(UnknownCommand, ts);
 }
 
-}
-
-
+}  // namespace ursql::parser

@@ -1,11 +1,11 @@
 #pragma once
 
 #include <memory>
+#include <string>
 #include <tuple>
 
 #include "Storable.hpp"
 #include "parser/TokenEnums.hpp"
-#include <string>
 
 namespace ursql {
 

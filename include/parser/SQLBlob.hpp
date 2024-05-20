@@ -1,7 +1,8 @@
 #pragma once
-#include "common/Macros.hpp"
-#include "TokenStream.hpp"
 #include <sstream>
+
+#include "TokenStream.hpp"
+#include "common/Macros.hpp"
 
 namespace ursql {
 
@@ -35,4 +36,4 @@ private:
     void _reset();
 };
 
-}
+}  // namespace ursql

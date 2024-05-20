@@ -1,6 +1,7 @@
 #pragma once
 
 #include <ostream>
+
 #include "common/Macros.hpp"
 
 namespace ursql {
@@ -15,4 +16,4 @@ public:
     virtual void show(std::ostream& os) const = 0;
 };
 
-}
+}  // namespace ursql

@@ -1,9 +1,12 @@
 #include "statement/ExecuteResult.hpp"
+
 #include "view/View.hpp"
 
 namespace ursql {
 
-ExecuteResult::ExecuteResult(std::unique_ptr<View>&& view, bool quit) : view_(std::move(view)), quit_(quit) {}
+ExecuteResult::ExecuteResult(std::unique_ptr<View>&& view, bool quit)
+    : view_(std::move(view)),
+      quit_(quit) {}
 
 void ExecuteResult::showView(std::ostream& os) const {
     if (view_) {
@@ -16,4 +19,4 @@ bool ExecuteResult::quit() const {
     return quit_;
 }
 
-}
+}  // namespace ursql

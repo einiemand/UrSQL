@@ -3,8 +3,8 @@
 #include <gtest/gtest.h>
 
 #include "exception/UserError.hpp"
-#include "parser/TokenStream.hpp"
 #include "parser/SQLBlob.hpp"
+#include "parser/TokenStream.hpp"
 
 namespace ursql {
 
@@ -31,7 +31,8 @@ TEST(TokenStream, create) {
     ASSERT_EQ("pri key", stream.next().get<TokenType::identifier>());
     ASSERT_EQ(Keyword::primary_kw, stream.next().get<TokenType::keyword>());
     ASSERT_EQ(Keyword::key_kw, stream.next().get<TokenType::keyword>());
-    ASSERT_EQ(Keyword::auto_increment_kw, stream.next().get<TokenType::keyword>());
+    ASSERT_EQ(Keyword::auto_increment_kw,
+              stream.next().get<TokenType::keyword>());
     ASSERT_EQ(Punctuation::comma, stream.next().get<TokenType::punctuation>());
     ASSERT_EQ("f1", stream.next().get<TokenType::identifier>());
     ASSERT_EQ(Keyword::varchar_kw, stream.next().get<TokenType::keyword>());
@@ -196,7 +197,7 @@ TEST(TokenStream, comp) {
         SQLBlob blob;
         std::istringstream iss(compStr);
         iss >> blob;
-        ASSERT_THROW((void) blob.tokenize(), SyntaxError);
+        ASSERT_THROW((void)blob.tokenize(), SyntaxError);
     }
 }
 
@@ -217,7 +218,7 @@ TEST(TokenStream, number) {
         SQLBlob blob;
         std::istringstream iss(numStr);
         iss >> blob;
-        ASSERT_THROW((void) blob.tokenize(), SyntaxError);
+        ASSERT_THROW((void)blob.tokenize(), SyntaxError);
     }
 }
 
@@ -246,7 +247,7 @@ TEST(TokenStream, quote) {
         SQLBlob blob;
         std::istringstream iss(str);
         iss >> blob;
-        ASSERT_THROW((void) blob.tokenize(), SyntaxError);
+        ASSERT_THROW((void)blob.tokenize(), SyntaxError);
     }
 }
 
@@ -255,7 +256,7 @@ TEST(TokenStream, unknown) {
         SQLBlob blob;
         std::istringstream iss(str);
         iss >> blob;
-        ASSERT_THROW((void) blob.tokenize(), SyntaxError);
+        ASSERT_THROW((void)blob.tokenize(), SyntaxError);
     }
 }
 

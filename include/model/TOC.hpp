@@ -1,7 +1,8 @@
 #pragma once
 
-#include "Storable.hpp"
 #include <string>
+
+#include "Storable.hpp"
 
 namespace ursql {
 

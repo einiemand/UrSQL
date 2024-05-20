@@ -97,7 +97,11 @@ public:
     }
 
     [[nodiscard]] constexpr std::string toString() const {
-        return std::visit([](auto&& val) { return std::format("{}", val); }, var_);
+        return std::visit(
+          [](auto&& val) {
+              return std::format("{}", val);
+          },
+          var_);
     }
 
 private:

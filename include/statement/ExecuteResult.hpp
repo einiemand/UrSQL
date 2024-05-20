@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+
 #include "view/View.hpp"
 
 namespace ursql {
@@ -12,9 +13,10 @@ public:
 
     void showView(std::ostream& os) const;
     [[nodiscard]] bool quit() const;
+
 private:
     std::unique_ptr<View> view_;
     bool quit_;
 };
 
-}
+}  // namespace ursql

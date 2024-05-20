@@ -26,7 +26,9 @@ void MonoStorable::encode(Block& block) const {
 void MonoStorable::decode(const Block& block) {
     BlockType expected = expectedBlockType();
     BlockType actual = block.getType();
-    URSQL_ASSERT(expected == actual, std::format("expected block type={}, actual={}", expected, actual));
+    URSQL_ASSERT(
+      expected == actual,
+      std::format("expected block type={}, actual={}", expected, actual));
     BufferReader reader(block.getData(), Block::size);
     deserialize(reader);
 }

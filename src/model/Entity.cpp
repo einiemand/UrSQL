@@ -52,7 +52,9 @@ std::size_t Entity::attributeIndex(std::string_view name) const {
                            [&](auto& attribute) {
                                return attribute.getName() == name;
                            });
-    return it == std::end(attributes_) ? npos : std::distance(std::begin(attributes_), it);
+    return it == std::end(attributes_) ?
+             npos :
+             std::distance(std::begin(attributes_), it);
 }
 
 const Attribute& Entity::getAttribute(std::size_t index) const {

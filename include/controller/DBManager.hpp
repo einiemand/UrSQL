@@ -22,5 +22,4 @@ private:
     std::unique_ptr<Database> activeDB_;
 };
 
-}
-
+}  // namespace ursql

@@ -76,6 +76,7 @@ public:
     void save(const MonoStorable& monoStorable);
     void saveIfDirty(const LazySaveMonoStorable& lazySaveMonoStorable);
     void load(MonoStorable& monoStorable);
+
 private:
     std::fstream file_;
 #ifdef ENABLE_BLOCKCACHE

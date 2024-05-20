@@ -15,4 +15,4 @@ private:
     const std::string text_;
 };
 
-}
+}  // namespace ursql

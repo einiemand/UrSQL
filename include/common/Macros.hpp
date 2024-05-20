@@ -34,14 +34,17 @@
 #define URSQL_THROW_TRACED(e, message) throw_traced(e(message))
 
 #define URSQL_CHECK(predicate, t, e, message) \
-    do {                                    \
-        if (!(predicate)) {                 \
-            t(e, message);         \
-        }                                   \
+    do {                                      \
+        if (!(predicate)) {                   \
+            t(e, message);                    \
+        }                                     \
     } while (false)
 
-#define URSQL_EXPECT(predicate, e, message) URSQL_CHECK(predicate, URSQL_THROW_NORMAL, e, message)
-#define URSQL_ASSERT(predicate, message) URSQL_CHECK(predicate, URSQL_THROW_TRACED, AssertFailure, message)
+#define URSQL_EXPECT(predicate, e, message) \
+    URSQL_CHECK(predicate, URSQL_THROW_NORMAL, e, message)
+#define URSQL_ASSERT(predicate, message) \
+    URSQL_CHECK(predicate, URSQL_THROW_TRACED, AssertFailure, message)
 
 // unreachable
-#define URSQL_UNREACHABLE(message) URSQL_THROW_TRACED(UnreachableReached, message)
+#define URSQL_UNREACHABLE(message) \
+    URSQL_THROW_TRACED(UnreachableReached, message)

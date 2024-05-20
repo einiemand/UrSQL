@@ -48,9 +48,13 @@ bool SQLBlob::ready() const {
 }
 
 TokenStream SQLBlob::tokenize() {
-    Finally cleanup([this]() { _reset(); });
+    Finally cleanup([this]() {
+        _reset();
+    });
     std::vector<Token> tokens;
-    for (auto peek = buf_.peek(); std::char_traits<char>::not_eof(peek); peek = buf_.peek()) {
+    for (auto peek = buf_.peek(); std::char_traits<char>::not_eof(peek);
+         peek = buf_.peek())
+    {
         char ch = std::char_traits<char>::to_char_type(peek);
         if (isWhiteSpace(ch)) {
             buf_.ignore();
@@ -70,7 +74,6 @@ TokenStream SQLBlob::tokenize() {
         } else if (charIsComparator(ch)) {
             std::string str = _readWhile(charIsComparator);
             if (!strIsComparator(str)) {
-
             }
             URSQL_EXPECT(strIsComparator(str), SyntaxError,
                          std::format("{} is not a comparator", str));
@@ -99,7 +102,8 @@ TokenStream SQLBlob::tokenize() {
                                     str);
             }
         } else {
-            URSQL_THROW_NORMAL(SyntaxError, std::format("unknown character {}", ch));
+            URSQL_THROW_NORMAL(SyntaxError,
+                               std::format("unknown character {}", ch));
         }
     }
     return TokenStream(std::move(tokens));
@@ -107,9 +111,13 @@ TokenStream SQLBlob::tokenize() {
 
 std::istream& operator>>(std::istream& input, SQLBlob& blob) {
     URSQL_ASSERT(!blob.ready(), "A SQLBlob is meant for only one statement");
-    for (auto gi = input.get(); std::char_traits<char>::not_eof(gi); gi = input.get()) {
+    for (auto gi = input.get(); std::char_traits<char>::not_eof(gi);
+         gi = input.get())
+    {
         char ch = std::char_traits<char>::to_char_type(gi);
-        if (ch == SQLBlob::delim && !blob.inDoubleQuote_ && !blob.inSingleQuote_) {
+        if (ch == SQLBlob::delim && !blob.inDoubleQuote_ &&
+            !blob.inSingleQuote_)
+        {
             blob.ready_ = true;
             break;
         }
@@ -125,7 +133,9 @@ std::istream& operator>>(std::istream& input, SQLBlob& blob) {
 
 std::string SQLBlob::_readUntil(const CharPredicate& pred) {
     std::string str;
-    for (auto gi = buf_.get(); std::char_traits<char>::not_eof(gi); gi = buf_.get()) {
+    for (auto gi = buf_.get(); std::char_traits<char>::not_eof(gi);
+         gi = buf_.get())
+    {
         char ch = std::char_traits<char>::to_char_type(gi);
         if (pred(ch)) {
             buf_.unget();
@@ -137,15 +147,19 @@ std::string SQLBlob::_readUntil(const CharPredicate& pred) {
 }
 
 std::string SQLBlob::_readUntil(char c) {
-    return _readUntil([c](char ch) { return c == ch; });
+    return _readUntil([c](char ch) {
+        return c == ch;
+    });
 }
 
 std::string SQLBlob::_readWhile(const CharPredicate& pred) {
-    return _readUntil([&pred](char c) { return !pred(c); });
+    return _readUntil([&pred](char c) {
+        return !pred(c);
+    });
 }
 
 void SQLBlob::_reset() {
     *this = SQLBlob();
 }
 
-}
+}  // namespace ursql

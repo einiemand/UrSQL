@@ -1,8 +1,8 @@
 #pragma once
 
+#include "ExecuteResult.hpp"
 #include "common/Macros.hpp"
 #include "parser/TokenEnums.hpp"
-#include "ExecuteResult.hpp"
 
 namespace ursql {
 

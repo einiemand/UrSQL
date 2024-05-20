@@ -1,9 +1,9 @@
 #include "statement/Statement.hpp"
 
 #include <format>
+#include <memory>
 
 #include "view/TextView.hpp"
-#include <memory>
 
 namespace ursql {
 
@@ -12,10 +12,9 @@ ExecuteResult NopStatement::run(DBManager&) const {
 }
 
 ExecuteResult HelpStatement::run(DBManager&) const {
-    constexpr const char str[] =
-      "help    - show guide on how to use UrSQL\n"
-      "version - show UrSQL version\n"
-      "quit    - quit UrSQL";
+    constexpr const char str[] = "help    - show guide on how to use UrSQL\n"
+                                 "version - show UrSQL version\n"
+                                 "quit    - quit UrSQL";
     return { std::make_unique<TextView>(str), false };
 }
 

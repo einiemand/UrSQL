@@ -76,7 +76,8 @@ Storage::Storage(const fs::path& filePath, CreateNewFile)
 }
 
 Storage::Storage(const fs::path& filePath, OpenExistingFile)
-    : file_(filePath, std::ios_base::binary | std::ios_base::in | std::ios_base::out) {
+    : file_(filePath,
+            std::ios_base::binary | std::ios_base::in | std::ios_base::out) {
     URSQL_EXPECT(file_, FileAccessError,
                  std::format("unable to open file {}", filePath.native()));
 }
@@ -105,7 +106,8 @@ void Storage::readBlock(Block& block, std::size_t blockNum) {
         }
 #endif
     } else {
-        URSQL_THROW_TRACED(FileAccessError, "unable to read from file. Probably offset issue");
+        URSQL_THROW_TRACED(FileAccessError,
+                           "unable to read from file. Probably offset issue");
     }
 }
 
@@ -121,7 +123,8 @@ void Storage::writeBlock(const Block& block, std::size_t blockNum) {
         }
 #endif
     } else {
-        URSQL_THROW_TRACED(FileAccessError, "unable to write to file. Probably offset issue");
+        URSQL_THROW_TRACED(FileAccessError,
+                           "unable to write to file. Probably offset issue");
     }
 }
 

@@ -34,7 +34,8 @@ public:
 
     //    Row generateNewRow(const std::vector<std::string>& fieldNames, const
     //    StringList& aValueStrs);
-    static constexpr const std::size_t npos = std::numeric_limits<std::size_t>::max();
+    static constexpr const std::size_t npos =
+      std::numeric_limits<std::size_t>::max();
 
 private:
     std::vector<Attribute> attributes_;

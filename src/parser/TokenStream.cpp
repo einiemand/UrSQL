@@ -2,7 +2,9 @@
 
 namespace ursql {
 
-TokenStream::TokenStream(std::vector<Token>&& tokens) : tokens_(std::move(tokens)), i_(0) {}
+TokenStream::TokenStream(std::vector<Token>&& tokens)
+    : tokens_(std::move(tokens)),
+      i_(0) {}
 
 bool TokenStream::hasNext() const noexcept {
     return remaining() > 0;

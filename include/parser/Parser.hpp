@@ -15,4 +15,4 @@ std::unique_ptr<Statement> parse(TokenStream& stream);
 
 }
 
-}
+}  // namespace ursql

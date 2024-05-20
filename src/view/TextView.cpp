@@ -8,4 +8,4 @@ void TextView::show(std::ostream& os) const {
     os << text_;
 }
 
-}
+}  // namespace ursql

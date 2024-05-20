@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Statement.hpp"
-
 #include <string>
+
+#include "Statement.hpp"
 
 namespace ursql {
 
@@ -58,6 +58,6 @@ std::unique_ptr<DropDBStatement> parseDropDBStatement(TokenStream& ts);
 std::unique_ptr<UseDBStatement> parseUseDBStatement(TokenStream& ts);
 std::unique_ptr<ShowDBStatement> parseShowDBStatement(TokenStream& ts);
 
-}
+}  // namespace parser
 
-}
+}  // namespace ursql
