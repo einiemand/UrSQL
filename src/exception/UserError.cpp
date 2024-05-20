@@ -21,4 +21,6 @@ MissingInput::MissingInput(std::string_view what) : UserError(std::format("missi
 
 UnexpectedInput::UnexpectedInput(std::string_view what) : UserError(std::format("unexpected input: {}", what)) {}
 
+RedundantInput::RedundantInput(TokenStream& ts) : UserError(std::format("redundant input: {}", ts.remainingToString())) {}
+
 }  // namespace ursql

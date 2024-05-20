@@ -72,14 +72,14 @@ public:
 
     [[nodiscard]] ValueType getType() const;
     [[nodiscard]] std::string toString() const;
+    [[nodiscard]] std::size_t displayWidth() const;
+    void show(std::ostream& os) const;
 
     void serialize(BufferWriter& aWriter) const override;
     void deserialize(BufferReader& aReader) override;
 
     friend bool operator<(const Value& lhs, const Value& rhs);
     friend bool operator==(const Value& lhs, const Value& rhs);
-    friend std::ostream& operator<<(std::ostream& anOutput,
-                                    const Value& aValue);
 
     static bool keywordIsValueType(Keyword aKeyword);
     static ValueType keyword2ValueType(Keyword aKeyword);
@@ -109,5 +109,7 @@ private:
     static_assert(std::is_same_v<varchar_t, var_alt_t<ValueType::varchar_type>>,
                   "varchar type should match variant index");
 };
+
+std::ostream& operator<<(std::ostream& os, const Value& val);
 
 }  // namespace ursql

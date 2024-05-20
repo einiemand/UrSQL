@@ -69,6 +69,19 @@ std::string Value::toString() const {
       }, var_);
 }
 
+std::size_t Value::displayWidth() const {
+    return toString().length();
+}
+
+void Value::show(std::ostream& os) const {
+    std::visit(overloaded{
+                 [&](auto&& val) { os << val; },
+                 [&](std::monostate) { os << "NULL"; },
+                 [&](bool_t boolVal) { os << (boolVal ? 't' : 'f'); },
+                 [&](const varchar_t&& varcharVal) { os << varcharVal; }
+    }, var_);
+}
+
 void Value::serialize(BufferWriter& writer) const {
     writer << getType();
     std::visit(overloaded{
@@ -102,6 +115,11 @@ void Value::deserialize(BufferReader& reader) {
     default:
         URSQL_UNREACHABLE(std::format("unknown value type: {}", type));
     }
+}
+
+std::ostream& operator<<(std::ostream& os, const Value& val) {
+    val.show(os);
+    return os;
 }
 
 bool Value::keywordIsValueType(Keyword aKeyword) {

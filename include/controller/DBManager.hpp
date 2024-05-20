@@ -16,6 +16,7 @@ public:
     void createDatabase(std::string_view dbName);
     void dropDatabase(std::string_view dbName);
     void useDatabase(std::string_view dbName);
+    static std::vector<std::string> getDatabaseNames();
 
 private:
     std::unique_ptr<Database> activeDB_;

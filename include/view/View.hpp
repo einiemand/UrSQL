@@ -1,6 +1,7 @@
 #pragma once
 
-#include <iostream>
+#include <ostream>
+#include "common/Macros.hpp"
 
 namespace ursql {
 
@@ -9,18 +10,9 @@ public:
     explicit View() = default;
     virtual ~View() = default;
 
+    URSQL_DISABLE_COPY(View);
+
     virtual void show(std::ostream& os) const = 0;
-};
-
-class TextView : public View {
-public:
-    explicit TextView(std::string text);
-    ~TextView() override = default;
-
-    void show(std::ostream& os) const override;
-
-private:
-    std::string text_;
 };
 
 }

@@ -35,6 +35,13 @@ std::unique_ptr<Statement> parseDropStatement(TokenStream& ts) {
     URSQL_THROW_NORMAL(UnknownCommand, ts);
 }
 
+std::unique_ptr<Statement> parseShowStatement(TokenStream& ts) {
+    if (ts.skipIf(Keyword::databases_kw)) {
+        return parseShowDBStatement(ts);
+    }
+    URSQL_THROW_NORMAL(UnknownCommand, ts);
+}
+
 }
 
 std::unique_ptr<Statement> parse(TokenStream& ts) {
@@ -52,6 +59,9 @@ std::unique_ptr<Statement> parse(TokenStream& ts) {
     }
     if (ts.skipIf(Keyword::use_kw)) {
         return parseUseDBStatement(ts);
+    }
+    if (ts.skipIf(Keyword::show_kw)) {
+        return parseShowStatement(ts);
     }
     URSQL_THROW_NORMAL(UnknownCommand, ts);
 }

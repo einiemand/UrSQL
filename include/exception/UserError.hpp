@@ -48,4 +48,10 @@ public:
     ~UnexpectedInput() override = default;
 };
 
+class RedundantInput : public UserError {
+public:
+    explicit RedundantInput(TokenStream& ts);
+    ~RedundantInput() override = default;
+};
+
 }  // namespace ursql

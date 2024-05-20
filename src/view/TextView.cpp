@@ -1,4 +1,4 @@
-#include "view/View.hpp"
+#include "view/TextView.hpp"
 
 namespace ursql {
 

@@ -2,7 +2,7 @@
 
 #include <format>
 
-#include "view/View.hpp"
+#include "view/TextView.hpp"
 #include <memory>
 
 namespace ursql {

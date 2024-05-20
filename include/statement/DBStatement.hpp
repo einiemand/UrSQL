@@ -41,6 +41,14 @@ public:
     [[nodiscard]] ExecuteResult run(DBManager& dbManager) const override;
 };
 
+class ShowDBStatement : public Statement {
+public:
+    explicit ShowDBStatement() = default;
+    ~ShowDBStatement() override = default;
+
+    [[nodiscard]] ExecuteResult run(DBManager&) const override;
+};
+
 class TokenStream;
 
 namespace parser {
@@ -48,6 +56,7 @@ namespace parser {
 std::unique_ptr<CreateDBStatement> parseCreateDBStatement(TokenStream& ts);
 std::unique_ptr<DropDBStatement> parseDropDBStatement(TokenStream& ts);
 std::unique_ptr<UseDBStatement> parseUseDBStatement(TokenStream& ts);
+std::unique_ptr<ShowDBStatement> parseShowDBStatement(TokenStream& ts);
 
 }
 

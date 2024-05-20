@@ -21,15 +21,11 @@ const Token& TokenStream::peek() const {
 }
 
 std::string TokenStream::toString() const {
-    if (tokens_.empty()) {
-        return {};
-    }
-    std::string str = tokens_[0].toString();
-    for (std::size_t i = 1; i < tokens_.size(); ++i) {
-        str += ' ';
-        str += tokens_[i].toString();
-    }
-    return str;
+    return _toString(0);
+}
+
+std::string TokenStream::remainingToString() const {
+    return _toString(i_);
 }
 
 bool TokenStream::skipIf(const TokenPredicate& pred) {
@@ -50,6 +46,18 @@ bool TokenStream::skipIf(Punctuation punctuation) {
     return skipIf([punctuation](const Token& token) {
         return token.is<TokenType::punctuation>(punctuation);
     });
+}
+
+std::string TokenStream::_toString(std::size_t i) const {
+    if (i >= tokens_.size()) {
+        return {};
+    }
+    std::string str = tokens_[i].toString();
+    for (; i < tokens_.size(); ++i) {
+        str += ' ';
+        str += tokens_[i].toString();
+    }
+    return str;
 }
 
 }  // namespace ursql

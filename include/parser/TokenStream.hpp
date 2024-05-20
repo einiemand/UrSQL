@@ -23,6 +23,7 @@ public:
     [[nodiscard]] const Token& peek() const;
 
     [[nodiscard]] std::string toString() const;
+    [[nodiscard]] std::string remainingToString() const;
 
     bool skipIf(const TokenPredicate& pred);
     bool skipIf(Keyword keyword);
@@ -31,6 +32,8 @@ public:
 private:
     std::vector<Token> tokens_;
     std::size_t i_;
+
+    std::string _toString(std::size_t i) const;
 };
 
 }  // namespace ursql

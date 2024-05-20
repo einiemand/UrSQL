@@ -7,11 +7,20 @@ namespace ursql {
 
 namespace {
 
-const fs::path directoryPath = fs::temp_directory_path();
+const fs::path directoryPath = fs::weakly_canonical(fs::temp_directory_path());
 const fs::path fileExtension = ".db";
 
 fs::path dbName2Path(std::string_view dbName) {
     return (directoryPath/dbName).replace_extension(fileExtension);
+}
+
+std::optional<std::string> dirEnt2DbName(const fs::directory_entry& entry) {
+    auto& path = entry.path();
+    URSQL_ASSERT(path.parent_path() == directoryPath, std::format("db file parent path should match. Expected={}, Actual={}", directoryPath.native(), path.parent_path().native()));
+    if (!entry.is_regular_file() || path.extension() != fileExtension || !path.has_stem()) {
+        return std::nullopt;
+    }
+    return path.stem();
 }
 
 }
@@ -38,6 +47,17 @@ void DBManager::useDatabase(std::string_view dbName) {
     if (!activeDB_ || activeDB_->getName() != dbName) {
         activeDB_ = std::make_unique<Database>(std::string(dbName), dbName2Path(dbName), OpenExistingFile{});
     }
+}
+
+std::vector<std::string> DBManager::getDatabaseNames() {
+    std::vector<std::string> dbNames;
+    std::ranges::for_each(fs::directory_iterator(directoryPath), [&dbNames](auto& entry) {
+        std::optional<std::string> dbNameOpt = dirEnt2DbName(entry);
+        if (dbNameOpt.has_value()) {
+            dbNames.push_back(std::move(dbNameOpt.value()));
+        }
+    });
+    return dbNames;
 }
 
 }
