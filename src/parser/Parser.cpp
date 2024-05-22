@@ -2,6 +2,7 @@
 
 #include "exception/UserError.hpp"
 #include "parser/TokenStream.hpp"
+#include "statement/CreateTableStatement.hpp"
 #include "statement/DBStatement.hpp"
 
 namespace ursql::parser {
@@ -24,6 +25,9 @@ std::unique_ptr<Statement> parseKeywordStatement(TokenStream& ts) {
 std::unique_ptr<Statement> parseCreateStatement(TokenStream& ts) {
     if (ts.skipIf(Keyword::database_kw)) {
         return CreateDBStatement::parse(ts);
+    }
+    if (ts.skipIf(Keyword::table_kw)) {
+        return CreateTableStatement::parse(ts);
     }
     URSQL_THROW_NORMAL(UnknownCommand, ts);
 }
@@ -70,7 +74,8 @@ std::string parseNextIdentifier(TokenStream& ts) {
     URSQL_EXPECT(ts.hasNext(), MissingInput, "identifier");
     auto& token = ts.next();
     URSQL_EXPECT(token.getType() == TokenType::identifier, UnexpectedInput,
-                 std::format("token type should be identifier but was {}", token.getType()));
+                 std::format("token type should be identifier but was {}",
+                             token.getType()));
     return token.get<TokenType::identifier>();
 }
 

@@ -6,7 +6,7 @@
 
 namespace ursql {
 
-class TOC : public LazySaveMonoStorable {
+class TOC : public MonoStorable {
 public:
     explicit TOC();
     ~TOC() override = default;

@@ -5,8 +5,8 @@
 #include "common/Messaging.hpp"
 #include "exception/InternalError.hpp"
 #include "exception/UserError.hpp"
-#include "persistence/BufferStream.hpp"
 #include "parser/TokenStream.hpp"
+#include "persistence/BufferStream.hpp"
 
 namespace ursql {
 
@@ -136,11 +136,13 @@ Value parseKeywordValue(Keyword keyword) {
     case Keyword::false_kw:
         return Value(false);
     default:
-        URSQL_THROW_NORMAL(UnexpectedInput, std::format("unsupported keyword {} used as Value", keyword));
+        URSQL_THROW_NORMAL(
+          UnexpectedInput,
+          std::format("unsupported keyword {} used as Value", keyword));
     }
 }
 
-}
+}  // namespace
 
 Value Value::parse(TokenStream& ts) {
     auto& token = ts.next();
@@ -152,7 +154,9 @@ Value Value::parse(TokenStream& ts) {
     case TokenType::text:
         return Value(token.get<TokenType::text>());
     default:
-        URSQL_THROW_NORMAL(UnexpectedInput, std::format("unrecognized default value {}", token.toString()));
+        URSQL_THROW_NORMAL(
+          UnexpectedInput,
+          std::format("unrecognized default value {}", token.toString()));
     }
 }
 

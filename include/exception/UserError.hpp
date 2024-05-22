@@ -54,4 +54,10 @@ public:
     ~RedundantInput() override = default;
 };
 
+class NoActiveDB : public UserError {
+public:
+    explicit NoActiveDB();
+    ~NoActiveDB() override = default;
+};
+
 }  // namespace ursql

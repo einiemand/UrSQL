@@ -11,8 +11,9 @@ public:
 
     URSQL_DISABLE_COPY(DBManager);
 
-    static bool databaseExists(std::string_view dbName);
+    Database* getActiveDB();
 
+    static bool databaseExists(std::string_view dbName);
     void createDatabase(std::string_view dbName);
     void dropDatabase(std::string_view dbName);
     void useDatabase(std::string_view dbName);

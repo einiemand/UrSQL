@@ -9,23 +9,23 @@ namespace ursql {
 
 class Row;
 
-class Entity : public LazySaveMonoStorable {
+class Entity : public MonoStorable {
 public:
     explicit Entity(std::size_t blockNum);
     ~Entity() override = default;
 
     URSQL_DISABLE_COPY(Entity);
+    URSQL_DEFAULT_MOVE(Entity);
 
     [[nodiscard]] BlockType expectedBlockType() const override;
     void serialize(BufferWriter& writer) const override;
     void deserialize(BufferReader& reader) override;
 
-    void addAttribute(Attribute&& attribute);
+    void setAttributes(std::vector<Attribute> attributes);
+    [[nodiscard]] const std::vector<Attribute>& getAttributes() const;
 
     std::size_t attributeIndex(std::string_view name) const;
     const Attribute& getAttribute(std::size_t index) const;
-
-    const std::vector<Attribute>& getAttributes() const;
 
     std::size_t getNextAutoInc();
 

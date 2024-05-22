@@ -29,4 +29,6 @@ UnexpectedInput::UnexpectedInput(std::string_view what)
 RedundantInput::RedundantInput(TokenStream& ts)
     : UserError(std::format("redundant input: {}", ts.remainingToString())) {}
 
+NoActiveDB::NoActiveDB() : UserError("No database selected") {}
+
 }  // namespace ursql

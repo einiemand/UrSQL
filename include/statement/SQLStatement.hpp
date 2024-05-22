@@ -13,4 +13,4 @@ protected:
     std::string tableName_;
 };
 
-}
+}  // namespace ursql

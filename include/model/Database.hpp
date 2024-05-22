@@ -16,8 +16,7 @@ class Order;
 
 class Database {
 public:
-    using EntityCache =
-      std::unordered_map<std::string, std::unique_ptr<Entity> >;
+    using EntityCache = std::unordered_map<std::string, Entity>;
 
     Database(std::string name, const fs::path& filePath, CreateNewFile);
     Database(std::string name, const fs::path& filePath, OpenExistingFile);
@@ -27,8 +26,8 @@ public:
 
     const std::string& getName() const;
 
-    //    StatusResult createTable(const AttributeList& anAttributeList,
-    //                             const std::string& anEntityName);
+    void createTable(const std::string& entityName,
+                     const std::vector<Attribute>& attributes);
     //
     //    StatusResult dropTable(const std::string& anEntityName,
     //                           size_type& aRowCount);

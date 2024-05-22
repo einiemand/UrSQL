@@ -128,14 +128,11 @@ void Storage::releaseBlock(std::size_t blockNum) {
 }
 
 void Storage::save(const MonoStorable& monoStorable) {
-    Block block;
-    monoStorable.encode(block);
-    writeBlock(block, monoStorable.getBlockNum());
-}
-
-void Storage::saveIfDirty(const LazySaveMonoStorable& lazySaveMonoStorable) {
-    if (lazySaveMonoStorable.isDirty()) {
-        save(lazySaveMonoStorable);
+    if (monoStorable.isDirty()) {
+        Block block;
+        monoStorable.encode(block);
+        writeBlock(block, monoStorable.getBlockNum());
+        monoStorable.makeDirty(false);
     }
 }
 
@@ -143,6 +140,7 @@ void Storage::load(MonoStorable& monoStorable) {
     Block block;
     readBlock(block, monoStorable.getBlockNum());
     monoStorable.decode(block);
+    monoStorable.makeDirty(false);
 }
 
 std::size_t Storage::findFreeBlockNumber() {

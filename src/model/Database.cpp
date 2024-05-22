@@ -1,7 +1,6 @@
 #include "model/Database.hpp"
 
-// #include "model/Filter.hpp"
-// #include "model/Order.hpp"
+#include "exception/UserError.hpp"
 
 namespace ursql {
 
@@ -22,9 +21,9 @@ Database::Database(std::string name, const fs::path& filePath, OpenExistingFile)
 }
 
 Database::~Database() {
-    storage_.saveIfDirty(toc_);
+    storage_.save(toc_);
     for (auto& [_, entity] : entityCache_) {
-        storage_.saveIfDirty(*entity);
+        storage_.save(entity);
     }
 }
 
@@ -32,31 +31,17 @@ const std::string& Database::getName() const {
     return name_;
 }
 
-// StatusResult Database::createTable(const AttributeList& anAttributeList,
-//                                    const std::string& anEntityName) {
-//     StatusResult theResult(Error::no_error);
-//     if (!_entityExists(anEntityName)) {
-//         blocknum_t theBlocknum;
-//         theResult = m_storage.findFreeBlocknumber(theBlocknum);
-//         if (theResult) {
-//             auto theEntity = std::make_unique<Entity>(theBlocknum);
-//             for (const auto& theAttribute : anAttributeList) {
-//                 theEntity->addAttribute(theAttribute);
-//             }
-//             if (theResult) {
-//                 theResult = m_storage.saveMonoStorable(*theEntity);
-//                 if (theResult) {
-//                     m_toc.add(anEntityName, theBlocknum);
-//                     _addEntityToCache(anEntityName, std::move(theEntity));
-//                 }
-//             }
-//         }
-//     } else {
-//         theResult.setError(Error::entity_exists, '\'' + anEntityName + '\'');
-//     }
-//     return theResult;
-// }
-//
+void Database::createTable(const std::string& entityName,
+                           const std::vector<Attribute>& attributes) {
+    URSQL_EXPECT(!toc_.entityExists(entityName), AlreadyExists, entityName);
+    std::size_t blockNum = storage_.findFreeBlockNumber();
+    Entity entity(blockNum);
+    entity.setAttributes(attributes);
+    storage_.save(entity);
+    toc_.addEntity(entityName, blockNum);
+    entityCache_.emplace(entityName, std::move(entity));
+}
+
 // StatusResult Database::dropTable(const std::string& anEntityName,
 //                                  size_type& aRowCount) {
 //     StatusResult theResult(Error::no_error);

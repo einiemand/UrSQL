@@ -1,7 +1,6 @@
 #include "model/Storable.hpp"
 
 #include <format>
-#include <iostream>
 
 #include "common/Messaging.hpp"
 #include "exception/InternalError.hpp"
@@ -11,7 +10,8 @@ namespace ursql {
 
 MonoStorable::MonoStorable(std::size_t blockNum)
     : Storable(),
-      blockNum_(blockNum) {}
+      blockNum_(blockNum),
+      dirty_(true) {}
 
 std::size_t MonoStorable::getBlockNum() const {
     return blockNum_;
@@ -33,15 +33,11 @@ void MonoStorable::decode(const Block& block) {
     deserialize(reader);
 }
 
-LazySaveMonoStorable::LazySaveMonoStorable(std::size_t blockNum)
-    : MonoStorable(blockNum),
-      dirty_(false) {}
-
-bool LazySaveMonoStorable::isDirty() const {
+bool MonoStorable::isDirty() const {
     return dirty_;
 }
 
-void LazySaveMonoStorable::makeDirty(bool dirty) const {
+void MonoStorable::makeDirty(bool dirty) const {
     dirty_ = dirty;
 }
 

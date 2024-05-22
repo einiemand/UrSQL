@@ -17,6 +17,6 @@ std::unique_ptr<Statement> parse(TokenStream& ts);
 std::string parseNextIdentifier(TokenStream& ts);
 std::string parseNextIdentifierAsLast(TokenStream& ts);
 
-}
+}  // namespace parser
 
 }  // namespace ursql

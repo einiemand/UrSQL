@@ -51,7 +51,6 @@ struct CreateNewFile {};
 
 class TOC;
 class MonoStorable;
-class LazySaveMonoStorable;
 
 namespace fs = std::filesystem;
 
@@ -74,7 +73,6 @@ public:
     std::size_t findFreeBlockNumber();
 
     void save(const MonoStorable& monoStorable);
-    void saveIfDirty(const LazySaveMonoStorable& lazySaveMonoStorable);
     void load(MonoStorable& monoStorable);
 
 private:

@@ -33,7 +33,7 @@ TabularView::TabularView(std::vector<std::string> headers,
 
 void TabularView::show(std::ostream& os) const {
     if (valueRows_.empty()) {
-        os << "empty set";
+        os << "Empty set";
         return;
     }
     std::vector<std::size_t> widths =
@@ -43,7 +43,8 @@ void TabularView::show(std::ostream& os) const {
     _printBreak(os, widths);
     _printValueRows(os, widths);
     _printBreak(os, widths);
-    os << valueRows_.size() << " row(s) in set";
+    os << valueRows_.size() << " row" << (valueRows_.size() > 1 ? "s" : "")
+       << " in set";
 }
 
 void TabularView::_printBreak(std::ostream& os,

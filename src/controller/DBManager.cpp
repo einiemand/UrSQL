@@ -32,6 +32,10 @@ std::optional<std::string> dirEnt2DbName(const fs::directory_entry& entry) {
 
 }  // namespace
 
+Database* DBManager::getActiveDB() {
+    return activeDB_.get();
+}
+
 bool DBManager::databaseExists(std::string_view dbName) {
     return fs::exists(dbName2Path(dbName));
 }

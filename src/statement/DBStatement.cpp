@@ -4,10 +4,10 @@
 
 #include "controller/DBManager.hpp"
 #include "exception/UserError.hpp"
-#include "parser/TokenStream.hpp"
-#include "view/TabularView.hpp"
-#include "view/TextView.hpp"
 #include "parser/Parser.hpp"
+#include "parser/TokenStream.hpp"
+#include "view/RowsAffectedTextView.hpp"
+#include "view/TabularView.hpp"
 
 namespace ursql {
 
@@ -20,13 +20,12 @@ CreateDBStatement::CreateDBStatement(std::string dbName)
 
 ExecuteResult CreateDBStatement::run(DBManager& dbManager) const {
     dbManager.createDatabase(dbName_);
-    return { std::make_unique<TextView>(
-               std::format("Database '{}' created", dbName_)),
-             false };
+    return { std::make_unique<RowsAffectedTextView>(1), false };
 }
 
 std::unique_ptr<CreateDBStatement> CreateDBStatement::parse(TokenStream& ts) {
-    return std::make_unique<CreateDBStatement>(parser::parseNextIdentifierAsLast(ts));
+    return std::make_unique<CreateDBStatement>(
+      parser::parseNextIdentifierAsLast(ts));
 }
 
 DropDBStatement::DropDBStatement(std::string dbName)
@@ -34,13 +33,12 @@ DropDBStatement::DropDBStatement(std::string dbName)
 
 ExecuteResult DropDBStatement::run(DBManager& dbManager) const {
     dbManager.dropDatabase(dbName_);
-    return { std::make_unique<TextView>(
-               std::format("Database '{}' dropped", dbName_)),
-             false };
+    return { std::make_unique<RowsAffectedTextView>(1), false };
 }
 
 std::unique_ptr<DropDBStatement> DropDBStatement::parse(TokenStream& ts) {
-    return std::make_unique<DropDBStatement>(parser::parseNextIdentifierAsLast(ts));
+    return std::make_unique<DropDBStatement>(
+      parser::parseNextIdentifierAsLast(ts));
 }
 
 UseDBStatement::UseDBStatement(std::string dbName)
@@ -52,7 +50,8 @@ ExecuteResult UseDBStatement::run(DBManager& dbManager) const {
 }
 
 std::unique_ptr<UseDBStatement> UseDBStatement::parse(TokenStream& ts) {
-    return std::make_unique<UseDBStatement>(parser::parseNextIdentifierAsLast(ts));
+    return std::make_unique<UseDBStatement>(
+      parser::parseNextIdentifierAsLast(ts));
 }
 
 class ShowDBView : public TabularView {

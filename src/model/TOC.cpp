@@ -2,13 +2,12 @@
 
 #include <format>
 
-#include "common/Messaging.hpp"
 #include "exception/InternalError.hpp"
 #include "persistence/BufferStream.hpp"
 
 namespace ursql {
 
-TOC::TOC() : LazySaveMonoStorable(0), entityPosMap_() {}
+TOC::TOC() : MonoStorable(0), entityPosMap_() {}
 
 BlockType TOC::expectedBlockType() const {
     return BlockType::toc;

@@ -2,14 +2,13 @@
 
 #include <format>
 
-#include "common/Messaging.hpp"
 #include "exception/InternalError.hpp"
 #include "persistence/BufferStream.hpp"
 
 namespace ursql {
 
 Entity::Entity(std::size_t blockNum)
-    : LazySaveMonoStorable(blockNum),
+    : MonoStorable(blockNum),
       attributes_(),
       autoInc_(1),
       rowBlockNums_() {}
@@ -42,9 +41,13 @@ void Entity::deserialize(BufferReader& reader) {
     }
 }
 
-void Entity::addAttribute(Attribute&& attribute) {
-    attributes_.emplace_back(std::move(attribute));
+void Entity::setAttributes(std::vector<Attribute> attributes) {
+    attributes_ = std::move(attributes);
     makeDirty(true);
+}
+
+const std::vector<Attribute>& Entity::getAttributes() const {
+    return attributes_;
 }
 
 std::size_t Entity::attributeIndex(std::string_view name) const {

@@ -27,19 +27,11 @@ public:
     void encode(Block& block) const;
     void decode(const Block& block);
 
-protected:
-    std::size_t blockNum_;
-};
-
-class LazySaveMonoStorable : public MonoStorable {
-public:
-    explicit LazySaveMonoStorable(std::size_t blockNum);
-    ~LazySaveMonoStorable() override = default;
-
     [[nodiscard]] bool isDirty() const;
     void makeDirty(bool dirty) const;
 
-private:
+protected:
+    std::size_t blockNum_;
     mutable bool dirty_;
 };
 

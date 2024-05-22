@@ -1,8 +1,8 @@
 #include "model/Attribute.hpp"
 
-#include "persistence/BufferStream.hpp"
 #include "parser/Parser.hpp"
 #include "parser/TokenStream.hpp"
+#include "persistence/BufferStream.hpp"
 
 namespace ursql {
 
@@ -84,7 +84,7 @@ ValueType parseNextValueType(TokenStream& ts) {
     URSQL_THROW_NORMAL(MissingInput, "attribute type");
 }
 
-}
+}  // namespace
 
 Attribute Attribute::parse(TokenStream& ts) {
     Attribute attribute;
@@ -97,18 +97,22 @@ Attribute Attribute::parse(TokenStream& ts) {
             attribute.setDefaultValue(Value::parse(ts));
             break;
         case Keyword::not_kw:
-            URSQL_EXPECT(ts.skipIf(Keyword::null_kw), UnexpectedInput, "'null' missing after 'not'");
+            URSQL_EXPECT(ts.skipIf(Keyword::null_kw), UnexpectedInput,
+                         "'null' missing after 'not'");
             attribute.setNullable(false);
             break;
         case Keyword::primary_kw:
-            URSQL_EXPECT(ts.skipIf(Keyword::key_kw), UnexpectedInput, "'key' missing after 'primary'");
+            URSQL_EXPECT(ts.skipIf(Keyword::key_kw), UnexpectedInput,
+                         "'key' missing after 'primary'");
             attribute.setPrimary();
             break;
         case Keyword::auto_increment_kw:
             attribute.setAutoInc();
             break;
         default:
-            URSQL_THROW_NORMAL(UnexpectedInput, std::format("unsupported keyword {} for an attribute", keyword));
+            URSQL_THROW_NORMAL(
+              UnexpectedInput,
+              std::format("unsupported keyword {} for an attribute", keyword));
         }
     }
     return attribute;
