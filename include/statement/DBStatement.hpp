@@ -1,8 +1,10 @@
 #pragma once
 
+#include <memory>
 #include <string>
 
 #include "Statement.hpp"
+#include "parser/TokenStream.hpp"
 
 namespace ursql {
 
@@ -23,6 +25,8 @@ public:
     ~CreateDBStatement() override = default;
 
     [[nodiscard]] ExecuteResult run(DBManager& dbManager) const override;
+
+    static std::unique_ptr<CreateDBStatement> parse(TokenStream& ts);
 };
 
 class DropDBStatement : public DBStatement {
@@ -31,6 +35,8 @@ public:
     ~DropDBStatement() override = default;
 
     [[nodiscard]] ExecuteResult run(DBManager& dbManager) const override;
+
+    static std::unique_ptr<DropDBStatement> parse(TokenStream& ts);
 };
 
 class UseDBStatement : public DBStatement {
@@ -39,6 +45,8 @@ public:
     ~UseDBStatement() override = default;
 
     [[nodiscard]] ExecuteResult run(DBManager& dbManager) const override;
+
+    static std::unique_ptr<UseDBStatement> parse(TokenStream& ts);
 };
 
 class ShowDBStatement : public Statement {
@@ -47,17 +55,8 @@ public:
     ~ShowDBStatement() override = default;
 
     [[nodiscard]] ExecuteResult run(DBManager&) const override;
+
+    static std::unique_ptr<ShowDBStatement> parse(TokenStream& ts);
 };
-
-class TokenStream;
-
-namespace parser {
-
-std::unique_ptr<CreateDBStatement> parseCreateDBStatement(TokenStream& ts);
-std::unique_ptr<DropDBStatement> parseDropDBStatement(TokenStream& ts);
-std::unique_ptr<UseDBStatement> parseUseDBStatement(TokenStream& ts);
-std::unique_ptr<ShowDBStatement> parseShowDBStatement(TokenStream& ts);
-
-}  // namespace parser
 
 }  // namespace ursql

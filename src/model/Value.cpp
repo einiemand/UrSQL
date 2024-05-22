@@ -4,7 +4,9 @@
 
 #include "common/Messaging.hpp"
 #include "exception/InternalError.hpp"
+#include "exception/UserError.hpp"
 #include "persistence/BufferStream.hpp"
+#include "parser/TokenStream.hpp"
 
 namespace ursql {
 
@@ -123,36 +125,40 @@ void Value::deserialize(BufferReader& reader) {
     }
 }
 
+namespace {
+
+Value parseKeywordValue(Keyword keyword) {
+    switch (keyword) {
+    case Keyword::null_kw:
+        return Value();
+    case Keyword::true_kw:
+        return Value(true);
+    case Keyword::false_kw:
+        return Value(false);
+    default:
+        URSQL_THROW_NORMAL(UnexpectedInput, std::format("unsupported keyword {} used as Value", keyword));
+    }
+}
+
+}
+
+Value Value::parse(TokenStream& ts) {
+    auto& token = ts.next();
+    switch (token.getType()) {
+    case TokenType::keyword:
+        return parseKeywordValue(token.get<TokenType::keyword>());
+    case TokenType::number:
+        return Value(token.get<TokenType::number>());
+    case TokenType::text:
+        return Value(token.get<TokenType::text>());
+    default:
+        URSQL_THROW_NORMAL(UnexpectedInput, std::format("unrecognized default value {}", token.toString()));
+    }
+}
+
 std::ostream& operator<<(std::ostream& os, const Value& val) {
     val.show(os);
     return os;
-}
-
-bool Value::keywordIsValueType(Keyword aKeyword) {
-    switch (aKeyword) {
-    case Keyword::integer_kw:
-    case Keyword::float_kw:
-    case Keyword::boolean_kw:
-    case Keyword::varchar_kw:
-        return true;
-    default:
-        return false;
-    }
-}
-
-ValueType Value::keyword2ValueType(Keyword keyword) {
-    switch (keyword) {
-    case Keyword::integer_kw:
-        return ValueType::int_type;
-    case Keyword::float_kw:
-        return ValueType::float_type;
-    case Keyword::boolean_kw:
-        return ValueType::bool_type;
-    case Keyword::varchar_kw:
-        return ValueType::varchar_type;
-    default:
-        URSQL_UNREACHABLE(std::format("unknown keyword: {}", keyword));
-    }
 }
 
 }  // namespace ursql

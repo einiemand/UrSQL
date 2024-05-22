@@ -7,6 +7,7 @@
 #include "parser/TokenStream.hpp"
 #include "view/TabularView.hpp"
 #include "view/TextView.hpp"
+#include "parser/Parser.hpp"
 
 namespace ursql {
 
@@ -24,6 +25,10 @@ ExecuteResult CreateDBStatement::run(DBManager& dbManager) const {
              false };
 }
 
+std::unique_ptr<CreateDBStatement> CreateDBStatement::parse(TokenStream& ts) {
+    return std::make_unique<CreateDBStatement>(parser::parseNextIdentifierAsLast(ts));
+}
+
 DropDBStatement::DropDBStatement(std::string dbName)
     : DBStatement(std::move(dbName)) {}
 
@@ -34,12 +39,20 @@ ExecuteResult DropDBStatement::run(DBManager& dbManager) const {
              false };
 }
 
+std::unique_ptr<DropDBStatement> DropDBStatement::parse(TokenStream& ts) {
+    return std::make_unique<DropDBStatement>(parser::parseNextIdentifierAsLast(ts));
+}
+
 UseDBStatement::UseDBStatement(std::string dbName)
     : DBStatement(std::move(dbName)) {}
 
 ExecuteResult UseDBStatement::run(DBManager& dbManager) const {
     dbManager.useDatabase(dbName_);
     return { std::make_unique<TextView>("Database changed"), false };
+}
+
+std::unique_ptr<UseDBStatement> UseDBStatement::parse(TokenStream& ts) {
+    return std::make_unique<UseDBStatement>(parser::parseNextIdentifierAsLast(ts));
 }
 
 class ShowDBView : public TabularView {
@@ -66,43 +79,9 @@ ExecuteResult ShowDBStatement::run(DBManager&) const {
     return { std::make_unique<ShowDBView>(dbNames), false };
 }
 
-namespace parser {
-
-namespace {
-
-std::string parseDatabaseName(TokenStream& ts) {
-    URSQL_EXPECT(ts.hasNext(), MissingInput, "database name");
-    auto& token = ts.next();
-    URSQL_EXPECT(token.getType() == TokenType::identifier, UnexpectedInput,
-                 "database name should be an identifier");
-    return token.get<TokenType::identifier>();
-}
-
-std::string parseDatabaseNameAsLast(TokenStream& ts) {
-    std::string dbName = parseDatabaseName(ts);
-    URSQL_EXPECT(!ts.hasNext(), RedundantInput, ts);
-    return dbName;
-}
-
-}  // namespace
-
-std::unique_ptr<CreateDBStatement> parseCreateDBStatement(TokenStream& ts) {
-    return std::make_unique<CreateDBStatement>(parseDatabaseNameAsLast(ts));
-}
-
-std::unique_ptr<DropDBStatement> parseDropDBStatement(TokenStream& ts) {
-    return std::make_unique<DropDBStatement>(parseDatabaseNameAsLast(ts));
-}
-
-std::unique_ptr<UseDBStatement> parseUseDBStatement(TokenStream& ts) {
-    return std::make_unique<UseDBStatement>(parseDatabaseNameAsLast(ts));
-}
-
-std::unique_ptr<ShowDBStatement> parseShowDBStatement(TokenStream& ts) {
+std::unique_ptr<ShowDBStatement> ShowDBStatement::parse(TokenStream& ts) {
     URSQL_EXPECT(!ts.hasNext(), RedundantInput, ts);
     return std::make_unique<ShowDBStatement>();
 }
-
-}  // namespace parser
 
 }  // namespace ursql

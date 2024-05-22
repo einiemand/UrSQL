@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Storable.hpp"
 #include "Value.hpp"
 
 namespace ursql {
@@ -39,6 +38,8 @@ public:
     [[nodiscard]] bool isPrimary() const;
 
     [[nodiscard]] bool isAutoInc() const;
+
+    static Attribute parse(TokenStream& ts);
 
 private:
     std::string name_;

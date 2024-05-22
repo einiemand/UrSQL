@@ -1,4 +1,4 @@
-#include "model/SQLStatement.hpp"
+#include "statement/SQLStatement.hpp"
 
 #include <unordered_set>
 

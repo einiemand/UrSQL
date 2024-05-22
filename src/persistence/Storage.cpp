@@ -8,12 +8,6 @@
 
 namespace ursql {
 
-namespace {
-
-constexpr const char fileExtension[] = ".db";
-
-}
-
 #ifdef ENABLE_BLOCKCACHE
 /* -------------------------------BlockCache------------------------------- */
 BlockCache::BlockCache(size_type aCapacity)

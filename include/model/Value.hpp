@@ -30,6 +30,8 @@ inline constexpr const std::size_t val_type_ordinal_v =
 
 }  // namespace
 
+class TokenStream;
+
 class Value : public Storable {
 public:
     using null_t = std::monostate;
@@ -78,11 +80,10 @@ public:
     void serialize(BufferWriter& aWriter) const override;
     void deserialize(BufferReader& aReader) override;
 
+    static Value parse(TokenStream& ts);
+
     friend bool operator<(const Value& lhs, const Value& rhs);
     friend bool operator==(const Value& lhs, const Value& rhs);
-
-    static bool keywordIsValueType(Keyword aKeyword);
-    static ValueType keyword2ValueType(Keyword aKeyword);
 
 private:
     using Var = std::variant<null_t, int_t, float_t, bool_t, varchar_t>;

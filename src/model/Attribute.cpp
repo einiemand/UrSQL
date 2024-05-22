@@ -1,6 +1,8 @@
 #include "model/Attribute.hpp"
 
 #include "persistence/BufferStream.hpp"
+#include "parser/Parser.hpp"
+#include "parser/TokenStream.hpp"
 
 namespace ursql {
 
@@ -60,6 +62,56 @@ bool Attribute::isPrimary() const {
 
 bool Attribute::isAutoInc() const {
     return isAutoInc_;
+}
+
+namespace {
+
+ValueType parseNextValueType(TokenStream& ts) {
+    if (ts.hasNext()) {
+        switch (ts.next().get<TokenType::keyword>()) {
+        case Keyword::integer_kw:
+            return ValueType::int_type;
+        case Keyword::float_kw:
+            return ValueType::float_type;
+        case Keyword::boolean_kw:
+            return ValueType::bool_type;
+        case Keyword::varchar_kw:
+            return ValueType::varchar_type;
+        default:
+            (void)0;
+        }
+    }
+    URSQL_THROW_NORMAL(MissingInput, "attribute type");
+}
+
+}
+
+Attribute Attribute::parse(TokenStream& ts) {
+    Attribute attribute;
+    attribute.setName(parser::parseNextIdentifier(ts));
+    attribute.setValueType(parseNextValueType(ts));
+    while (ts.hasNext() && ts.peek().getType() == TokenType::keyword) {
+        Keyword keyword = ts.next().get<TokenType::keyword>();
+        switch (keyword) {
+        case Keyword::default_kw:
+            attribute.setDefaultValue(Value::parse(ts));
+            break;
+        case Keyword::not_kw:
+            URSQL_EXPECT(ts.skipIf(Keyword::null_kw), UnexpectedInput, "'null' missing after 'not'");
+            attribute.setNullable(false);
+            break;
+        case Keyword::primary_kw:
+            URSQL_EXPECT(ts.skipIf(Keyword::key_kw), UnexpectedInput, "'key' missing after 'primary'");
+            attribute.setPrimary();
+            break;
+        case Keyword::auto_increment_kw:
+            attribute.setAutoInc();
+            break;
+        default:
+            URSQL_THROW_NORMAL(UnexpectedInput, std::format("unsupported keyword {} for an attribute", keyword));
+        }
+    }
+    return attribute;
 }
 
 }  // namespace ursql

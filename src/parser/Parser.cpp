@@ -23,21 +23,21 @@ std::unique_ptr<Statement> parseKeywordStatement(TokenStream& ts) {
 
 std::unique_ptr<Statement> parseCreateStatement(TokenStream& ts) {
     if (ts.skipIf(Keyword::database_kw)) {
-        return parseCreateDBStatement(ts);
+        return CreateDBStatement::parse(ts);
     }
     URSQL_THROW_NORMAL(UnknownCommand, ts);
 }
 
 std::unique_ptr<Statement> parseDropStatement(TokenStream& ts) {
     if (ts.skipIf(Keyword::database_kw)) {
-        return parseDropDBStatement(ts);
+        return DropDBStatement::parse(ts);
     }
     URSQL_THROW_NORMAL(UnknownCommand, ts);
 }
 
 std::unique_ptr<Statement> parseShowStatement(TokenStream& ts) {
     if (ts.skipIf(Keyword::databases_kw)) {
-        return parseShowDBStatement(ts);
+        return ShowDBStatement::parse(ts);
     }
     URSQL_THROW_NORMAL(UnknownCommand, ts);
 }
@@ -58,12 +58,26 @@ std::unique_ptr<Statement> parse(TokenStream& ts) {
         return parseDropStatement(ts);
     }
     if (ts.skipIf(Keyword::use_kw)) {
-        return parseUseDBStatement(ts);
+        return UseDBStatement::parse(ts);
     }
     if (ts.skipIf(Keyword::show_kw)) {
         return parseShowStatement(ts);
     }
     URSQL_THROW_NORMAL(UnknownCommand, ts);
+}
+
+std::string parseNextIdentifier(TokenStream& ts) {
+    URSQL_EXPECT(ts.hasNext(), MissingInput, "identifier");
+    auto& token = ts.next();
+    URSQL_EXPECT(token.getType() == TokenType::identifier, UnexpectedInput,
+                 std::format("token type should be identifier but was {}", token.getType()));
+    return token.get<TokenType::identifier>();
+}
+
+std::string parseNextIdentifierAsLast(TokenStream& ts) {
+    std::string id = parseNextIdentifier(ts);
+    URSQL_EXPECT(!ts.hasNext(), RedundantInput, ts);
+    return id;
 }
 
 }  // namespace ursql::parser
