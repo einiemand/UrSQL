@@ -43,6 +43,9 @@ std::unique_ptr<Statement> parseShowStatement(TokenStream& ts) {
     if (ts.skipIf(Keyword::databases_kw)) {
         return ShowDBStatement::parse(ts);
     }
+    if (ts.skipIf(Keyword::tables_kw)) {
+        return ShowTablesStatement::parse(ts);
+    }
     URSQL_THROW_NORMAL(UnknownCommand, ts);
 }
 

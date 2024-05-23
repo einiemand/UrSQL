@@ -61,4 +61,30 @@ std::unique_ptr<ShowDBStatement> ShowDBStatement::parse(TokenStream& ts) {
     return std::make_unique<ShowDBStatement>();
 }
 
+class ShowTablesView : public TabularView {
+public:
+    explicit ShowTablesView(const std::string& dbName, const std::vector<std::string>& tableNames) : TabularView({ std::format("Tables_in_{}", dbName) }, _tableNames2Rows(tableNames)) {}
+    ~ShowTablesView() override = default;
+private:
+    static std::vector<std::vector<Value>> _tableNames2Rows(const std::vector<std::string>& tableNames) {
+        std::vector<std::vector<Value>> rows;
+        rows.reserve(tableNames.size());
+        for (auto& tableName : tableNames) {
+            rows.push_back({ Value(tableName) });
+        }
+        return rows;
+    }
+};
+
+ExecuteResult ShowTablesStatement::run(DBManager& dbManager) const {
+    Database* activeDB = dbManager.getActiveDB();
+    URSQL_EXPECT(activeDB, NoActiveDB, );
+    return { std::make_unique<ShowTablesView>(activeDB->getName(), activeDB->getAllEntityNames()), false };
+}
+
+std::unique_ptr<ShowTablesStatement> ShowTablesStatement::parse(TokenStream& ts) {
+    URSQL_EXPECT(!ts.hasNext(), RedundantInput, ts);
+    return std::make_unique<ShowTablesStatement>();
+}
+
 }  // namespace ursql

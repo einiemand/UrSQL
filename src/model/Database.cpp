@@ -41,6 +41,10 @@ std::vector<BlockType> Database::getBlockTypes() {
     return blockTypes;
 }
 
+std::vector<std::string> Database::getAllEntityNames() const {
+    return toc_.getAllEntityNames();
+}
+
 void Database::createTable(const std::string& entityName,
                            const std::vector<Attribute>& attributes) {
     URSQL_EXPECT(!toc_.entityExists(entityName), AlreadyExists, entityName);

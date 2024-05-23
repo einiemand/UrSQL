@@ -59,8 +59,8 @@ void TOC::dropEntity(const std::string& entityName) {
 std::vector<std::string> TOC::getAllEntityNames() const {
     std::vector<std::string> entityNames;
     entityNames.reserve(entityPosMap_.size());
-    for (auto& p : entityPosMap_) {
-        entityNames.push_back(p.first);
+    for (auto& [entityName, _] : entityPosMap_) {
+        entityNames.push_back(entityName);
     }
     return entityNames;
 }

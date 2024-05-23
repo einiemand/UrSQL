@@ -24,9 +24,9 @@ public:
 
     URSQL_DISABLE_COPY(Database);
 
-    const std::string& getName() const;
-
-    std::vector<BlockType> getBlockTypes();
+    [[nodiscard]] const std::string& getName() const;
+    [[nodiscard]] std::vector<BlockType> getBlockTypes();
+    [[nodiscard]] std::vector<std::string> getAllEntityNames() const;
 
     void createTable(const std::string& entityName,
                      const std::vector<Attribute>& attributes);

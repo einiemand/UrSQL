@@ -60,4 +60,10 @@ public:
     ~NoActiveDB() override = default;
 };
 
+class InvalidCommand : public UserError {
+public:
+    explicit InvalidCommand(std::string_view what);
+    ~InvalidCommand() override = default;
+};
+
 }  // namespace ursql

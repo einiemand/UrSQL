@@ -17,6 +17,8 @@ public:
 
 private:
     const std::vector<Attribute> attributes_;
+
+    void _validateAttributes() const;
 };
 
 }  // namespace ursql

@@ -31,4 +31,6 @@ RedundantInput::RedundantInput(TokenStream& ts)
 
 NoActiveDB::NoActiveDB() : UserError("No database selected") {}
 
+InvalidCommand::InvalidCommand(std::string_view what) : UserError(std::format("invalid command: {}", what)) {}
+
 }  // namespace ursql

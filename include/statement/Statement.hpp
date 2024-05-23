@@ -61,4 +61,14 @@ public:
     static std::unique_ptr<ShowDBStatement> parse(TokenStream& ts);
 };
 
+class ShowTablesStatement : public Statement {
+public:
+    explicit ShowTablesStatement() = default;
+    ~ShowTablesStatement() override = default;
+
+    [[nodiscard]] ExecuteResult run(DBManager& dbManager) const override;
+
+    static std::unique_ptr<ShowTablesStatement> parse(TokenStream& ts);
+};
+
 }  // namespace ursql

@@ -21,6 +21,7 @@ std::ostream& err = std::cerr;
 int main(int argc, char* argv[]) {
     using namespace ursql;
 
+    out.setf(std::ios_base::left, std::ios_base::adjustfield);
     DBManager dbManager;
 
     SQLBlob blob;
