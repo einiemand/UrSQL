@@ -31,15 +31,35 @@ const std::string& Database::getName() const {
     return name_;
 }
 
+std::vector<BlockType> Database::getBlockTypes() {
+    std::size_t blockCnt = storage_.getBlockCount();
+    std::vector<BlockType> blockTypes;
+    blockTypes.reserve(blockCnt);
+    for (std::size_t i = 0; i < blockCnt; ++i) {
+        blockTypes.push_back(storage_.getBlockType(i));
+    }
+    return blockTypes;
+}
+
 void Database::createTable(const std::string& entityName,
                            const std::vector<Attribute>& attributes) {
     URSQL_EXPECT(!toc_.entityExists(entityName), AlreadyExists, entityName);
-    std::size_t blockNum = storage_.findFreeBlockNumber();
+    std::size_t blockNum = _findFreeBlockNumber();
     Entity entity(blockNum);
     entity.setAttributes(attributes);
     storage_.save(entity);
     toc_.addEntity(entityName, blockNum);
     entityCache_.emplace(entityName, std::move(entity));
+}
+
+std::size_t Database::_findFreeBlockNumber() {
+    std::size_t blockCnt = storage_.getBlockCount();
+    for (std::size_t i = 0; i < blockCnt; ++i) {
+        if (storage_.getBlockType(i) == BlockType::free) {
+            return i;
+        }
+    }
+    return blockCnt;
 }
 
 // StatusResult Database::dropTable(const std::string& anEntityName,

@@ -76,55 +76,29 @@ Storage::Storage(const fs::path& filePath, OpenExistingFile)
                  std::format("unable to open file {}", filePath.native()));
 }
 
-std::size_t Storage::_getBlockCount() {
+void Storage::readBlock(Block& block, std::size_t blockNum) {
+    _read(&block, Block::size * blockNum, Block::size);
+}
+
+void Storage::writeBlock(const Block& block, std::size_t blockNum) {
+    _write(&block, Block::size * blockNum, Block::size);
+}
+
+std::size_t Storage::getBlockCount() {
     file_.seekg(0, std::ios_base::end);
     std::size_t total = static_cast<std::size_t>(file_.tellg());
     return static_cast<std::size_t>(total / Block::size);
 }
 
-void Storage::readBlock(Block& block, std::size_t blockNum) {
-#ifdef ENABLE_BLOCKCACHE
-    if (m_blockCache.contains(aBlocknum)) {
-        aBlock = m_blockCache.get(aBlocknum);
-        return StatusResult(Error::no_error);
-    }
-#endif
-    if (file_.seekg(blockNum * Block::size)) {
-        if (!file_.read(reinterpret_cast<char*>(&block), Block::size)) {
-            URSQL_THROW_TRACED(FileAccessError, "unable to read from file");
-        }
-#ifdef ENABLE_BLOCKCACHE
-        else
-        {
-            m_blockCache.put(aBlocknum, aBlock);
-        }
-#endif
-    } else {
-        URSQL_THROW_TRACED(FileAccessError,
-                           "unable to read from file. Probably offset issue");
-    }
-}
-
-void Storage::writeBlock(const Block& block, std::size_t blockNum) {
-    if (file_.seekp(blockNum * Block::size)) {
-        if (!file_.write(reinterpret_cast<const char*>(&block), Block::size)) {
-            URSQL_THROW_TRACED(FileAccessError, "unable to write to file");
-        }
-#ifdef ENABLE_BLOCKCACHE
-        else
-        {
-            m_blockCache.put(aBlocknum, aBlock);
-        }
-#endif
-    } else {
-        URSQL_THROW_TRACED(FileAccessError,
-                           "unable to write to file. Probably offset issue");
-    }
+BlockType Storage::getBlockType(std::size_t blockNum) {
+    BlockType blockType;
+    _read(&blockType, Block::size * blockNum, sizeof(BlockType));
+    return blockType;
 }
 
 void Storage::releaseBlock(std::size_t blockNum) {
-    Block theBlock(BlockType::free);
-    writeBlock(theBlock, blockNum);
+    constexpr const BlockType freeType = BlockType::free;
+    _write(&freeType, Block::size * blockNum, sizeof(BlockType));
 }
 
 void Storage::save(const MonoStorable& monoStorable) {
@@ -143,16 +117,16 @@ void Storage::load(MonoStorable& monoStorable) {
     monoStorable.makeDirty(false);
 }
 
-std::size_t Storage::findFreeBlockNumber() {
-    std::size_t blockCnt = _getBlockCount();
-    for (std::size_t i = 0; i < blockCnt; ++i) {
-        Block block;
-        readBlock(block, i);
-        if (block.getType() == BlockType::free) {
-            return i;
-        }
-    }
-    return blockCnt;
+void Storage::_read(void* dst, std::size_t offset, std::size_t len) {
+    URSQL_EXPECT(file_.seekg(offset), FileAccessError, "seekg error");
+    URSQL_EXPECT(file_.read(static_cast<char*>(dst), len), FileAccessError,
+                 "read error");
+}
+
+void Storage::_write(const void* src, std::size_t offset, std::size_t len) {
+    URSQL_EXPECT(file_.seekp(offset), FileAccessError, "seekp error");
+    URSQL_EXPECT(file_.write(static_cast<const char*>(src), len),
+                 FileAccessError, "write error");
 }
 
 }  // namespace ursql

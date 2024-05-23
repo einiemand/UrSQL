@@ -7,13 +7,12 @@
 #include <unordered_map>
 
 #include "common/Macros.hpp"
+#include "Block.hpp"
 
 #ifndef ENABLE_BLOCKCACHE
 #endif
 
 namespace ursql {
-
-class Block;
 
 #ifdef ENABLE_BLOCKCACHE
 class BlockCache {
@@ -68,9 +67,10 @@ public:
 
     void readBlock(Block& block, std::size_t blockNum);
     void writeBlock(const Block& block, std::size_t blockNum);
-    void releaseBlock(std::size_t blockNum);
 
-    std::size_t findFreeBlockNumber();
+    std::size_t getBlockCount();
+    BlockType getBlockType(std::size_t blockNum);
+    void releaseBlock(std::size_t blockNum);
 
     void save(const MonoStorable& monoStorable);
     void load(MonoStorable& monoStorable);
@@ -80,7 +80,8 @@ private:
 #ifdef ENABLE_BLOCKCACHE
     BlockCache m_blockCache;
 #endif
-    std::size_t _getBlockCount();
+    void _read(void* dst, std::size_t offset, std::size_t len);
+    void _write(const void* src, std::size_t offset, std::size_t len);
 };
 
 }  // namespace ursql

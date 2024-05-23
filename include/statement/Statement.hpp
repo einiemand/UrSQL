@@ -7,6 +7,7 @@
 namespace ursql {
 
 class DBManager;
+class TokenStream;
 
 class Statement {
 public:
@@ -48,6 +49,16 @@ public:
     ~QuitStatement() override = default;
 
     [[nodiscard]] ExecuteResult run(DBManager&) const override;
+};
+
+class ShowDBStatement : public Statement {
+public:
+    explicit ShowDBStatement() = default;
+    ~ShowDBStatement() override = default;
+
+    [[nodiscard]] ExecuteResult run(DBManager&) const override;
+
+    static std::unique_ptr<ShowDBStatement> parse(TokenStream& ts);
 };
 
 }  // namespace ursql

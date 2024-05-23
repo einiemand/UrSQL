@@ -26,6 +26,8 @@ public:
 
     const std::string& getName() const;
 
+    std::vector<BlockType> getBlockTypes();
+
     void createTable(const std::string& entityName,
                      const std::vector<Attribute>& attributes);
     //
@@ -68,6 +70,8 @@ private:
     Storage storage_;
     TOC toc_;
     EntityCache entityCache_;
+
+    std::size_t _findFreeBlockNumber();
 };
 
 }  // namespace ursql

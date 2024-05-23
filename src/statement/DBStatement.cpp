@@ -3,7 +3,7 @@
 #include <format>
 
 #include "controller/DBManager.hpp"
-#include "exception/UserError.hpp"
+#include "exception/InternalError.hpp"
 #include "parser/Parser.hpp"
 #include "parser/TokenStream.hpp"
 #include "view/RowsAffectedTextView.hpp"
@@ -54,33 +54,64 @@ std::unique_ptr<UseDBStatement> UseDBStatement::parse(TokenStream& ts) {
       parser::parseNextIdentifierAsLast(ts));
 }
 
-class ShowDBView : public TabularView {
+class DescDBView : public TabularView {
 public:
-    explicit ShowDBView(const std::vector<std::string>& dbNames)
-        : TabularView({ "Database" }, _dbNames2Rows(dbNames)) {}
+    explicit DescDBView(const std::vector<BlockType>& blockTypes)
+        : TabularView({ "Index", "Type" }, _blockTypes2Rows(blockTypes)) {}
 
-    ~ShowDBView() override = default;
+    ~DescDBView() override = default;
 
 private:
-    static std::vector<std::vector<Value>> _dbNames2Rows(
-      const std::vector<std::string>& dbNames) {
-        std::vector<std::vector<Value>> rows;
-        rows.reserve(dbNames.size());
-        for (auto& dbName : dbNames) {
-            rows.push_back({ Value(dbName) });
+    static std::vector<std::vector<Value>> _blockTypes2Rows(
+      const std::vector<BlockType>& blockTypes) {
+        std::vector<std::vector<Value>> valueRows;
+        valueRows.reserve(blockTypes.size());
+        for (std::size_t i = 0; i < blockTypes.size(); ++i) {
+            std::vector<Value> valueRow;
+            valueRow.emplace_back(static_cast<Value::int_t>(i));
+            valueRow.emplace_back(_blockType2String(blockTypes[i]));
+            valueRows.push_back(std::move(valueRow));
         }
-        return rows;
+        return valueRows;
+    }
+
+    static std::string _blockType2String(BlockType blockType) {
+        switch (blockType) {
+        case BlockType::toc:
+            return "TOC";
+        case BlockType::entity:
+            return "Entity";
+        case BlockType::index:
+            return "Index";
+        case BlockType::row:
+            return "Row";
+        case BlockType::free:
+            return "Free";
+        default:
+            URSQL_UNREACHABLE(std::format("unknown block type {}", blockType));
+        }
     }
 };
 
-ExecuteResult ShowDBStatement::run(DBManager&) const {
-    std::vector<std::string> dbNames = DBManager::getDatabaseNames();
-    return { std::make_unique<ShowDBView>(dbNames), false };
+DescDBStatement::DescDBStatement(std::string dbName)
+    : DBStatement(std::move(dbName)) {}
+
+ExecuteResult DescDBStatement::run(DBManager& dbManager) const {
+    std::vector<BlockType> blockTypes;
+    if (Database* activeDB = dbManager.getActiveDB();
+        activeDB && activeDB->getName() == dbName_)
+    {
+        blockTypes = activeDB->getBlockTypes();
+    } else {
+        std::unique_ptr<Database> database = DBManager::getDBByName(dbName_);
+        blockTypes = database->getBlockTypes();
+    }
+    return { std::make_unique<DescDBView>(blockTypes), false };
 }
 
-std::unique_ptr<ShowDBStatement> ShowDBStatement::parse(TokenStream& ts) {
-    URSQL_EXPECT(!ts.hasNext(), RedundantInput, ts);
-    return std::make_unique<ShowDBStatement>();
+std::unique_ptr<DescDBStatement> DescDBStatement::parse(TokenStream& ts) {
+    return std::make_unique<DescDBStatement>(
+      parser::parseNextIdentifierAsLast(ts));
 }
 
 }  // namespace ursql

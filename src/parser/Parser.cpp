@@ -46,6 +46,13 @@ std::unique_ptr<Statement> parseShowStatement(TokenStream& ts) {
     URSQL_THROW_NORMAL(UnknownCommand, ts);
 }
 
+std::unique_ptr<Statement> parseDescStatement(TokenStream& ts) {
+    if (ts.skipIf(Keyword::database_kw)) {
+        return DescDBStatement::parse(ts);
+    }
+    URSQL_THROW_NORMAL(UnknownCommand, ts);
+}
+
 }  // namespace
 
 std::unique_ptr<Statement> parse(TokenStream& ts) {
@@ -66,6 +73,9 @@ std::unique_ptr<Statement> parse(TokenStream& ts) {
     }
     if (ts.skipIf(Keyword::show_kw)) {
         return parseShowStatement(ts);
+    }
+    if (ts.skipIf(Keyword::describe_kw) || ts.skipIf(Keyword::desc_kw)) {
+        return parseDescStatement(ts);
     }
     URSQL_THROW_NORMAL(UnknownCommand, ts);
 }

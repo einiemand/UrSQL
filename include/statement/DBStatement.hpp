@@ -49,14 +49,14 @@ public:
     static std::unique_ptr<UseDBStatement> parse(TokenStream& ts);
 };
 
-class ShowDBStatement : public Statement {
+class DescDBStatement : public DBStatement {
 public:
-    explicit ShowDBStatement() = default;
-    ~ShowDBStatement() override = default;
+    explicit DescDBStatement(std::string dbName);
+    ~DescDBStatement() override = default;
 
-    [[nodiscard]] ExecuteResult run(DBManager&) const override;
+    [[nodiscard]] ExecuteResult run(DBManager& dbManager) const override;
 
-    static std::unique_ptr<ShowDBStatement> parse(TokenStream& ts);
+    static std::unique_ptr<DescDBStatement> parse(TokenStream& ts);
 };
 
 }  // namespace ursql

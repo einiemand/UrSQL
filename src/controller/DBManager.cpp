@@ -36,6 +36,12 @@ Database* DBManager::getActiveDB() {
     return activeDB_.get();
 }
 
+std::unique_ptr<Database> DBManager::getDBByName(std::string_view dbName) {
+    URSQL_EXPECT(databaseExists(dbName), DoesNotExist, dbName);
+    return std::make_unique<Database>(std::string(dbName), dbName2Path(dbName),
+                                      OpenExistingFile{});
+}
+
 bool DBManager::databaseExists(std::string_view dbName) {
     return fs::exists(dbName2Path(dbName));
 }
