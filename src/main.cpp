@@ -22,7 +22,7 @@ int main(int argc, char* argv[]) {
     using namespace ursql;
 
     out.setf(std::ios_base::left, std::ios_base::adjustfield);
-    DBManager dbManager;
+    DBManager dbManager(fs::temp_directory_path(), ".db");
 
     SQLBlob blob;
     bool quit = false;

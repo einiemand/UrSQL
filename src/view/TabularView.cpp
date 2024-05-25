@@ -60,9 +60,10 @@ void TabularView::_printBreak(std::ostream& os,
 
 void TabularView::_printHeaders(std::ostream& os,
                                 const std::vector<std::size_t>& widths) const {
-    os << "| ";
+    os << '|';
     for (std::size_t i = 0; i < headers_.size(); ++i) {
-        os << std::setw(static_cast<int>(widths[i])) << headers_[i] << " |";
+        os << ' ' << std::setw(static_cast<int>(widths[i])) << headers_[i]
+           << " |";
     }
     os << '\n';
 }
@@ -70,9 +71,9 @@ void TabularView::_printHeaders(std::ostream& os,
 void TabularView::_printValueRows(
   std::ostream& os, const std::vector<std::size_t>& widths) const {
     for (auto& valueRow : valueRows_) {
-        os << "| ";
+        os << '|';
         for (std::size_t i = 0; i < valueRow.size(); ++i) {
-            os << std::setw(static_cast<int>(widths[i])) << valueRow[i]
+            os << ' ' << std::setw(static_cast<int>(widths[i])) << valueRow[i]
                << " |";
         }
         os << '\n';

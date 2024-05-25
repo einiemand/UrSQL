@@ -1,12 +1,13 @@
 #include "statement/CreateTableStatement.hpp"
 
+#include <unordered_set>
+
 #include "controller/DBManager.hpp"
 #include "exception/UserError.hpp"
 #include "model/Database.hpp"
 #include "parser/Parser.hpp"
 #include "parser/TokenStream.hpp"
 #include "view/RowsAffectedTextView.hpp"
-#include <unordered_set>
 
 namespace ursql {
 
@@ -39,16 +40,19 @@ std::unique_ptr<CreateTableStatement> CreateTableStatement::parse(
 }
 
 void CreateTableStatement::_validateAttributes() const {
-    URSQL_EXPECT(!attributes_.empty(), InvalidCommand, "attributes can't be empty");
+    URSQL_EXPECT(!attributes_.empty(), InvalidCommand,
+                 "attributes can't be empty");
     std::size_t autoIncCnt = 0;
     std::unordered_set<std::string> attrNames;
     for (auto& attribute : attributes_) {
         if (attribute.isAutoInc()) {
             ++autoIncCnt;
-            URSQL_EXPECT(autoIncCnt <= 1, InvalidCommand, "there can be only one auto inc column");
+            URSQL_EXPECT(autoIncCnt <= 1, InvalidCommand,
+                         "there can be only one auto inc column");
         }
-        URSQL_EXPECT(attrNames.insert(attribute.getName()).second,
-                     InvalidCommand, std::format("duplicate column name '{}'", attribute.getName()));
+        URSQL_EXPECT(
+          attrNames.insert(attribute.getName()).second, InvalidCommand,
+          std::format("duplicate column name '{}'", attribute.getName()));
     }
 }
 

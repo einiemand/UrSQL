@@ -56,7 +56,7 @@ public:
     explicit ShowDBStatement() = default;
     ~ShowDBStatement() override = default;
 
-    [[nodiscard]] ExecuteResult run(DBManager&) const override;
+    [[nodiscard]] ExecuteResult run(DBManager& dbManager) const override;
 
     static std::unique_ptr<ShowDBStatement> parse(TokenStream& ts);
 };

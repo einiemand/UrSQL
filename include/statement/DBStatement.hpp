@@ -10,18 +10,27 @@ namespace ursql {
 
 class DBManager;
 
-class DBStatement : public Statement {
+class SingleDBStatement : public Statement {
 public:
-    explicit DBStatement(std::string dbName);
-    ~DBStatement() override = default;
+    explicit SingleDBStatement(std::string dbName);
+    ~SingleDBStatement() override = default;
 
 protected:
     const std::string dbName_;
 };
 
-class CreateDBStatement : public DBStatement {
+class MultiDBStatement : public Statement {
 public:
-    explicit CreateDBStatement(std::string dbName);
+    explicit MultiDBStatement(std::vector<std::string> dbNames);
+    ~MultiDBStatement() override = default;
+
+protected:
+    const std::vector<std::string> dbNames_;
+};
+
+class CreateDBStatement : public MultiDBStatement {
+public:
+    explicit CreateDBStatement(std::vector<std::string> dbNames);
     ~CreateDBStatement() override = default;
 
     [[nodiscard]] ExecuteResult run(DBManager& dbManager) const override;
@@ -29,9 +38,9 @@ public:
     static std::unique_ptr<CreateDBStatement> parse(TokenStream& ts);
 };
 
-class DropDBStatement : public DBStatement {
+class DropDBStatement : public MultiDBStatement {
 public:
-    explicit DropDBStatement(std::string dbName);
+    explicit DropDBStatement(std::vector<std::string> dbNames);
     ~DropDBStatement() override = default;
 
     [[nodiscard]] ExecuteResult run(DBManager& dbManager) const override;
@@ -39,7 +48,7 @@ public:
     static std::unique_ptr<DropDBStatement> parse(TokenStream& ts);
 };
 
-class UseDBStatement : public DBStatement {
+class UseDBStatement : public SingleDBStatement {
 public:
     explicit UseDBStatement(std::string dbName);
     ~UseDBStatement() override = default;
@@ -49,7 +58,7 @@ public:
     static std::unique_ptr<UseDBStatement> parse(TokenStream& ts);
 };
 
-class DescDBStatement : public DBStatement {
+class DescDBStatement : public SingleDBStatement {
 public:
     explicit DescDBStatement(std::string dbName);
     ~DescDBStatement() override = default;

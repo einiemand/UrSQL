@@ -6,8 +6,8 @@
 #include <memory>
 #include <unordered_map>
 
-#include "common/Macros.hpp"
 #include "Block.hpp"
+#include "common/Macros.hpp"
 
 #ifndef ENABLE_BLOCKCACHE
 #endif

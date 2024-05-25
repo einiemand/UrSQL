@@ -51,8 +51,8 @@ private:
     }
 };
 
-ExecuteResult ShowDBStatement::run(DBManager&) const {
-    std::vector<std::string> dbNames = DBManager::getDatabaseNames();
+ExecuteResult ShowDBStatement::run(DBManager& dbManager) const {
+    std::vector<std::string> dbNames = dbManager.getDatabaseNames();
     return { std::make_unique<ShowDBView>(dbNames), false };
 }
 
@@ -63,10 +63,16 @@ std::unique_ptr<ShowDBStatement> ShowDBStatement::parse(TokenStream& ts) {
 
 class ShowTablesView : public TabularView {
 public:
-    explicit ShowTablesView(const std::string& dbName, const std::vector<std::string>& tableNames) : TabularView({ std::format("Tables_in_{}", dbName) }, _tableNames2Rows(tableNames)) {}
+    explicit ShowTablesView(const std::string& dbName,
+                            const std::vector<std::string>& tableNames)
+        : TabularView({ std::format("Tables_in_{}", dbName) },
+                      _tableNames2Rows(tableNames)) {}
+
     ~ShowTablesView() override = default;
+
 private:
-    static std::vector<std::vector<Value>> _tableNames2Rows(const std::vector<std::string>& tableNames) {
+    static std::vector<std::vector<Value>> _tableNames2Rows(
+      const std::vector<std::string>& tableNames) {
         std::vector<std::vector<Value>> rows;
         rows.reserve(tableNames.size());
         for (auto& tableName : tableNames) {
@@ -79,10 +85,13 @@ private:
 ExecuteResult ShowTablesStatement::run(DBManager& dbManager) const {
     Database* activeDB = dbManager.getActiveDB();
     URSQL_EXPECT(activeDB, NoActiveDB, );
-    return { std::make_unique<ShowTablesView>(activeDB->getName(), activeDB->getAllEntityNames()), false };
+    return { std::make_unique<ShowTablesView>(activeDB->getName(),
+                                              activeDB->getAllEntityNames()),
+             false };
 }
 
-std::unique_ptr<ShowTablesStatement> ShowTablesStatement::parse(TokenStream& ts) {
+std::unique_ptr<ShowTablesStatement> ShowTablesStatement::parse(
+  TokenStream& ts) {
     URSQL_EXPECT(!ts.hasNext(), RedundantInput, ts);
     return std::make_unique<ShowTablesStatement>();
 }

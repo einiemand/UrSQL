@@ -11,38 +11,46 @@
 
 namespace ursql {
 
-DBStatement::DBStatement(std::string dbName)
+SingleDBStatement::SingleDBStatement(std::string dbName)
     : Statement(),
       dbName_(std::move(dbName)) {}
 
-CreateDBStatement::CreateDBStatement(std::string dbName)
-    : DBStatement(std::move(dbName)) {}
+MultiDBStatement::MultiDBStatement(std::vector<std::string> dbNames)
+    : Statement(),
+      dbNames_(std::move(dbNames)) {}
+
+CreateDBStatement::CreateDBStatement(std::vector<std::string> dbNames)
+    : MultiDBStatement(std::move(dbNames)) {}
 
 ExecuteResult CreateDBStatement::run(DBManager& dbManager) const {
-    dbManager.createDatabase(dbName_);
-    return { std::make_unique<RowsAffectedTextView>(1), false };
+    dbManager.createDatabases(dbNames_);
+    return { std::make_unique<RowsAffectedTextView>(dbNames_.size()), false };
 }
 
 std::unique_ptr<CreateDBStatement> CreateDBStatement::parse(TokenStream& ts) {
-    return std::make_unique<CreateDBStatement>(
-      parser::parseNextIdentifierAsLast(ts));
+    std::vector<std::string> dbNames =
+      parser::parseCommaSeparated(ts, parser::parseNextIdentifier);
+    URSQL_EXPECT(!ts.hasNext(), RedundantInput, ts);
+    return std::make_unique<CreateDBStatement>(std::move(dbNames));
 }
 
-DropDBStatement::DropDBStatement(std::string dbName)
-    : DBStatement(std::move(dbName)) {}
+DropDBStatement::DropDBStatement(std::vector<std::string> dbNames)
+    : MultiDBStatement(std::move(dbNames)) {}
 
 ExecuteResult DropDBStatement::run(DBManager& dbManager) const {
-    dbManager.dropDatabase(dbName_);
-    return { std::make_unique<RowsAffectedTextView>(1), false };
+    dbManager.dropDatabases(dbNames_);
+    return { std::make_unique<RowsAffectedTextView>(dbNames_.size()), false };
 }
 
 std::unique_ptr<DropDBStatement> DropDBStatement::parse(TokenStream& ts) {
-    return std::make_unique<DropDBStatement>(
-      parser::parseNextIdentifierAsLast(ts));
+    std::vector<std::string> dbNames =
+      parser::parseCommaSeparated(ts, parser::parseNextIdentifier);
+    URSQL_EXPECT(!ts.hasNext(), RedundantInput, ts);
+    return std::make_unique<DropDBStatement>(std::move(dbNames));
 }
 
 UseDBStatement::UseDBStatement(std::string dbName)
-    : DBStatement(std::move(dbName)) {}
+    : SingleDBStatement(std::move(dbName)) {}
 
 ExecuteResult UseDBStatement::run(DBManager& dbManager) const {
     dbManager.useDatabase(dbName_);
@@ -94,7 +102,7 @@ private:
 };
 
 DescDBStatement::DescDBStatement(std::string dbName)
-    : DBStatement(std::move(dbName)) {}
+    : SingleDBStatement(std::move(dbName)) {}
 
 ExecuteResult DescDBStatement::run(DBManager& dbManager) const {
     std::vector<BlockType> blockTypes;
@@ -103,7 +111,8 @@ ExecuteResult DescDBStatement::run(DBManager& dbManager) const {
     {
         blockTypes = activeDB->getBlockTypes();
     } else {
-        std::unique_ptr<Database> database = DBManager::getDBByName(dbName_);
+        std::unique_ptr<Database> database =
+          dbManager.getExistingDBByName(dbName_);
         blockTypes = database->getBlockTypes();
     }
     return { std::make_unique<DescDBView>(blockTypes), false };
