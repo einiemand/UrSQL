@@ -4,6 +4,7 @@
 #include "parser/TokenStream.hpp"
 #include "statement/CreateTableStatement.hpp"
 #include "statement/DBStatement.hpp"
+#include "statement/DropTableStatement.hpp"
 
 namespace ursql::parser {
 
@@ -35,6 +36,9 @@ std::unique_ptr<Statement> parseCreateStatement(TokenStream& ts) {
 std::unique_ptr<Statement> parseDropStatement(TokenStream& ts) {
     if (ts.skipIf(Keyword::database_kw)) {
         return DropDBStatement::parse(ts);
+    }
+    if (ts.skipIf(Keyword::table_kw)) {
+        return DropTableStatement::parse(ts);
     }
     URSQL_THROW_NORMAL(UnknownCommand, ts);
 }

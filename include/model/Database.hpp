@@ -30,6 +30,9 @@ public:
 
     void createTable(const std::string& entityName,
                      const std::vector<Attribute>& attributes);
+
+    void dropTables(const std::vector<std::string>& entityNames);
+
     //
     //    StatusResult dropTable(const std::string& anEntityName,
     //                           size_type& aRowCount);
@@ -58,8 +61,6 @@ public:
     //        return m_storage;
     //    }
     //
-    //    Entity* getEntityByName(const std::string& anEntityName,
-    //                            StatusResult& aResult);
     //
     //    inline StringList collectEntityNames() const {
     //        return m_toc.collectEntityNames();
@@ -71,7 +72,10 @@ private:
     TOC toc_;
     EntityCache entityCache_;
 
-    std::size_t _findFreeBlockNumber();
+    [[nodiscard]] std::size_t _findFreeBlockNumber();
+    [[nodiscard]] Entity& _getEntityByName(const std::string& entityName);
+    void _addEntity(const std::string& entityName, Entity& entity);
+    void _dropEntity(const std::string& entityName);
 };
 
 }  // namespace ursql

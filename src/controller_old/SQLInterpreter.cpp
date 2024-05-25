@@ -3,7 +3,7 @@
 #include "model/Database.hpp"
 #include "model/Filter.hpp"
 #include "model/Order.hpp"
-#include "statement/SQLStatement.hpp"
+#include "statement/TableStatement.hpp"
 #include "token/Tokenizer.hpp"
 #include "view/View.hpp"
 

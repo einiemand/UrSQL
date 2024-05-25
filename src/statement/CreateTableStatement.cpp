@@ -13,7 +13,7 @@ namespace ursql {
 
 CreateTableStatement::CreateTableStatement(std::string tableName,
                                            std::vector<Attribute> attributes)
-    : SQLStatement(std::move(tableName)),
+    : SingleTableStatement(std::move(tableName)),
       attributes_(std::move(attributes)) {}
 
 ExecuteResult CreateTableStatement::run(DBManager& dbManager) const {

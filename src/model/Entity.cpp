@@ -88,6 +88,10 @@ void Entity::dropRowPosition(std::size_t blockNum) {
     makeDirty(true);
 }
 
+const std::vector<std::size_t>& Entity::getRowBlockNums() const {
+    return rowBlockNums_;
+}
+
 // StatusResult Entity::generateNewRow(Row& aRow, const StringList& aFieldNames,
 //                                     const StringList& aValueStrs) {
 //     StatusResult theResult(Error::no_error);

@@ -1,5 +1,3 @@
-#include "statement/SQLStatement.hpp"
-
 #include <unordered_set>
 
 #include "controller/SQLInterpreter.hpp"
@@ -8,6 +6,7 @@
 #include "model/Filter.hpp"
 #include "model/Order.hpp"
 #include "model/Row.hpp"
+#include "statement/TableStatement.hpp"
 #include "token/Tokenizer.hpp"
 
 namespace ursql {

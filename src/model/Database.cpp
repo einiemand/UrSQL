@@ -1,6 +1,7 @@
 #include "model/Database.hpp"
 
 #include "exception/UserError.hpp"
+#include "model/Entity.hpp"
 
 namespace ursql {
 
@@ -51,9 +52,16 @@ void Database::createTable(const std::string& entityName,
     std::size_t blockNum = _findFreeBlockNumber();
     Entity entity(blockNum);
     entity.setAttributes(attributes);
-    storage_.save(entity);
-    toc_.addEntity(entityName, blockNum);
-    entityCache_.emplace(entityName, std::move(entity));
+    _addEntity(entityName, entity);
+}
+
+void Database::dropTables(const std::vector<std::string>& entityNames) {
+    std::ranges::for_each(entityNames, [this](const std::string& entityName) {
+        URSQL_EXPECT(toc_.entityExists(entityName), DoesNotExist, entityName);
+    });
+    std::ranges::for_each(entityNames, [this](const std::string& entityName) {
+        _dropEntity(entityName);
+    });
 }
 
 std::size_t Database::_findFreeBlockNumber() {
@@ -273,24 +281,34 @@ std::size_t Database::_findFreeBlockNumber() {
 //     return theResult;
 // }
 //
-// Entity* Database::getEntityByName(const std::string& anEntityName,
-//                                   StatusResult& aResult) {
-//     Entity* theObserver = nullptr;
-//     if (_entityExists(anEntityName)) {
-//         if (!_entityCached(anEntityName)) {
-//             blocknum_t theEntityPos = m_toc.getEntityPosByName(anEntityName);
-//             auto theEntity = std::make_unique<Entity>(theEntityPos);
-//             aResult = m_storage.decodeMonoStorable(*theEntity);
-//             if (aResult) {
-//                 _addEntityToCache(anEntityName, std::move(theEntity));
-//             }
-//         }
-//         if (aResult) {
-//             theObserver = m_entityCache[anEntityName].get();
-//         }
-//     }
-//     return theObserver;
-// }
+Entity& Database::_getEntityByName(const std::string& entityName) {
+    auto it = entityCache_.find(entityName);
+    if (it == std::end(entityCache_)) {
+        std::size_t blockNum = toc_.getEntityPosByName(entityName);
+        Entity entity(blockNum);
+        storage_.load(entity);
+        it = entityCache_.emplace(entityName, std::move(entity)).first;
+    }
+    return it->second;
+}
+
+void Database::_addEntity(const std::string& entityName, Entity& entity) {
+    storage_.save(entity);
+    toc_.addEntity(entityName, entity.getBlockNum());
+    entityCache_.emplace(entityName, std::move(entity));
+}
+
+void Database::_dropEntity(const std::string& entityName) {
+    Entity& entity = _getEntityByName(entityName);
+    std::ranges::for_each(entity.getRowBlockNums(),
+                          [this](std::size_t rowBlockNum) {
+                              storage_.releaseBlock(rowBlockNum);
+                          });
+    storage_.releaseBlock(entity.getBlockNum());
+    toc_.dropEntity(entityName);
+    entityCache_.erase(entityName);
+}
+
 //
 // void Database::_addEntityToCache(const std::string& anEntityName,
 //                                  std::unique_ptr<Entity>&& anEntity) {

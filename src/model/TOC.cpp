@@ -2,7 +2,7 @@
 
 #include <format>
 
-#include "exception/InternalError.hpp"
+#include "exception/UserError.hpp"
 #include "persistence/BufferStream.hpp"
 
 namespace ursql {
@@ -35,23 +35,20 @@ bool TOC::entityExists(const std::string& entityName) const {
 
 std::size_t TOC::getEntityPosByName(const std::string& entityName) const {
     auto it = entityPosMap_.find(entityName);
-    URSQL_ASSERT(it != std::end(entityPosMap_),
-                 std::format("entity {} doesn't exist", entityName));
+    URSQL_EXPECT(it != std::end(entityPosMap_), DoesNotExist, entityName);
     return it->second;
 }
 
 void TOC::addEntity(const std::string& entityName, std::size_t blockNum) {
     auto it = entityPosMap_.find(entityName);
-    URSQL_ASSERT(it == std::end(entityPosMap_),
-                 std::format("entity {} already exists", entityName));
+    URSQL_EXPECT(it == std::end(entityPosMap_), AlreadyExists, entityName);
     entityPosMap_.emplace(entityName, blockNum);
     makeDirty(true);
 }
 
 void TOC::dropEntity(const std::string& entityName) {
     auto it = entityPosMap_.find(entityName);
-    URSQL_ASSERT(it != std::end(entityPosMap_),
-                 std::format("entity {} doesn't exist", entityName));
+    URSQL_EXPECT(it != std::end(entityPosMap_), DoesNotExist, entityName);
     entityPosMap_.erase(it);
     makeDirty(true);
 }

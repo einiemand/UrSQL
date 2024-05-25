@@ -1,11 +1,11 @@
 #include <vector>
 
-#include "SQLStatement.hpp"
+#include "TableStatement.hpp"
 #include "model/Attribute.hpp"
 
 namespace ursql {
 
-class CreateTableStatement : public SQLStatement {
+class CreateTableStatement : public SingleTableStatement {
 public:
     CreateTableStatement(std::string tableName,
                          std::vector<Attribute> attributes);

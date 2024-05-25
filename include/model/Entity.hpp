@@ -31,6 +31,7 @@ public:
 
     void addRowPosition(std::size_t blockNum);
     void dropRowPosition(std::size_t blockNum);
+    const std::vector<std::size_t>& getRowBlockNums() const;
 
     //    Row generateNewRow(const std::vector<std::string>& fieldNames, const
     //    StringList& aValueStrs);
