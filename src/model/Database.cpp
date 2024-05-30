@@ -1,9 +1,47 @@
 #include "model/Database.hpp"
 
+#include <format>
+#include <numeric>
+
 #include "exception/UserError.hpp"
 #include "model/Entity.hpp"
+#include "model/Row.hpp"
 
 namespace ursql {
+
+namespace {
+
+std::vector<bool> validateSpecifiedAttributes(
+  const std::vector<Attribute>& attributes,
+  const std::vector<std::size_t>& attrIndexes) {
+    std::vector<bool> attrSpecified(attributes.size(), false);
+    for (std::size_t index : attrIndexes) {
+        URSQL_EXPECT(!attrSpecified[index], InvalidCommand,
+                     std::format("'{}' specified more than once",
+                                 attributes[index].getName()));
+        attrSpecified[index] = true;
+    }
+    return attrSpecified;
+}
+
+void validateInsertValueLists(const std::vector<std::vector<Value>>& valueLists,
+                              const std::vector<Attribute>& attributes,
+                              const std::vector<std::size_t>& attrIndexes) {
+    for (auto& valueList : valueLists) {
+        URSQL_EXPECT(valueList.size() == attrIndexes.size(), MisMatch,
+                     "column count and value count");
+        for (std::size_t i = 0; i < valueList.size(); ++i) {
+            if (valueList[i].isNull()) {
+                auto& attribute = attributes[attrIndexes[i]];
+                URSQL_EXPECT(
+                  attribute.isNullable(), InvalidCommand,
+                  std::format("'{}' can't be null", attribute.getName()));
+            }
+        }
+    }
+}
+
+}  // namespace
 
 Database::Database(std::string name, const fs::path& filePath, CreateNewFile)
     : name_(std::move(name)),
@@ -56,12 +94,32 @@ void Database::createTable(const std::string& entityName,
 }
 
 void Database::dropTables(const std::vector<std::string>& entityNames) {
-    std::ranges::for_each(entityNames, [this](const std::string& entityName) {
+    for (auto& entityName : entityNames) {
         URSQL_EXPECT(toc_.entityExists(entityName), DoesNotExist, entityName);
-    });
-    std::ranges::for_each(entityNames, [this](const std::string& entityName) {
+    }
+    for (auto& entityName : entityNames) {
         _dropEntity(entityName);
-    });
+    }
+}
+
+void Database::insertIntoTable(
+  const std::string& entityName,
+  const std::optional<std::vector<std::string>>& attrNamesOpt,
+  const std::vector<std::vector<Value>>& valueLists) {
+    Entity& entity = _getEntityByName(entityName);
+    std::vector<std::size_t> attrIndexes;
+    if (attrNamesOpt.has_value()) {
+        auto& attrNames = attrNamesOpt.value();
+        attrIndexes.reserve(attrNames.size());
+        for (auto& attrName : attrNames) {
+            attrIndexes.push_back(entity.attributeIndex(attrName));
+        }
+    } else {
+        auto& attributes = entity.getAttributes();
+        attrIndexes.resize(attributes.size());
+        std::iota(std::begin(attrIndexes), std::end(attrIndexes), 0);
+    }
+    _insertIntoTableInternal(entity, attrIndexes, valueLists);
 }
 
 std::size_t Database::_findFreeBlockNumber() {
@@ -300,13 +358,54 @@ void Database::_addEntity(const std::string& entityName, Entity& entity) {
 
 void Database::_dropEntity(const std::string& entityName) {
     Entity& entity = _getEntityByName(entityName);
-    std::ranges::for_each(entity.getRowBlockNums(),
-                          [this](std::size_t rowBlockNum) {
-                              storage_.releaseBlock(rowBlockNum);
-                          });
+    for (std::size_t rowBlockNum : entity.getRowBlockNums()) {
+        storage_.releaseBlock(rowBlockNum);
+    }
     storage_.releaseBlock(entity.getBlockNum());
     toc_.dropEntity(entityName);
     entityCache_.erase(entityName);
+}
+
+void Database::_insertIntoTableInternal(
+  Entity& entity, const std::vector<std::size_t>& attrIndexes,
+  const std::vector<std::vector<Value>>& valueLists) {
+    auto& attributes = entity.getAttributes();
+    std::vector<bool> attrSpecified =
+      validateSpecifiedAttributes(attributes, attrIndexes);
+    validateInsertValueLists(valueLists, attributes, attrIndexes);
+    std::vector<std::vector<Value>> valueRows;
+    valueRows.reserve(valueLists.size());
+    for (auto& valueList : valueLists) {
+        std::vector<Value> valueRow(attributes.size());
+        for (std::size_t i = 0; i < attributes.size(); ++i) {
+            if (!attrSpecified[i]) {
+                auto& attribute = attributes[i];
+                URSQL_EXPECT(
+                  !attribute.mustBeSpecified(), InvalidCommand,
+                  std::format("'{}' must be specified", attribute.getName()));
+                valueRow[i] =
+                  attribute.isAutoInc() ?
+                    Value(static_cast<Value::int_t>(entity.getNextAutoInc())) :
+                    attribute.getDefaultValue();
+            }
+        }
+        for (std::size_t i = 0; i < attrIndexes.size(); ++i) {
+            std::size_t attrIndex = attrIndexes[i];
+            auto& attribute = attributes[attrIndex];
+            valueRow[attrIndex] = valueList[i].cast(attribute.getType());
+            if (attribute.isAutoInc()) {
+                entity.updateAutoInc(
+                  valueRow[attrIndex].raw<ValueType::int_type>());
+            }
+        }
+        valueRows.push_back(std::move(valueRow));
+    }
+    for (auto& valueRow : valueRows) {
+        std::size_t blockNum = _findFreeBlockNumber();
+        Row row(blockNum, std::move(valueRow));
+        storage_.save(row);
+        entity.addRowPosition(blockNum);
+    }
 }
 
 //

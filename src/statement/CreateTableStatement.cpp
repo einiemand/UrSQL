@@ -42,14 +42,28 @@ std::unique_ptr<CreateTableStatement> CreateTableStatement::parse(
 void CreateTableStatement::_validateAttributes() const {
     URSQL_EXPECT(!attributes_.empty(), InvalidCommand,
                  "attributes can't be empty");
-    std::size_t autoIncCnt = 0;
+    bool autoIncDefined = false;
+    bool primaryKeyDefined = false;
     std::unordered_set<std::string> attrNames;
     for (auto& attribute : attributes_) {
         if (attribute.isAutoInc()) {
-            ++autoIncCnt;
-            URSQL_EXPECT(autoIncCnt <= 1, InvalidCommand,
-                         "there can be only one auto inc column");
+            URSQL_EXPECT(!autoIncDefined, InvalidCommand,
+                         "there can be only one auto_increment column");
+            autoIncDefined = true;
+            URSQL_EXPECT(attribute.isPrimary(), InvalidCommand,
+                         "auto_increment column should be a key");
+            URSQL_EXPECT(attribute.getType() == ValueType::int_type, MisMatch,
+                         "auto_increment column should be integer type");
         }
+        if (attribute.isPrimary()) {
+            URSQL_EXPECT(!primaryKeyDefined, InvalidCommand,
+                         "multiple primary keys defined");
+            primaryKeyDefined = true;
+        }
+        URSQL_EXPECT(
+          attribute.getDefaultValue().castableTo(attribute.getType()), MisMatch,
+          std::format("default value type doesn't match '{}' type",
+                      attribute.getName()));
         URSQL_EXPECT(
           attrNames.insert(attribute.getName()).second, InvalidCommand,
           std::format("duplicate column name '{}'", attribute.getName()));

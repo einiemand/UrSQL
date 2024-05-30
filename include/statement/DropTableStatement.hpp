@@ -14,4 +14,4 @@ public:
     static std::unique_ptr<DropTableStatement> parse(TokenStream& ts);
 };
 
-}
+}  // namespace ursql

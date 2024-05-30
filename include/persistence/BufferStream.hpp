@@ -52,7 +52,7 @@ public:
     BufferReader& operator>>(Storable& storable);
 
     template<typename T>
-    T read() {
+    auto read() {
         T val;
         *this >> val;
         return val;

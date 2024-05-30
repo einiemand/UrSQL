@@ -28,16 +28,18 @@ void Attribute::setDefaultValue(Value defaultValue) {
     defaultValue_ = std::move(defaultValue);
 }
 
-void Attribute::setNullable(bool isNullable) {
-    isNullable_ = isNullable;
+void Attribute::setNotNullable() {
+    isNullable_ = false;
 }
 
 void Attribute::setPrimary() {
     isPrimary_ = true;
+    setNotNullable();
 }
 
 void Attribute::setAutoInc() {
     isAutoInc_ = true;
+    setNotNullable();
 }
 
 const std::string& Attribute::getName() const {
@@ -62,6 +64,10 @@ bool Attribute::isPrimary() const {
 
 bool Attribute::isAutoInc() const {
     return isAutoInc_;
+}
+
+bool Attribute::mustBeSpecified() const {
+    return !isNullable() && getDefaultValue().isNull();
 }
 
 namespace {
@@ -99,7 +105,7 @@ Attribute Attribute::parse(TokenStream& ts) {
         case Keyword::not_kw:
             URSQL_EXPECT(ts.skipIf(Keyword::null_kw), UnexpectedInput,
                          "'null' missing after 'not'");
-            attribute.setNullable(false);
+            attribute.setNotNullable();
             break;
         case Keyword::primary_kw:
             URSQL_EXPECT(ts.skipIf(Keyword::key_kw), UnexpectedInput,

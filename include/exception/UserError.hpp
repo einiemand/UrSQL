@@ -66,4 +66,10 @@ public:
     ~InvalidCommand() override = default;
 };
 
+class MisMatch : public UserError {
+public:
+    explicit MisMatch(std::string_view what);
+    ~MisMatch() override = default;
+};
+
 }  // namespace ursql

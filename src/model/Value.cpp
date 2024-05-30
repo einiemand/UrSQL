@@ -53,6 +53,65 @@ ValueType Value::getType() const {
     return static_cast<ValueType>(var_.index());
 }
 
+bool Value::isNull() const {
+    return getType() == ValueType::null_type;
+}
+
+bool Value::castableTo(ValueType type) const {
+    switch (getType()) {
+    case ValueType::null_type:
+        return true;
+    case ValueType::int_type:
+    case ValueType::float_type:
+        return type == ValueType::int_type || type == ValueType::float_type;
+    case ValueType::bool_type:
+        return type == ValueType::bool_type;
+    case ValueType::varchar_type:
+        return type == ValueType::varchar_type;
+    default:
+        URSQL_UNREACHABLE(std::format("unknown cast type {}", type));
+    }
+}
+
+Value Value::cast(ValueType type) const {
+    return std::visit(
+      overloaded{
+        [](null_t) {
+            return Value();
+        },
+        [type](int_t intVal) {
+            switch (type) {
+            case ValueType::int_type:
+                return Value(intVal);
+            case ValueType::float_type:
+                return Value(static_cast<float_t>(intVal));
+            default:
+                URSQL_THROW_NORMAL(MisMatch, "column type and value type");
+            }
+        },
+        [type](float_t floatVal) {
+            switch (type) {
+            case ValueType::int_type:
+                return Value(static_cast<int_t>(floatVal));
+            case ValueType::float_type:
+                return Value(floatVal);
+            default:
+                URSQL_THROW_NORMAL(MisMatch, "column type and value type");
+            }
+        },
+        [type](bool_t boolVal) {
+            URSQL_EXPECT(type == ValueType::bool_type, MisMatch,
+                         "column type and value type");
+            return Value(boolVal);
+        },
+        [type](const varchar_t& varcharVal) {
+            URSQL_EXPECT(type == ValueType::varchar_type, MisMatch,
+                         "column type and value type");
+            return Value(varcharVal);
+        } },
+      var_);
+}
+
 std::string Value::toString() const {
     return std::visit(overloaded{ [](auto&& val) {
                                      return std::to_string(val);
@@ -156,7 +215,7 @@ Value Value::parse(TokenStream& ts) {
     default:
         URSQL_THROW_NORMAL(
           UnexpectedInput,
-          std::format("unrecognized default value {}", token.toString()));
+          std::format("unrecognized input as value {}", token.toString()));
     }
 }
 

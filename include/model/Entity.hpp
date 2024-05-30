@@ -7,8 +7,6 @@
 
 namespace ursql {
 
-class Row;
-
 class Entity : public MonoStorable {
 public:
     explicit Entity(std::size_t blockNum);
@@ -28,6 +26,7 @@ public:
     const Attribute& getAttribute(std::size_t index) const;
 
     std::size_t getNextAutoInc();
+    void updateAutoInc(std::size_t i);
 
     void addRowPosition(std::size_t blockNum);
     void dropRowPosition(std::size_t blockNum);

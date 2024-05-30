@@ -73,9 +73,17 @@ public:
       std::is_nothrow_move_assignable_v<Var>) = default;
 
     [[nodiscard]] ValueType getType() const;
+    [[nodiscard]] bool isNull() const;
+    [[nodiscard]] bool castableTo(ValueType type) const;
+    [[nodiscard]] Value cast(ValueType type) const;
     [[nodiscard]] std::string toString() const;
     [[nodiscard]] std::size_t displayWidth() const;
     void show(std::ostream& os) const;
+
+    template<ValueType type>
+    decltype(auto) raw() const {
+        return std::get<val_type_ordinal_v<type>>(var_);
+    }
 
     void serialize(BufferWriter& aWriter) const override;
     void deserialize(BufferReader& aReader) override;

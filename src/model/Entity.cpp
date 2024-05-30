@@ -3,6 +3,7 @@
 #include <format>
 
 #include "exception/InternalError.hpp"
+#include "exception/UserError.hpp"
 #include "persistence/BufferStream.hpp"
 
 namespace ursql {
@@ -10,7 +11,7 @@ namespace ursql {
 Entity::Entity(std::size_t blockNum)
     : MonoStorable(blockNum),
       attributes_(),
-      autoInc_(1),
+      autoInc_(0),
       rowBlockNums_() {}
 
 BlockType Entity::expectedBlockType() const {
@@ -51,13 +52,11 @@ const std::vector<Attribute>& Entity::getAttributes() const {
 }
 
 std::size_t Entity::attributeIndex(std::string_view name) const {
-    auto it = std::find_if(std::begin(attributes_), std::end(attributes_),
-                           [&](auto& attribute) {
-                               return attribute.getName() == name;
-                           });
-    return it == std::end(attributes_) ?
-             npos :
-             std::distance(std::begin(attributes_), it);
+    auto it = std::ranges::find_if(attributes_, [name](auto& attribute) {
+        return attribute.getName() == name;
+    });
+    URSQL_EXPECT(it != std::end(attributes_), DoesNotExist, name);
+    return std::distance(std::begin(attributes_), it);
 }
 
 const Attribute& Entity::getAttribute(std::size_t index) const {
@@ -67,7 +66,14 @@ const Attribute& Entity::getAttribute(std::size_t index) const {
 
 std::size_t Entity::getNextAutoInc() {
     makeDirty(true);
-    return autoInc_++;
+    return ++autoInc_;
+}
+
+void Entity::updateAutoInc(std::size_t i) {
+    if (i > autoInc_) {
+        autoInc_ = i;
+        makeDirty(true);
+    }
 }
 
 void Entity::addRowPosition(std::size_t blockNum) {

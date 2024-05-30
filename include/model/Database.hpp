@@ -33,13 +33,11 @@ public:
 
     void dropTables(const std::vector<std::string>& entityNames);
 
-    //
-    //    StatusResult dropTable(const std::string& anEntityName,
-    //                           size_type& aRowCount);
-    //
-    //    StatusResult insertIntoTable(
-    //      const std::string& anEntityName, const StringList& aFieldNames,
-    //      const std::vector<StringList>& aValueStrsOfRows);
+    void insertIntoTable(
+      const std::string& entityName,
+      const std::optional<std::vector<std::string>>& attrNames,
+      const std::vector<std::vector<Value>>& valueLists);
+
     //
     //    StatusResult selectFromTable(RowCollection& aRowCollection,
     //                                 const std::string& anEntityName,
@@ -76,6 +74,10 @@ private:
     [[nodiscard]] Entity& _getEntityByName(const std::string& entityName);
     void _addEntity(const std::string& entityName, Entity& entity);
     void _dropEntity(const std::string& entityName);
+
+    void _insertIntoTableInternal(
+      Entity& entity, const std::vector<std::size_t>& attrIndexes,
+      const std::vector<std::vector<Value>>& valueLists);
 };
 
 }  // namespace ursql

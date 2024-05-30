@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Statement.hpp"
-
 #include <vector>
+
+#include "Statement.hpp"
 
 namespace ursql {
 
